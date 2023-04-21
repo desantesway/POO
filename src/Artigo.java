@@ -4,15 +4,24 @@ public abstract class Artigo {
     private String marca;
     private double precoBase;
     private double desconto;
+    private boolean novo;
 
     // construtor, getters e setters
-
-    public Artigo(String id, String descricao, String marca, double precoBase, double desconto) {
+    public Artigo(String id, String descricao, String marca, double precoBase, double desconto, boolean novo) {
         this.id = id;
         this.descricao = descricao;
         this.marca = marca;
         this.precoBase = precoBase;
         this.desconto = desconto;
+        this.novo = novo;
+    }
+
+    public boolean isNovo() {
+        return novo;
+    }
+
+    public void setNovo(boolean novo) {
+        this.novo = novo;
     }
 
     public String getId() {

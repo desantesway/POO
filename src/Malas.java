@@ -2,18 +2,18 @@ public class Malas extends Artigo{
     private String tamanho;
     private String material;
     private int anoColecao;
-    private boolean novo;
     private double estadoUtilizacao;
     private boolean premium;
 
     // construtores, getters e setters
 
-    public Malas(String id, String descricao, String marca, double precoBase, double desconto) {
-        super(id, descricao, marca, precoBase, desconto);
+
+    public Malas(String id, String descricao, String marca, double precoBase, double desconto,
+                 boolean novo, String tamanho, String material, int anoColecao, double estadoUtilizacao, boolean premium) {
+        super(id, descricao, marca, precoBase, desconto, novo);
         this.tamanho = tamanho;
         this.material = material;
         this.anoColecao = anoColecao;
-        this.novo = novo;
         this.estadoUtilizacao = estadoUtilizacao;
         this.premium = premium;
     }
@@ -30,10 +30,6 @@ public class Malas extends Artigo{
         return anoColecao;
     }
 
-    public boolean isNovo() {
-        return novo;
-    }
-
     public double getEstadoUtilizacao() {
         return estadoUtilizacao;
     }
@@ -44,7 +40,9 @@ public class Malas extends Artigo{
 
     @Override
     public double calculaPreco() {
-        if (premium){
-        return getPrecoBase() * ;
+        if (premium) {
+            return getPrecoBase();
+        }
+        return 0.01;
     }
 }

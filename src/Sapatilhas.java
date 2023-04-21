@@ -4,22 +4,21 @@ public class Sapatilhas extends Artigo {
     private String cor;
     private int anoColecao;
     private int numeroDonos;
-    private boolean novo;
     private double estadoUtilizacao;
     private boolean premium;
 
     // construtor, getters e setters
 
+
     public Sapatilhas(String id, String descricao, String marca, double precoBase, double desconto,
-                   int tamanho, boolean atacadores, String cor, int anoColecao, int numeroDonos,
-                   boolean novo, double estadoUtilizacao, boolean Premium) {
-        super(id, descricao, marca, precoBase, desconto);
+                      boolean novo, int tamanho, boolean atacadores, String cor, int anoColecao,
+                      int numeroDonos, double estadoUtilizacao, boolean premium) {
+        super(id, descricao, marca, precoBase, desconto, novo);
         this.tamanho = tamanho;
         this.atacadores = atacadores;
         this.cor = cor;
         this.anoColecao = anoColecao;
         this.numeroDonos = numeroDonos;
-        this.novo = novo;
         this.estadoUtilizacao = estadoUtilizacao;
         this.premium = premium;
     }
@@ -44,10 +43,6 @@ public class Sapatilhas extends Artigo {
         return numeroDonos;
     }
 
-    public boolean isNovo() {
-        return novo;
-    }
-
     public double getEstadoUtilizacao(){
         return estadoUtilizacao;
     }
@@ -61,7 +56,7 @@ public class Sapatilhas extends Artigo {
         if (premium) {
             return getPrecoBase() * 1+ getDesconto();
         } else {
-            if (this.novo && this.tamanho > 45) {
+            if (super.isNovo() && this.tamanho > 45) {
                 return (getPrecoBase() / getNumeroDonos())* getEstadoUtilizacao() ;
             } else {
                 return getPrecoBase();

@@ -1,14 +1,18 @@
+import java.util.Objects;
+
 public class TShirt extends Artigo {
     private String tamanho;
     private String padrao;
 
+
     // construtores, getters e setters
 
-
-    public TShirt(String id, String descricao, String marca, double precoBase, double desconto, boolean novo, String tamanho, String padrao) {
-        super(id, descricao, marca, precoBase, desconto, novo);
+    public TShirt(String id, String descricao, String marca, double precoBase, double desconto, int numeroDonos) {
+        super(id, descricao, marca, precoBase, desconto, numeroDonos);
         this.tamanho = tamanho;
         this.padrao = padrao;
+
+
     }
 
     public String getTamanho(){
@@ -19,22 +23,42 @@ public class TShirt extends Artigo {
         return padrao;
     }
 
-    public String setTamanho(){
-        return tamanho;
+    public void setTamanho(){
+        this.tamanho = tamanho;
     }
 
-    public String setPadrao(){
-        return padrao;
+    public void setPadrao(){
+        this.padrao = padrao;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TShirt)) return false;
+        if (!super.equals(o)) return false;
+
+        TShirt tShirt = (TShirt) o;
+
+        if (!getTamanho().equals(tShirt.getTamanho())) return false;
+        return getPadrao().equals(tShirt.getPadrao());
     }
 
 
     @Override
     public double calculaPreco() {
-        if (this.padrao.equals("liso")) {
-            return getPrecoBase();
+        double preco = getPrecoBase();
+        if (padrao.equals("liso")) {
+            return preco;
         } else {
-            return getPrecoBase() * 0.5;
+            if (getNumeroDonos() > 0) {
+                preco -= (preco * 0.50); // desconto de 50% no preço
+            } else {
+                return preco;
+
+            }
         }
+        return preco;
     }
 
 

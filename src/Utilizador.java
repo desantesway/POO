@@ -130,7 +130,7 @@ public class Utilizador {
     }
 
     // Método para adicionar uma venda efetuada à lista de vendas efetuadas
-    public void adicionarVendaEfetuada(Venda venda) {
+    public void adicionarVendaEfetuada(Artigo venda) {
         this.vendasEfetuadas.add(venda);
     }
 

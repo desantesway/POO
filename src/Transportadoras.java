@@ -1,37 +1,139 @@
+import java.time.LocalDate;
+import java.util.Objects;
+
 public class Transportadoras {
-    private int nenc;
-    private double imposto;
-    private double valorBase;
-    private double profit;
-    private double precoExport;
+    private double valorBaseP, valorBaseM, valorBaseG, imposto, precoExp, precoPremium, profit;
+    //private Triple<Double, Double, Double> triple;
+    private Boolean premium, enviado;
+    private LocalDate dataEnviado;
+    private String formulaPreco, formulaPremium;
 
-    // construtor, getters e setters
+    // calcula o preco do premium com formula (ainda sem a formula)
+    public void premium(String dimensao){
+        if (this.getPremium()){
+            double valorbase = 0;
+            if (Objects.equals(dimensao, "pequeno")){
+                valorbase = this.getValorBaseP();
+            } else if (Objects.equals(dimensao, "medio")){
+                valorbase = this.getValorBaseM();
+            } else if (Objects.equals(dimensao, "grande")){
+                valorbase = this.getValorBaseG();
+            }
+            this.setPrecoPremium((valorbase * this.getProfit() * (1 + this.getImposto())) * 0.9);
+        } else{
+            System.out.println("Esta transportadora não tem o premium ativado!\n");
+        }
+    }
 
-    public Transportadoras(int nenc, double imposto) {
-        this.nenc = nenc;
+    // calcula o preco com formula (ainda sem a formula)
+    public void preco(String dimensao){
+        double valorbase = 0;
+        if (Objects.equals(dimensao, "pequeno")){
+            valorbase = this.getValorBaseP();
+        } else if (Objects.equals(dimensao, "medio")){
+            valorbase = this.getValorBaseM();
+        } else if (Objects.equals(dimensao, "grande")){
+            valorbase = this.getValorBaseG();
+        }
+        this.setPrecoExp((valorbase * this.getProfit() * (1 + this.getImposto())) * 0.9);
+    }
+
+    //a transportadora envia o artigo
+    public void enviar(){
+        if(this.getEnviado()){
+            System.out.println("A transportadora já enviou este artigo!");
+        } else{
+            this.setEnviado(true);
+            this.setDataEnviado(LocalDate.now());
+        }
+    }
+
+    //ativa o premium na transportadora
+    public void ativaPremium(){
+        this.setPremium(true);
+    }
+
+    //desativa o premium na transportadora
+    public void desativaPremium(){
+        this.setPremium(false);
+    }
+
+    // constructor, clone, tostring, getters e setters
+
+    public Transportadoras(Transportadoras other) {
+        this.valorBaseP = other.valorBaseP;
+        this.valorBaseM = other.valorBaseM;
+        this.valorBaseG = other.valorBaseG;
+        this.imposto = other.imposto;
+        this.precoExp = other.precoExp;
+        this.precoPremium = other.precoPremium;
+        this.profit = other.profit;
+        this.premium = other.premium;
+        this.enviado = other.enviado;
+        this.dataEnviado = other.dataEnviado;
+        this.formulaPreco = other.formulaPreco;
+        this.formulaPremium = other.formulaPremium;
+    }
+
+    public Transportadoras(double valorBaseP, double valorBaseM, double valorBaseG, double imposto) {
+        this.valorBaseP = valorBaseP;
+        this.valorBaseM = valorBaseM;
+        this.valorBaseG = valorBaseG;
         this.imposto = imposto;
+        this.setProfit(0);
+        this.setPrecoExp(0);
+        this.setPrecoPremium(0);
+        this.setPremium(false);
+        this.setEnviado(false);
+        this.setDataEnviado(null);
     }
 
-    public Transportadoras(int nenc, double imposto, double precoExport) {
-        this.nenc = nenc;
-        this.imposto = imposto;
-        this.precoExport = precoExport;
+    public String getFormulaPreco() {
+        return formulaPreco;
     }
 
-    public double getPrecoExport() {
-        return precoExport;
+    public void setFormulaPreco(String formulaPreco) {
+        this.formulaPreco = formulaPreco;
     }
 
-    public void setPrecoExport(double precoExport) {
-        this.precoExport = precoExport;
+    public String getFormulaPremium() {
+        return formulaPremium;
     }
 
-    public int getNenc() {
-        return nenc;
+    public void setFormulaPremium(String formulaPremium) {
+        this.formulaPremium = formulaPremium;
     }
 
-    public void setNenc(int nenc) {
-        this.nenc = nenc;
+    public double getProfit() {
+        return profit;
+    }
+
+    public void setProfit(double profit) {
+        this.profit = profit;
+    }
+
+    public double getValorBaseP() {
+        return valorBaseP;
+    }
+
+    public void setValorBaseP(double valorBaseP) {
+        this.valorBaseP = valorBaseP;
+    }
+
+    public double getValorBaseM() {
+        return valorBaseM;
+    }
+
+    public void setValorBaseM(double valorBaseM) {
+        this.valorBaseM = valorBaseM;
+    }
+
+    public double getValorBaseG() {
+        return valorBaseG;
+    }
+
+    public void setValorBaseG(double valorBaseG) {
+        this.valorBaseG = valorBaseG;
     }
 
     public double getImposto() {
@@ -42,19 +144,76 @@ public class Transportadoras {
         this.imposto = imposto;
     }
 
-    public double getValorBase() {
-        return valorBase;
+    public double getPrecoExp() {
+        return precoExp;
     }
 
-    public void setValorBase(double valorBase) {
-        this.valorBase = valorBase;
+    public void setPrecoExp(double precoExp) {
+        this.precoExp = precoExp;
     }
 
-    public double getProfit() {
-        return profit;
+    public double getPrecoPremium() {
+        return precoPremium;
     }
 
-    public void setProfit(double profit) {
-        this.profit = profit;
+    public void setPrecoPremium(double precoPremium) {
+        this.precoPremium = precoPremium;
+    }
+
+    public Boolean getPremium() {
+        return premium;
+    }
+
+    public void setPremium(Boolean premium) {
+        this.premium = premium;
+    }
+
+    public Boolean getEnviado() {
+        return enviado;
+    }
+
+    public void setEnviado(Boolean enviado) {
+        this.enviado = enviado;
+    }
+
+    public LocalDate getDataEnviado() {
+        return dataEnviado;
+    }
+
+    public void setDataEnviado(LocalDate dataEnviado) {
+        this.dataEnviado = dataEnviado;
+    }
+    @Override
+    public Transportadoras clone(){
+        return new Transportadoras(this);
+    }
+    @Override
+    public String toString() {
+        return "Transportadoras{" +
+                "valorBaseP=" + valorBaseP +
+                ", valorBaseM=" + valorBaseM +
+                ", valorBaseG=" + valorBaseG +
+                ", imposto=" + imposto +
+                ", precoExp=" + precoExp +
+                ", precoPremium=" + precoPremium +
+                ", profit=" + profit +
+                ", premium=" + premium +
+                ", enviado=" + enviado +
+                ", dataEnviado=" + dataEnviado +
+                ", formulaPreco='" + formulaPreco + '\'' +
+                ", formulaPremium='" + formulaPremium + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Transportadoras that)) return false;
+        return Double.compare(that.getValorBaseP(), getValorBaseP()) == 0 && Double.compare(that.getValorBaseM(), getValorBaseM()) == 0 && Double.compare(that.getValorBaseG(), getValorBaseG()) == 0 && Double.compare(that.getImposto(), getImposto()) == 0 && Double.compare(that.getPrecoExp(), getPrecoExp()) == 0 && Double.compare(that.getPrecoPremium(), getPrecoPremium()) == 0 && Double.compare(that.getProfit(), getProfit()) == 0 && Objects.equals(getPremium(), that.getPremium()) && Objects.equals(getEnviado(), that.getEnviado()) && Objects.equals(getDataEnviado(), that.getDataEnviado()) && Objects.equals(getFormulaPreco(), that.getFormulaPreco()) && Objects.equals(getFormulaPremium(), that.getFormulaPremium());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getValorBaseP(), getValorBaseM(), getValorBaseG(), getImposto(), getPrecoExp(), getPrecoPremium(), getProfit(), getPremium(), getEnviado(), getDataEnviado(), getFormulaPreco(), getFormulaPremium());
     }
 }

@@ -58,11 +58,11 @@ public class Encomendas {
     }
 
     public Encomendas(Encomendas o) {
-        this.artigos = o.artigos;
-        this.data = o.data;
-        this.dimensao = o.dimensao;
-        this.precoFinal = o.precoFinal;
-        this.estado = o.estado;
+        this.artigos = o.getArtigos();
+        this.data = o.getData();
+        this.dimensao = o.getDimensao();
+        this.precoFinal = o.getPrecoFinal();
+        this.estado = o.getEstado();
     }
 
     public Encomendas() {
@@ -131,10 +131,19 @@ public class Encomendas {
     public void setData(LocalDate data) {
         this.data = data;
     }
+
     @Override
-    public Encomendas clone(){
-        return new Encomendas(this);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Encomendas that = (Encomendas) o;
+        return Double.compare(that.getPrecoFinal(), getPrecoFinal()) == 0
+                && getEstado() == that.getEstado()
+                && Objects.equals(getArtigos(), that.getArtigos())
+                && Objects.equals(getDimensao(), that.getDimensao())
+                && Objects.equals(getData(), that.getData());
     }
+
     @Override
     public String toString() {
         return "Encomendas{" +
@@ -146,15 +155,7 @@ public class Encomendas {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Encomendas that)) return false;
-        return Double.compare(that.getPrecoFinal(), getPrecoFinal()) == 0 && getEstado() == that.getEstado() && Objects.equals(getArtigos(), that.getArtigos()) && Objects.equals(getDimensao(), that.getDimensao()) && Objects.equals(getData(), that.getData());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getArtigos(), getDimensao(), getPrecoFinal(), getEstado(), getData());
+    public Encomendas clone(){
+        return new Encomendas(this);
     }
 }

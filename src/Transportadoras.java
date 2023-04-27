@@ -59,20 +59,19 @@ public class Transportadoras {
     }
 
     // constructor, clone, tostring, getters e setters
-
     public Transportadoras(Transportadoras other) {
-        this.valorBaseP = other.valorBaseP;
-        this.valorBaseM = other.valorBaseM;
-        this.valorBaseG = other.valorBaseG;
-        this.imposto = other.imposto;
-        this.precoExp = other.precoExp;
-        this.precoPremium = other.precoPremium;
-        this.profit = other.profit;
-        this.premium = other.premium;
-        this.enviado = other.enviado;
-        this.dataEnviado = other.dataEnviado;
-        this.formulaPreco = other.formulaPreco;
-        this.formulaPremium = other.formulaPremium;
+        this.valorBaseP = other.getValorBaseP();
+        this.valorBaseM = other.getValorBaseM();
+        this.valorBaseG = other.getValorBaseG();
+        this.imposto = other.getImposto();
+        this.precoExp = other.getPrecoExp();
+        this.precoPremium = other.getPrecoPremium();
+        this.profit = other.getProfit();
+        this.premium = other.getPremium();
+        this.enviado = other.getEnviado();
+        this.dataEnviado = other.getDataEnviado();
+        this.formulaPreco = other.getFormulaPreco();
+        this.formulaPremium = other.getFormulaPremium();
     }
 
     public Transportadoras(double valorBaseP, double valorBaseM, double valorBaseG, double imposto) {
@@ -183,10 +182,27 @@ public class Transportadoras {
     public void setDataEnviado(LocalDate dataEnviado) {
         this.dataEnviado = dataEnviado;
     }
+
     @Override
-    public Transportadoras clone(){
-        return new Transportadoras(this);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transportadoras that = (Transportadoras) o;
+        return Double.compare(that.getValorBaseP(), getValorBaseP()) == 0
+                && Double.compare(that.getValorBaseM(), getValorBaseM()) == 0
+                && Double.compare(that.getValorBaseG(), getValorBaseG()) == 0
+                && Double.compare(that.getImposto(), getImposto()) == 0
+                && Double.compare(that.getPrecoExp(), getPrecoExp()) == 0
+                && Double.compare(that.getPrecoPremium(), getPrecoPremium()) == 0
+                && Double.compare(that.getProfit(), getProfit()) == 0
+                && Objects.equals(getPremium(), that.getPremium())
+                && Objects.equals(getEnviado(), that.getEnviado())
+                && Objects.equals(getDataEnviado(), that.getDataEnviado())
+                && Objects.equals(getFormulaPreco(), that.getFormulaPreco())
+                && Objects.equals(getFormulaPremium(), that.getFormulaPremium());
+
     }
+
     @Override
     public String toString() {
         return "Transportadoras{" +
@@ -205,15 +221,8 @@ public class Transportadoras {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Transportadoras that)) return false;
-        return Double.compare(that.getValorBaseP(), getValorBaseP()) == 0 && Double.compare(that.getValorBaseM(), getValorBaseM()) == 0 && Double.compare(that.getValorBaseG(), getValorBaseG()) == 0 && Double.compare(that.getImposto(), getImposto()) == 0 && Double.compare(that.getPrecoExp(), getPrecoExp()) == 0 && Double.compare(that.getPrecoPremium(), getPrecoPremium()) == 0 && Double.compare(that.getProfit(), getProfit()) == 0 && Objects.equals(getPremium(), that.getPremium()) && Objects.equals(getEnviado(), that.getEnviado()) && Objects.equals(getDataEnviado(), that.getDataEnviado()) && Objects.equals(getFormulaPreco(), that.getFormulaPreco()) && Objects.equals(getFormulaPremium(), that.getFormulaPremium());
+    public Transportadoras clone(){
+        return new Transportadoras(this);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getValorBaseP(), getValorBaseM(), getValorBaseG(), getImposto(), getPrecoExp(), getPrecoPremium(), getProfit(), getPremium(), getEnviado(), getDataEnviado(), getFormulaPreco(), getFormulaPremium());
-    }
 }

@@ -1,7 +1,8 @@
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
 
 public class Utilizador {
     private int id;
@@ -12,7 +13,7 @@ public class Utilizador {
     private List<Artigo> produtosAVenda;
     private List<Artigo> produtosComprados;
     private List<Artigo> vendasEfetuadas;
-
+    private static Random random = new Random();
     public Utilizador(){
         this.id=0;
         this.email="";
@@ -24,8 +25,8 @@ public class Utilizador {
         this.vendasEfetuadas=new ArrayList<Artigo>();
     }
 
-    public Utilizador(int id,String email,String nome,String morada,String nif){
-        this.id=id;
+    public Utilizador(String email,String nome,String morada,String nif){
+        this.id=gerarIDAleatorio();
         this.email=email;
         this.nome=nome;
         this.morada=morada;
@@ -130,15 +131,29 @@ public class Utilizador {
     }
 
     // Método para adicionar uma venda efetuada à lista de vendas efetuadas
-    public void adicionarVendaEfetuada(Artigo venda) {
-        this.vendasEfetuadas.add(venda);
-    }
+   // public void adicionarVendaEfetuada(Venda venda) {
+        //this.vendasEfetuadas.add(venda);
+   // }
 
 
     public Utilizador clone(){
         return new Utilizador();
     }
 
+//modificar preco base,por preco final depois da promoção
+    public double getRevenue(ArrayList<Artigo> vendasEfetuadas) {
+        double revenue = 0.0;
+        for (Artigo artigo : vendasEfetuadas) {
+            revenue += artigo.getPrecoBase();
+        }
+        return revenue;
+    }
 
+    private static int gerarIDAleatorio() {
+        int codigo = 0;
+        do {
+            codigo = random.nextInt(1000000);
+        } while (codigo < 100000);
+        return codigo;
+    }
 }
-

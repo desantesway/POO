@@ -1,86 +1,71 @@
+import java.time.LocalDate;
+import java.util.Objects;
+
 public class Malas extends Artigo{
-    private String tamanho;
-    private String material;
-    private int anoColecao;
-    private boolean premium;
+    private boolean Premium;
+    private LocalDate dataPremium;
+    private double valorizacao;
 
-    // construtores, getters e setters
-
-    public Malas(String id, String descricao, String marca, double precoBase, double desconto, int numeroDonos) {
-        super(id, descricao, marca, precoBase, desconto, numeroDonos);
-        this.tamanho = tamanho;
-        this.material = material;
-        this.anoColecao = anoColecao;
-        this.premium = premium;
+    public Malas(boolean premium, LocalDate dataPremium, double valorizacao) {
+        this.Premium = premium;
+        this.dataPremium = dataPremium;
+        this.valorizacao = valorizacao;
+    }
+    public Malas(Malas m){
+        this.Premium=m.isPremium();
+        this.dataPremium=m.getDataPremium();
+        this.valorizacao=m.getValorizacao();
+    }
+    public Malas(){
+        this.Premium=false;
+        this.dataPremium=LocalDate.now();
+        this.valorizacao=0;
     }
 
-    public String getTamanho() {
-        return tamanho;
+
+    public boolean isPremium() {
+        return Premium;
     }
 
-    public void setTamanho(String tamanho) {
-        this.tamanho = tamanho;
-    }
-
-    public String getMaterial() {
-        return material;
-    }
-
-    public void setMaterial(String material) {
-        this.material = material;
-    }
-
-    public int getAnoColecao() {
-        return anoColecao;
-    }
-
-    public void setAnoColecao(int anoColecao) {
-        this.anoColecao = anoColecao;
-    }
-
-    public boolean isPremium(){
-        return premium;
-    }
 
     public void setPremium(boolean premium) {
-        this.premium = premium;
+        Premium = premium;
     }
 
-    @Override
+    public LocalDate getDataPremium() {
+        return dataPremium;
+    }
+
+    public void setDataPremium(LocalDate dataPremium) {
+        this.dataPremium = dataPremium;
+    }
+
+    public double getValorizacao() {
+        return valorizacao;
+    }
+
+    public void setValorizacao(double valorizacao) {
+        this.valorizacao = valorizacao;
+    }
+
+    public Malas clone(){
+        return new Malas(this);
+    }
+
+
+    public String toString() {
+        return "Malas{" +
+                "Premium=" + Premium +
+                ", dataPremium=" + dataPremium +
+                ", valorizacao=" + valorizacao +
+                '}';
+    }
+
+
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Malas)) return false;
-        if (!super.equals(o)) return false;
-
+        if (o == null || getClass() != o.getClass()) return false;
         Malas malas = (Malas) o;
-
-        if (getAnoColecao() != malas.getAnoColecao()) return false;
-        if (isPremium() != malas.isPremium()) return false;
-        if (!getTamanho().equals(malas.getTamanho())) return false;
-        return getMaterial().equals(malas.getMaterial());
-    }
-
-    
-
-    @Override
-    public double calculaPreco() {
-        double preco = getPrecoBase();
-
-        // se a mala é usada, aplica desconto em função do número de donos e estado de utilização
-        if (getNumeroDonos() > 0) {
-            preco -= preco / (getNumeroDonos() * 0.5 * getAnoColecao());
-        }
-
-        // adiciona 20% ao preço para malas com material de couro
-        if (this.material.equals("couro")) {
-            preco += preco * 0.2;
-        }
-
-        // adiciona 10% ao preço para malas com tamanho acima de 80cm
-        if (this.tamanho.toLowerCase().equals("grande") || this.tamanho.toLowerCase().equals("gigante")) {
-            preco += preco * 0.1;
-        }
-
-        return preco;
+        return Premium == malas.Premium && Double.compare(malas.valorizacao, valorizacao) == 0 && Objects.equals(dataPremium, malas.dataPremium);
     }
 }

@@ -19,9 +19,9 @@ public class Tamanhos {
     }
 
     public Tamanhos() {
-        this.pequeno = 0.0;
-        this.medio = 0.0;
-        this.grande = 0.0;
+        this.pequeno = -1.0;
+        this.medio = -1.0;
+        this.grande = -1.0;
     }
     public double get(int i){
         if (i <= 0){
@@ -32,6 +32,17 @@ public class Tamanhos {
             return this.getGrande();
         }
     }
+
+    public void set(int i, double d){
+        if (i <= 0){
+            this.setPequeno(d);
+        } else if (i == 1){
+            this.setMedio(d);
+        } else{
+            this.setGrande(d);
+        }
+    }
+
     public void setPequeno(double pequeno) {
         this.pequeno = pequeno;
     }

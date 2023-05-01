@@ -5,7 +5,7 @@ import java.util.Random;
 
 
 public class Utilizador {
-    private int id;
+    private int ID;
     private String email;
     private String nome;
     private String morada;
@@ -15,7 +15,7 @@ public class Utilizador {
     private List<Artigo> vendasEfetuadas;
     private static Random random = new Random();
     public Utilizador(){
-        this.id=0;
+        this.ID=0;
         this.email="";
         this.nome="";
         this.morada="";
@@ -24,9 +24,19 @@ public class Utilizador {
         this.produtosComprados=new ArrayList<Artigo>();
         this.vendasEfetuadas=new ArrayList<Artigo>();
     }
+    public Utilizador(Utilizador l){
+        this.ID=l.getID();
+        this.email=l.getEmail();
+        this.nome=l.getNome();
+        this.morada=l.getMorada();
+        this.nif=l.getNif();
+        this.produtosAVenda=new ArrayList<Artigo>();
+        this.produtosComprados=new ArrayList<Artigo>();
+        this.vendasEfetuadas=new ArrayList<Artigo>();
+    }
 
     public Utilizador(String email,String nome,String morada,String nif){
-        this.id=gerarIDAleatorio();
+        this.ID=gerarIDAleatorio();
         this.email=email;
         this.nome=nome;
         this.morada=morada;
@@ -35,8 +45,10 @@ public class Utilizador {
         this.produtosComprados=new ArrayList<Artigo>();
         this.vendasEfetuadas=new ArrayList<Artigo>();
     }
-     public int getId(){
-        return this.id;
+
+
+    public int getID(){
+        return this.ID;
      }
      public String getEmail(){
         return this.email;
@@ -62,7 +74,7 @@ public class Utilizador {
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.ID = id;
     }
 
     public void setEmail(String email) {
@@ -73,7 +85,7 @@ public class Utilizador {
         this.nome = nome;
     }
 
-    public ArrayList<Artigo> getprodutosAVenda(){
+   /* public ArrayList<Artigo> getprodutosAVenda(){
         ArrayList<Artigo> resultado=new ArrayList<>();
         for(Artigo le:this.produtosAVenda){
             resultado.add(le.clone());
@@ -111,8 +123,8 @@ public class Utilizador {
         this.vendasEfetuadas = new ArrayList<>();
         for (Artigo le : vendasEfetuadas) {
             this.vendasEfetuadas.add(le.clone());
-        }
-    }
+        }*/
+
     public void adicionarProdutoAVenda(Artigo produto) {
         this.produtosAVenda.add(produto);
     }
@@ -136,24 +148,50 @@ public class Utilizador {
    // }
 
 
-    public Utilizador clone(){
-        return new Utilizador();
-    }
-
 //modificar preco base,por preco final depois da promoção
     public double getRevenue(ArrayList<Artigo> vendasEfetuadas) {
         double revenue = 0.0;
         for (Artigo artigo : vendasEfetuadas) {
-            revenue += artigo.getPrecoBase();
+            revenue += artigo.getPrecobase();
         }
         return revenue;
     }
 
     private static int gerarIDAleatorio() {
-        int codigo = 0;
+        int ID = 0;
         do {
-            codigo = random.nextInt(1000000);
-        } while (codigo < 100000);
-        return codigo;
+            ID = random.nextInt(1000000);
+        } while (ID < 100000);
+        return ID;
+    }
+
+    public boolean equals(Object o){
+        if (this==o) return true;
+        if ((o == null) || (this.getClass() != o.getClass())) return false;
+
+        Utilizador l = (Utilizador) o;
+        return l.getID() == this.ID &&
+                l.getEmail() == this.email &&
+                l.getNome() == this.nome &&
+                l.getNif() == this.nif &&
+                l.getMorada() == this.morada;
+    }
+
+    @Override
+    public String toString() {
+        return "Utilizador{" +
+                "ID=" + ID +
+                ", email='" + email + '\'' +
+                ", nome='" + nome + '\'' +
+                ", morada='" + morada + '\'' +
+                ", nif='" + nif + '\'' +
+                ", produtosAVenda=" + produtosAVenda +
+                ", produtosComprados=" + produtosComprados +
+                ", vendasEfetuadas=" + vendasEfetuadas +
+                '}';
+    }
+
+    public Utilizador clone(){
+        return new Utilizador(this);
     }
 }

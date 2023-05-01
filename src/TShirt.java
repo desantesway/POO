@@ -1,65 +1,41 @@
 import java.util.Objects;
 
 public class TShirt extends Artigo {
-    private String tamanho;
-    private String padrao;
+    private String Padrao;
 
-
-    // construtores, getters e setters
-
-    public TShirt(String id, String descricao, String marca, double precoBase, double desconto, int numeroDonos) {
-        super(id, descricao, marca, precoBase, desconto, numeroDonos);
-        this.tamanho = tamanho;
-        this.padrao = padrao;
-
-
+    public TShirt(){
+        this.Padrao="";
+    }
+    public TShirt(TShirt t){
+        this.Padrao=getPadrao();
+    }
+    public TShirt(String Padrao){
+        this.Padrao=Padrao;
     }
 
-    public String getTamanho(){
-        return tamanho;
+    public String getPadrao() {
+        return Padrao;
     }
 
-    public String getPadrao(){
-        return padrao;
+    public void setPadrao(String padrao) {
+        Padrao = padrao;
     }
 
-    public void setTamanho(){
-        this.tamanho = tamanho;
+    public String toString() {
+        return "TShirt{" +
+                "Padrao='" + Padrao + '\'' +
+                '}';
     }
-
-    public void setPadrao(){
-        this.padrao = padrao;
-    }
-
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof TShirt)) return false;
-        if (!super.equals(o)) return false;
-
+        if (o == null || getClass() != o.getClass()) return false;
         TShirt tShirt = (TShirt) o;
-
-        if (!getTamanho().equals(tShirt.getTamanho())) return false;
-        return getPadrao().equals(tShirt.getPadrao());
+        return Objects.equals(Padrao, tShirt.Padrao);
     }
 
-
-    @Override
-    public double calculaPreco() {
-        double preco = getPrecoBase();
-        if (padrao.equals("liso")) {
-            return preco;
-        } else {
-            if (getNumeroDonos() > 0) {
-                preco -= (preco * 0.50); // desconto de 50% no preço
-            } else {
-                return preco;
-
-            }
-        }
-        return preco;
+    public TShirt clone(){
+        return new TShirt(this);
     }
-
-
 }

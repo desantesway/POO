@@ -1,30 +1,107 @@
-import java.util.Objects;
+import java.util.UUID;
 
-public abstract class Artigo {
-    private String id;
-    private String descricao;
-    private String marca;
-    private double precoBase;
-    private double desconto;
-    private int numeroDonos;
+public class Artigo {
+        private boolean publicado;
+        private boolean novo;
+        private boolean premium;
+        private String estado;
+        private int NumeroDonos;
+        private String descricao;
+        private String Brand;
+        private String ID;
+        private double preco;
+        private double precobase;
+        private double desconto;
+        private Colecao colecao;
+        private String dimensoes;
+        private Transportadoras transportadoras;
 
-    // construtor, getters e setters
-
-    public Artigo(String id, String descricao, String marca, double precoBase, double desconto, int numeroDonos) {
-        this.id = id;
+    public Artigo(boolean publicado, boolean novo, boolean premium, String estado, int numeroDonos, String descricao, String brand, double preco, double precobase, double desconto, Colecao colecao, String dimensoes, Transportadoras transportadoras) {
+        this.publicado = publicado;
+        this.novo = novo;
+        this.premium = premium;
+        this.estado = estado;
+        this.NumeroDonos = numeroDonos;
         this.descricao = descricao;
-        this.marca = marca;
-        this.precoBase = precoBase;
+        this.Brand = brand;
+        this.ID =generateID();
+        this.preco = preco;
+        this.precobase = precobase;
         this.desconto = desconto;
-        this.numeroDonos = numeroDonos;
+        this.colecao = colecao;
+        this.dimensoes = dimensoes;
+        this.transportadoras = transportadoras;
     }
 
-    public String getId() {
-        return id;
+    public Artigo() {
+        this.publicado=false;
+        this.novo=false;
+        this.premium=false;
+        this.estado="";
+        this.NumeroDonos=0;
+        this.descricao="";
+        this.Brand="";
+        this.ID="";
+        this.preco=0;
+        this.precobase=0;
+        this.desconto=0;
+        this.colecao=new Colecao();
+        this.dimensoes="";
+    }
+    public Artigo(Artigo l){
+        this.publicado=l.isPublicado();
+        this.novo=l.isNovo();
+        this.premium=l.isPremium();
+        this.estado=l.getEstado();
+        this.NumeroDonos=l.getNumeroDonos();
+        this.descricao=l.getDescricao();
+        this.Brand=l.getBrand();
+        this.ID=getID();
+        this.preco=getPreco();
+        this.precobase=getPrecobase();
+        this.desconto=getDesconto();
+        this.colecao=getColecao();
+        this.dimensoes=getDimensoes();
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public boolean isPublicado() {
+        return publicado;
+    }
+
+    public void setPublicado(boolean publicado) {
+        this.publicado = publicado;
+    }
+
+    public boolean isNovo() {
+        return novo;
+    }
+
+    public void setNovo(boolean novo) {
+        this.novo = novo;
+    }
+
+    public boolean isPremium() {
+        return premium;
+    }
+
+    public void setPremium(boolean premium) {
+        this.premium = premium;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public int getNumeroDonos() {
+        return NumeroDonos;
+    }
+
+    public void setNumeroDonos(int numeroDonos) {
+        NumeroDonos = numeroDonos;
     }
 
     public String getDescricao() {
@@ -35,20 +112,36 @@ public abstract class Artigo {
         this.descricao = descricao;
     }
 
-    public String getMarca() {
-        return marca;
+    public String getBrand() {
+        return Brand;
     }
 
-    public void setMarca(String marca) {
-        this.marca = marca;
+    public void setBrand(String brand) {
+        Brand = brand;
     }
 
-    public double getPrecoBase() {
-        return precoBase;
+    public String getID() {
+        return ID;
     }
 
-    public void setPrecoBase(double precoBase) {
-        this.precoBase = precoBase;
+    public void setID(String ID) {
+        this.ID = ID;
+    }
+
+    public double getPreco() {
+        return preco;
+    }
+
+    public void setPreco(double preco) {
+        this.preco = preco;
+    }
+
+    public double getPrecobase() {
+        return precobase;
+    }
+
+    public void setPrecobase(double precobase) {
+        this.precobase = precobase;
     }
 
     public double getDesconto() {
@@ -59,39 +152,81 @@ public abstract class Artigo {
         this.desconto = desconto;
     }
 
-    public int getNumeroDonos(){
-        return numeroDonos;
+    public Colecao getColecao() {
+        return colecao;
     }
 
-    public void setNumeroDonos(int numeroDonos) {
-        this.numeroDonos = numeroDonos;
+    public void setColecao(Colecao colecao) {
+        this.colecao = colecao;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Artigo)) return false;
+    public String getDimensoes() {
+        return dimensoes;
+    }
 
-        Artigo artigo = (Artigo) o;
+    public void setDimensoes(String dimensoes) {
+        this.dimensoes = dimensoes;
+    }
 
-        if (Double.compare(artigo.getPrecoBase(), getPrecoBase()) != 0) return false;
-        if (Double.compare(artigo.getDesconto(), getDesconto()) != 0) return false;
-        if (getNumeroDonos() != artigo.getNumeroDonos()) return false;
-        if (!getId().equals(artigo.getId())) return false;
-        if (!getDescricao().equals(artigo.getDescricao())) return false;
-        return getMarca().equals(artigo.getMarca());
+    public Transportadoras getTransportadoras() {
+        return transportadoras;
+    }
+
+    public void setTransportadoras(Transportadoras transportadoras) {
+        this.transportadoras = transportadoras;
+    }
+
+    public String generateID(){
+        ID=UUID.randomUUID().toString().toUpperCase().substring(0,6);
+        return ID;
+    }
+    public void setNovo(){
+            int Onwer=getNumeroDonos();
+            if (Onwer==0) this.novo=true;
+            else this.novo=false;
+    }
+    public void publicar(){
+        this.publicado=true;
+    }
+
+    public void privar(){
+        this.publicado=false;
+    }
+
+    public void ativaPremium(){
+        this.premium=true;
+    }
+    public void desativaPremium(){
+        this.premium=false;
     }
 
 
-    public Artigo clone() {
-        try {
-            return (Artigo) super.clone();
-        } catch (CloneNotSupportedException e) {
-            return null;
-        }
+    public String toString() {
+        return "Artigo{" +
+                "publicado=" + publicado +
+                ", novo=" + novo +
+                ", premium=" + premium +
+                ", estado='" + estado + '\'' +
+                ", NumeroDonos=" + NumeroDonos +
+                ", descricao='" + descricao + '\'' +
+                ", Brand='" + Brand + '\'' +
+                ", ID='" + ID + '\'' +
+                ", preco=" + preco +
+                ", precobase=" + precobase +
+                ", desconto=" + desconto +
+                ", colecao=" + colecao +
+                ", dimensoes='" + dimensoes + '\'' +
+                ", transportadoras=" + transportadoras +
+                '}';
     }
 
-    public abstract double calculaPreco();
+    public Artigo clone(){
+        return new Artigo(this);
+    }
+
+
+
+
 
 
 }

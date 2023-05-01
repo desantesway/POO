@@ -1,96 +1,82 @@
 import java.util.Objects;
+import java.time.LocalDate;
 
 public class Sapatilhas extends Artigo {
-    private int tamanho;
-    private boolean atacadores;
-    private String cor;
-    private int anoColecao;
-    private double estadoUtilizacao;
-    private boolean premium;
-
-    // construtor, getters e setters
-
-    public Sapatilhas(String id, String descricao, String marca, double precoBase, double desconto,
-                      int tamanho, boolean atacadores, String cor, int anoColecao, int numeroDonos,
-                      boolean novo, double estadoUtilizacao, boolean Premium) {
-        super(id, descricao, marca, precoBase, desconto, numeroDonos);
-        this.tamanho = tamanho;
-        this.atacadores = atacadores;
-        this.cor = cor;
-        this.anoColecao = anoColecao;
-        this.estadoUtilizacao = estadoUtilizacao;
-        this.premium = premium;
+    private int Atacadores;
+    private String Cor;
+    private LocalDate data;
+    private LocalDate dataPremium;
+    public Sapatilhas(){
+        this.Atacadores=0;
+        this.Cor="N/A";
+        this.data=LocalDate.now();
+        this.dataPremium=LocalDate.now();
     }
 
-    public int getTamanho() {
-        return tamanho;
+    public Sapatilhas(int Atacadores, String cor, LocalDate data, LocalDate dataPremium) {
+        this.Atacadores = Atacadores;
+        this.Cor = cor;
+        this.data = data;
+        this.dataPremium = dataPremium;
+    }
+    public Sapatilhas(Sapatilhas s) {
+        this.Atacadores = s.getAtacadores();
+        this.Cor = s.getCor();
+        this.data = s.getData();
+        this.dataPremium = s.getDataPremium();
     }
 
-    public void setTamanho(int tamanho) {
-        this.tamanho = tamanho;
+    public int getAtacadores() {
+        return Atacadores;
     }
 
-    public boolean isAtacadores() {
-        return atacadores;
-    }
-
-    public void setAtacadores(boolean atacadores) {
-        this.atacadores = atacadores;
+    public void setAtacadores(int atacadores) {
+        Atacadores = atacadores;
     }
 
     public String getCor() {
-        return cor;
+        return Cor;
     }
 
     public void setCor(String cor) {
-        this.cor = cor;
+        Cor = cor;
     }
 
-    public int getAnoColecao() {
-        return anoColecao;
+    public LocalDate getData() {
+        return data;
     }
 
-    public void setAnoColecao(int anoColecao) {
-        this.anoColecao = anoColecao;
+    public void setData(LocalDate data) {
+        this.data = data;
     }
 
-    public double getEstadoUtilizacao() {
-        return estadoUtilizacao;
+    public LocalDate getDataPremium() {
+        return dataPremium;
     }
 
-    public void setEstadoUtilizacao(double estadoUtilizacao) {
-        this.estadoUtilizacao = estadoUtilizacao;
+    public void setDataPremium(LocalDate dataPremium) {
+        this.dataPremium = dataPremium;
+    }
+    public Sapatilhas clone(){
+        return new Sapatilhas(this);
     }
 
-    public boolean isPremium() {
-        return premium;
+
+    public String toString() {
+        return "Sapatilhas{" +
+                "Atacadores=" + Atacadores +
+                ", Cor='" + Cor + '\'' +
+                ", data=" + data +
+                ", dataPremium=" + dataPremium +
+                '}';
     }
 
-    public void setPremium(boolean premium) {
-        this.premium = premium;
-    }
 
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Sapatilhas)) return false;
-        if (!super.equals(o)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Sapatilhas that = (Sapatilhas) o;
-        return getTamanho() == that.getTamanho() && isAtacadores() == that.isAtacadores() && getAnoColecao() == that.getAnoColecao() && Double.compare(that.getEstadoUtilizacao(), getEstadoUtilizacao()) == 0 && isPremium() == that.isPremium() && Objects.equals(getCor(), that.getCor());
+        return Atacadores == that.Atacadores && Objects.equals(Cor, that.Cor) && Objects.equals(data, that.data) && Objects.equals(dataPremium, that.dataPremium);
     }
 
-
-    @Override
-    public double calculaPreco() {
-        double preco = getPrecoBase();
-        if (getNumeroDonos() > 0) {
-            double desconto = preco / getNumeroDonos();
-            if (!premium && (getNumeroDonos() > 1 || anoColecao < 2020 || tamanho > 45)) {
-                preco -= desconto;
-            } else if (premium) {
-                preco += (preco * 0.1); // aumento de 10% no preço
-            }
-        }
-        return preco;
-    }
 }

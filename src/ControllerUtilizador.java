@@ -9,6 +9,7 @@ public class ControllerUtilizador {
     private ArrayList<Encomenda> encomendasEnviadas;
     private double valorTotalVendido;
     private double valorTotalComprado;
+    private int quantidade;
 
     public ControllerUtilizador() {
         inventario = new HashMap<String, Integer>();
@@ -18,20 +19,20 @@ public class ControllerUtilizador {
         valorTotalComprado = 0;
     }
 
-    public void adicionarArtigo(String nomeArtigo, int quantidade) {
-        if (inventario.containsKey(nomeArtigo)) {
-            int quantidadeAtual = inventario.get(nomeArtigo);
-            inventario.put(nomeArtigo, quantidadeAtual + quantidade);
+    public void adicionarArtigo(String id, int quantidade) {
+        if (inventario.containsKey(id)) {
+            int quantidadeAtual = inventario.get(id);
+            inventario.put(id, quantidadeAtual + quantidade);
         } else {
-            inventario.put(nomeArtigo, quantidade);
+            inventario.put(id, quantidade);
         }
     }
 
-    public void removerArtigo(String nomeArtigo, int quantidade) {
-        if (inventario.containsKey(nomeArtigo)) {
-            int quantidadeAtual = inventario.get(nomeArtigo);
+    public void removerArtigo(String id, int quantidade) {
+        if (inventario.containsKey(id)) {
+            int quantidadeAtual = inventario.get(id);
             if (quantidadeAtual >= quantidade) {
-                inventario.put(nomeArtigo, quantidadeAtual - quantidade);
+                inventario.put(id, quantidadeAtual - quantidade);
             } else {
                 System.out.println("Quantidade insuficiente no inventário.");
             }

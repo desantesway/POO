@@ -2,7 +2,6 @@ import java.util.UUID;
 
 public class Artigo {
         private boolean publicado;
-        private boolean novo;
         private boolean premium;
         private String estado;
         private int NumeroDonos;
@@ -16,9 +15,8 @@ public class Artigo {
         private String dimensoes;
         private Transportadoras transportadoras;
 
-    public Artigo(boolean publicado, boolean novo, boolean premium, String estado, int numeroDonos, String descricao, String brand, double preco, double precobase, double desconto, Colecao colecao, String dimensoes, Transportadoras transportadoras) {
+    public Artigo(boolean publicado, boolean premium, String estado, int numeroDonos, String descricao, String brand, double preco, double precobase, double desconto, Colecao colecao, String dimensoes, Transportadoras transportadoras) {
         this.publicado = publicado;
-        this.novo = novo;
         this.premium = premium;
         this.estado = estado;
         this.NumeroDonos = numeroDonos;
@@ -35,7 +33,6 @@ public class Artigo {
 
     public Artigo() {
         this.publicado=false;
-        this.novo=false;
         this.premium=false;
         this.estado="";
         this.NumeroDonos=0;
@@ -50,7 +47,6 @@ public class Artigo {
     }
     public Artigo(Artigo l){
         this.publicado=l.isPublicado();
-        this.novo=l.isNovo();
         this.premium=l.isPremium();
         this.estado=l.getEstado();
         this.NumeroDonos=l.getNumeroDonos();
@@ -70,14 +66,6 @@ public class Artigo {
 
     public void setPublicado(boolean publicado) {
         this.publicado = publicado;
-    }
-
-    public boolean isNovo() {
-        return novo;
-    }
-
-    public void setNovo(boolean novo) {
-        this.novo = novo;
     }
 
     public boolean isPremium() {
@@ -180,11 +168,7 @@ public class Artigo {
         ID=UUID.randomUUID().toString().toUpperCase().substring(0,6);
         return ID;
     }
-    public void setNovo(){
-            int Onwer=getNumeroDonos();
-            if (Onwer==0) this.novo=true;
-            else this.novo=false;
-    }
+
     public void publicar(){
         this.publicado=true;
     }
@@ -204,7 +188,6 @@ public class Artigo {
     public String toString() {
         return "Artigo{" +
                 "publicado=" + publicado +
-                ", novo=" + novo +
                 ", premium=" + premium +
                 ", estado='" + estado + '\'' +
                 ", NumeroDonos=" + NumeroDonos +

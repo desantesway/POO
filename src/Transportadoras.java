@@ -6,6 +6,7 @@ public class Transportadoras {
     private Tamanhos valorBase, precoExp, precoPremium;
     private Boolean premium, enviado;
     private LocalDate dataEnviado;
+    private int diasAtraso;
 
     // faz conta do o 1º elemento com o 2ª elemento e da return do resultado
     public double ari(double st,String operador, double nd){
@@ -57,10 +58,14 @@ public class Transportadoras {
                 if(this.getPrecoExp().get(i) == -1.0){
                     System.out.println("Preço de expedição ainda não definido!");
                     quit++;
+                    break;
                 }
-                if(this.getPrecoPremium().get(i) == -1.0 && this.getPremium()){
-                    System.out.println("Preço do premium ainda não definido!");
-                    quit++;
+                if(this.getPremium()){
+                    if(this.getPrecoPremium().get(i) == -1.0){
+                        System.out.println("Preço do premium ainda não definido!");
+                        quit++;
+                        break;
+                    }
                 }
             }
             if (quit == 0){
@@ -91,16 +96,26 @@ public class Transportadoras {
         this.premium = other.getPremium();
         this.enviado = other.getEnviado();
         this.dataEnviado = other.getDataEnviado();
+        this.diasAtraso = other.getDiasAtraso();
     }
 
     public Transportadoras(double valorBaseP, double valorBaseM, double valorBaseG, double imposto) {
         this.setValorBase(valorBaseP,valorBaseM,valorBaseG);
         this.imposto = imposto;
+        this.diasAtraso = 1;
         this.setPremium(false);
         this.setEnviado(false);
         this.setDataEnviado(null);
         this.precoExp = new Tamanhos();
         this.precoPremium = new Tamanhos();
+    }
+
+    public int getDiasAtraso() {
+        return diasAtraso;
+    }
+
+    public void setDiasAtraso(int diasAtraso) {
+        this.diasAtraso = diasAtraso;
     }
 
     public Tamanhos getValorBase() {
@@ -124,11 +139,20 @@ public class Transportadoras {
     }
 
     public Tamanhos getPrecoPremium() {
-        return precoPremium;
+        if (this.getPremium()){
+            return precoPremium;
+        }else{
+            System.out.println("Premium não ativado!");
+            return null;
+        }
     }
 
     public void setPrecoPremium(Tamanhos precoPremium) {
-        this.precoPremium = new Tamanhos(precoPremium);
+        if (this.getPremium()){
+            this.precoPremium = new Tamanhos(precoPremium);
+        }else{
+            System.out.println("Premium não ativado!");
+        }
     }
 
     public double getImposto() {
@@ -169,6 +193,7 @@ public class Transportadoras {
         if (o == null || getClass() != o.getClass()) return false;
         Transportadoras that = (Transportadoras) o;
         return Double.compare(that.getImposto(), getImposto()) == 0
+                && Integer.compare(that.getDiasAtraso(), getDiasAtraso()) == 0
                 && this.getValorBase().equals(that.getValorBase())
                 && this.getPrecoExp().equals(that.getPrecoExp())
                 && this.getPrecoPremium().equals(that.getPrecoPremium())
@@ -188,6 +213,7 @@ public class Transportadoras {
                 ", premium=" + premium +
                 ", enviado=" + enviado +
                 ", dataEnviado=" + dataEnviado +
+                ", diasAtraso=" + diasAtraso +
                 '}';
     }
 

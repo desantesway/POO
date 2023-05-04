@@ -23,6 +23,7 @@ public class Tamanhos {
         this.medio = -1.0;
         this.grande = -1.0;
     }
+
     public double get(int i){
         if (i <= 0){
             return this.getPequeno();

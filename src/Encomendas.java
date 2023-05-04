@@ -7,13 +7,13 @@ public class Encomendas {
     private List<Artigo> artigos;
     private String dimensao;
     private double precoFinal;
-    private int estado; // 0, 1, 2
+    private int estado, devolucao; // 0, 1, 2
     private LocalDate data;
 
     // funçao para calcular o preço da encomenda
     public Boolean devolucao(){
-        //setEstado();
-        return estado == 2 && (this.data.plusDays(14).isAfter(LocalDate.now()));
+        setEstado();
+        return this.estado == 2 && (this.data.plusDays(this.getDevolucao()).isAfter(LocalDate.now()));
     }
 
     //envia a encomenda
@@ -25,14 +25,26 @@ public class Encomendas {
 
     //calcula o preço da encomenda
     public void precoEncomenda(){
+        this.setDimensao();
         double preco = 0;
+        Tamanhos tam;
         for (Artigo art : artigos) {
-            preco += art.getPrecoBase() - art.getDesconto(); // mudar isto para quando o artigo tiver feito
-            if (/*art.isNovo()*/0 == 1) { //isto tmb
+            tam = art.getTransportadoras().getPrecoExp();
+            if (art.isPremium()){
+                tam = art.getTransportadoras().getPrecoPremium();
+            }
+            switch (this.dimensao) {
+                case "pequeno" -> preco += tam.getPequeno();
+                case "medio" -> preco += tam.getMedio();
+                case "grande" -> preco += tam.getGrande();
+                default -> System.out.println("Erro na dimensão: não existe");
+            }
+            if (art.getNumeroDonos() == 0) {
                 preco += 0.5;
             } else {
                 preco += 0.25;
             }
+            preco += art.getPreco();
         }
         this.setPrecoFinal(preco);
     }
@@ -53,8 +65,9 @@ public class Encomendas {
         this.artigos = artigos;
         this.setDimensao();
         this.setPrecoFinal(0);
-        //this.setEstado();
+        this.setEstado(0);
         this.data = null;
+        this.setDevolucao(14);
     }
 
     public Encomendas(Encomendas o) {
@@ -63,6 +76,7 @@ public class Encomendas {
         this.dimensao = o.getDimensao();
         this.precoFinal = o.getPrecoFinal();
         this.estado = o.getEstado();
+        this.devolucao = o.getDevolucao();
     }
 
     public Encomendas() {
@@ -71,6 +85,15 @@ public class Encomendas {
         this.setPrecoFinal(0);
         this.setEstado(0);
         this.data = null;
+        this.setDevolucao(14);
+    }
+
+    public int getDevolucao() {
+        return devolucao;
+    }
+
+    public void setDevolucao(int devolucao) {
+        this.devolucao = devolucao;
     }
 
     public List<Artigo> getArtigos() {
@@ -110,15 +133,23 @@ public class Encomendas {
         return estado;
     }
 
-    /*public void setEstado() {
-        if(artigos.size() > 0){
-            if(artigos.get(0).getTransportadora().getEnviado()){
+    public void setEstado() {
+        boolean done;
+        done = true;
+        if(this.getEstado() == 1){
+            for(Artigo art: artigos) {
+                if (this.getData().plusDays(art.getTransportadoras().getDiasAtraso()).isAfter(LocalDate.now())) {
+                    art.getTransportadoras().enviar();
+                }
+                if (art.getTransportadoras().getDataEnviado() == null){
+                    done = false;
+                }
+            }
+            if (done){
                 this.setEstado(2);
             }
-        } else{
-            this.setEstado(0);
         }
-    }*/
+    }
 
     public void setEstado(int estado) {
         this.estado = estado;
@@ -138,6 +169,7 @@ public class Encomendas {
         if (o == null || getClass() != o.getClass()) return false;
         Encomendas that = (Encomendas) o;
         return Double.compare(that.getPrecoFinal(), getPrecoFinal()) == 0
+                && Integer.compare(that.getDevolucao(), getDevolucao()) == 0
                 && getEstado() == that.getEstado()
                 && Objects.equals(getArtigos(), that.getArtigos())
                 && Objects.equals(getDimensao(), that.getDimensao())
@@ -152,6 +184,7 @@ public class Encomendas {
                 ", precoFinal=" + precoFinal +
                 ", estado=" + estado +
                 ", data=" + data +
+                ", Devolução=" + devolucao +
                 '}';
     }
 

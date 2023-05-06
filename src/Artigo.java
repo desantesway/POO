@@ -1,5 +1,5 @@
 import java.util.UUID;
-
+import java.util.Objects;
 public class Artigo {
         private boolean publicado;
         private boolean premium;

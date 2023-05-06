@@ -85,7 +85,7 @@ public class Utilizador {
         this.nome = nome;
     }
 
-   /* public ArrayList<Artigo> getprodutosAVenda(){
+   public ArrayList<Artigo> getprodutosAVenda(){
         ArrayList<Artigo> resultado=new ArrayList<>();
         for(Artigo le:this.produtosAVenda){
             resultado.add(le.clone());
@@ -123,8 +123,8 @@ public class Utilizador {
         this.vendasEfetuadas = new ArrayList<>();
         for (Artigo le : vendasEfetuadas) {
             this.vendasEfetuadas.add(le.clone());
-        }*/
-
+        }
+    }
     public void adicionarProdutoAVenda(Artigo produto) {
         this.produtosAVenda.add(produto);
     }
@@ -133,7 +133,7 @@ public class Utilizador {
         this.produtosAVenda.remove(produto);
     }
 
-    // Métodos para adicionar e remover produtos à lista de produtos comprados
+
     public void adicionarProdutoComprado(Artigo produto) {
         this.produtosComprados.add(produto);
     }
@@ -142,17 +142,17 @@ public class Utilizador {
         this.produtosComprados.remove(produto);
     }
 
-    // Método para adicionar uma venda efetuada à lista de vendas efetuadas
-   // public void adicionarVendaEfetuada(Venda venda) {
-        //this.vendasEfetuadas.add(venda);
-   // }
+
+   public void adicionarVendaEfetuada(Artigo venda) {
+        this.vendasEfetuadas.add(venda);
+    }
 
 
-//modificar preco base,por preco final depois da promoção
+
     public double getRevenue(ArrayList<Artigo> vendasEfetuadas) {
         double revenue = 0.0;
         for (Artigo artigo : vendasEfetuadas) {
-            revenue += artigo.getPrecobase();
+            revenue += artigo.getPreco();
         }
         return revenue;
     }

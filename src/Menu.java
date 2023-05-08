@@ -97,7 +97,7 @@ public class Menu {
         System.out.print("NIF: ");
         int nif = is.nextInt();
 
-        Utilizador utilizador = new Utilizador(nome, idade, nic);
+        Utilizador utilizador = new Utilizador(email, nome, morada, nif);
         this.utilizador.add(utilizador);
         System.out.println("Utilizador criado com sucesso.");
     }

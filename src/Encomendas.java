@@ -10,7 +10,7 @@ public class Encomendas {
     private int estado, devolucao; // 0, 1, 2
     private LocalDate data;
 
-    // funçao para calcular o preço da encomenda
+    // funçao para ver se pode pedir devolução ou não
     public Boolean devolucao(){
         setEstado();
         return this.estado == 2 && (this.data.plusDays(this.getDevolucao()).isAfter(LocalDate.now()));
@@ -60,7 +60,9 @@ public class Encomendas {
         this.setDimensao();
     }
 
-    // construtor, getters e setters
+    /*
+        construtores, getters, setters, clone, tostring e equals
+     */
     public Encomendas(List<Artigo> artigos) {
         this.artigos = artigos;
         this.setDimensao();
@@ -169,7 +171,7 @@ public class Encomendas {
         if (o == null || getClass() != o.getClass()) return false;
         Encomendas that = (Encomendas) o;
         return Double.compare(that.getPrecoFinal(), getPrecoFinal()) == 0
-                && Integer.compare(that.getDevolucao(), getDevolucao()) == 0
+                && that.getDevolucao() == getDevolucao()
                 && getEstado() == that.getEstado()
                 && Objects.equals(getArtigos(), that.getArtigos())
                 && Objects.equals(getDimensao(), that.getDimensao())

@@ -1,10 +1,6 @@
-import java.util.Objects;
-
 public class Tamanhos {
 
-    private double pequeno;
-    private double medio;
-    private double grande;
+    private double pequeno, medio, grande;
 
     public Tamanhos(Tamanhos o){
         this.pequeno = o.getPequeno();
@@ -16,6 +12,12 @@ public class Tamanhos {
         this.pequeno = left;
         this.medio = middle;
         this.grande = right;
+    }
+
+    public Tamanhos(double d) {
+        this.pequeno = d;
+        this.medio = d;
+        this.grande = d;
     }
 
     public Tamanhos() {
@@ -90,5 +92,16 @@ public class Tamanhos {
                 ", medio=" + medio +
                 ", grande=" + grande +
                 '}';
+    }
+
+    public static Tamanhos fromString(String tamanhosString) {
+        String[] values = tamanhosString.split(",");
+        if (values.length != 3) {
+            throw new IllegalArgumentException("Invalid Tamanhos string format: " + tamanhosString);
+        }
+        double pequeno = Double.parseDouble(values[0]);
+        double medio = Double.parseDouble(values[1]);
+        double grande = Double.parseDouble(values[2]);
+        return new Tamanhos(pequeno, medio, grande);
     }
 }

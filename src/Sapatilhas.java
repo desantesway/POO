@@ -1,29 +1,87 @@
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.time.LocalDate;
 
 public class Sapatilhas extends Artigo {
-    private int Atacadores;
+    private int Atacadores, tamanho;
     private String Cor;
-    private LocalDate data;
     private LocalDate dataPremium;
-    public Sapatilhas(){
-        this.Atacadores=0;
-        this.Cor="N/A";
-        this.data=LocalDate.now();
-        this.dataPremium=LocalDate.now();
+
+    //calcula o preço da sapatilha
+    public void calcPreco(){
+        double desconto = 0, preco = super.getPrecobase();
+        if(super.getNumeroDonos() != 0){
+            desconto += super.getPrecobase() / super.getNumeroDonos();
+        }
+        switch (super.getEstado()) {
+            case "Pouco usado" -> desconto *= 2;
+            case "Usado" -> desconto *= 3;
+            case "Muito usado" -> desconto *= 4;
+        } if (!(super.getColecao().getdata().plusDays(365).isAfter(LocalDate.now()))
+                || this.getTamanho() >= 45){
+            preco -= desconto;
+        } if(super.isPremium()){
+            preco += 100 * (ChronoUnit.YEARS.between(LocalDate.now(), this.dataPremium) *
+                    (ChronoUnit.YEARS.between(LocalDate.now(), this.dataPremium)));
+        }
+        super.setPreco(preco);
     }
 
-    public Sapatilhas(int Atacadores, String cor, LocalDate data, LocalDate dataPremium) {
+    /*
+        construtores, getters, setters, clone, tostring e equals
+     */
+    public Sapatilhas(){
+        super();
+        this.Atacadores=0;
+        this.Cor="N/A";
+        this.dataPremium= null;
+    }
+
+    public Sapatilhas(boolean publicado, boolean premium, String estado, int numeroDonos, String descricao, String brand,
+                      double precobase, double desconto, Colecao colecao,
+                      Transportadoras transportadoras) {
+        super(publicado, premium, estado, numeroDonos,
+                descricao, brand, precobase, desconto, colecao, transportadoras);
+        this.Atacadores=0;
+        this.Cor="N/A";
+        this.dataPremium= null;
+    }
+
+    public Sapatilhas(boolean publicado, boolean premium, String estado, int numeroDonos, String descricao, String brand,
+                 double precobase, double desconto, Colecao colecao,
+                 Transportadoras transportadoras, int Atacadores, String cor, LocalDate dataPremium, int tamanho) {
+        super(publicado, premium, estado, numeroDonos,
+                descricao, brand, precobase, desconto, colecao, transportadoras);
         this.Atacadores = Atacadores;
         this.Cor = cor;
-        this.data = data;
         this.dataPremium = dataPremium;
+        this.tamanho = tamanho;
     }
+
+    public Sapatilhas(int Atacadores, String cor, LocalDate dataPremium, int tamanho) {
+        super();
+        this.Atacadores = Atacadores;
+        this.Cor = cor;
+        this.dataPremium = dataPremium;
+        this.tamanho = tamanho;
+    }
+
     public Sapatilhas(Sapatilhas s) {
+        super(s.isPublicado(), s.isPremium(), s.getEstado(), s.getNumeroDonos(), s.getDescricao(), s.getBrand(),
+                s.getPreco(), s.getPrecobase(), s.getDesconto(), s.getColecao(),
+                s.getTransportadoras());
         this.Atacadores = s.getAtacadores();
         this.Cor = s.getCor();
-        this.data = s.getData();
         this.dataPremium = s.getDataPremium();
+        this.tamanho = s.getTamanho();
+    }
+
+    public int getTamanho() {
+        return tamanho;
+    }
+
+    public void setTamanho(int tamanho) {
+        this.tamanho = tamanho;
     }
 
     public int getAtacadores() {
@@ -42,14 +100,6 @@ public class Sapatilhas extends Artigo {
         Cor = cor;
     }
 
-    public LocalDate getData() {
-        return data;
-    }
-
-    public void setData(LocalDate data) {
-        this.data = data;
-    }
-
     public LocalDate getDataPremium() {
         return dataPremium;
     }
@@ -61,13 +111,14 @@ public class Sapatilhas extends Artigo {
         return new Sapatilhas(this);
     }
 
-
     public String toString() {
         return "Sapatilhas{" +
-                "Atacadores=" + Atacadores +
+                ", Tamanho=" + tamanho +
+                ", Atacadores=" + Atacadores +
                 ", Cor='" + Cor + '\'' +
-                ", data=" + data +
                 ", dataPremium=" + dataPremium +
+                ", " +
+                super.toString(this) +
                 '}';
     }
 
@@ -76,7 +127,10 @@ public class Sapatilhas extends Artigo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Sapatilhas that = (Sapatilhas) o;
-        return Atacadores == that.Atacadores && Objects.equals(Cor, that.Cor) && Objects.equals(data, that.data) && Objects.equals(dataPremium, that.dataPremium);
+        return Atacadores == that.Atacadores
+                && Objects.equals(Cor, that.Cor)
+                && Objects.equals(dataPremium, that.dataPremium)
+                && super.equals(that);
     }
 
 }

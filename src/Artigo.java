@@ -1,21 +1,37 @@
-import java.util.UUID;
 import java.util.Objects;
+import java.util.UUID;
 public class Artigo {
-        private boolean publicado;
-        private boolean premium;
-        private String estado;
-        private int NumeroDonos;
-        private String descricao;
-        private String Brand;
-        private String ID;
-        private double preco;
-        private double precobase;
-        private double desconto;
-        private Colecao colecao;
-        private String dimensoes;
-        private Transportadoras transportadoras;
+    private boolean publicado, premium;
+    private String estado, descricao, Brand, ID;
+    private int NumeroDonos, devolucao;
+    private double preco, precobase, desconto;
+    private Colecao colecao;
+    private Transportadoras transportadoras;
 
-    public Artigo(boolean publicado, boolean premium, String estado, int numeroDonos, String descricao, String brand, double preco, double precobase, double desconto, Colecao colecao, String dimensoes, Transportadoras transportadoras) {
+    /*
+        construtores, getters, setters, clone, tostring e equals
+     */
+    public Artigo(boolean publicado, boolean premium, String estado, int numeroDonos,
+                  String descricao, String brand, double precobase,
+                  double desconto, Colecao colecao, Transportadoras transportadoras) {
+        this.publicado = publicado;
+        this.premium = premium;
+        this.estado = estado;
+        this.NumeroDonos = numeroDonos;
+        this.descricao = descricao;
+        this.Brand = brand;
+        this.ID =generateID();
+        this.preco = -1.0;
+        this.precobase = precobase;
+        this.desconto = desconto;
+        this.colecao = colecao;
+        this.transportadoras = transportadoras;
+        this.devolucao = 14;
+    }
+
+    public Artigo(boolean publicado, boolean premium, String estado, int numeroDonos,
+                  String descricao, String brand, double precobase, double preco,
+                  double desconto, Colecao colecao, Transportadoras transportadoras) {
         this.publicado = publicado;
         this.premium = premium;
         this.estado = estado;
@@ -27,8 +43,8 @@ public class Artigo {
         this.precobase = precobase;
         this.desconto = desconto;
         this.colecao = colecao;
-        this.dimensoes = dimensoes;
         this.transportadoras = transportadoras;
+        this.devolucao = 14;
     }
 
     public Artigo() {
@@ -43,8 +59,25 @@ public class Artigo {
         this.precobase=0;
         this.desconto=0;
         this.colecao=new Colecao();
-        this.dimensoes="";
+        this.devolucao = 14;
     }
+
+    public Artigo(Transportadoras transportadoras) {
+        this.publicado=false;
+        this.premium=false;
+        this.estado="";
+        this.NumeroDonos=0;
+        this.descricao="";
+        this.Brand="";
+        this.ID="";
+        this.preco=0;
+        this.precobase=0;
+        this.desconto=0;
+        this.colecao=new Colecao();
+        this.transportadoras = transportadoras;
+        this.devolucao = 14;
+    }
+
     public Artigo(Artigo l){
         this.publicado=l.isPublicado();
         this.premium=l.isPremium();
@@ -52,12 +85,21 @@ public class Artigo {
         this.NumeroDonos=l.getNumeroDonos();
         this.descricao=l.getDescricao();
         this.Brand=l.getBrand();
-        this.ID=getID();
-        this.preco=getPreco();
-        this.precobase=getPrecobase();
-        this.desconto=getDesconto();
-        this.colecao=getColecao();
-        this.dimensoes=getDimensoes();
+        this.ID=l.getID();
+        this.preco=l.getPreco();
+        this.precobase=l.getPrecobase();
+        this.desconto=l.getDesconto();
+        this.colecao=l.getColecao();
+        this.transportadoras=l.getTransportadoras();
+        this.devolucao = l.getDevolucao();
+    }
+
+    public int getDevolucao() {
+        return devolucao;
+    }
+
+    public void setDevolucao(int devolucao) {
+        this.devolucao = devolucao;
     }
 
     public boolean isPublicado() {
@@ -148,14 +190,6 @@ public class Artigo {
         this.colecao = colecao;
     }
 
-    public String getDimensoes() {
-        return dimensoes;
-    }
-
-    public void setDimensoes(String dimensoes) {
-        this.dimensoes = dimensoes;
-    }
-
     public Transportadoras getTransportadoras() {
         return transportadoras;
     }
@@ -180,10 +214,10 @@ public class Artigo {
     public void ativaPremium(){
         this.premium=true;
     }
+
     public void desativaPremium(){
         this.premium=false;
     }
-
 
     public String toString() {
         return "Artigo{" +
@@ -198,18 +232,49 @@ public class Artigo {
                 ", precobase=" + precobase +
                 ", desconto=" + desconto +
                 ", colecao=" + colecao +
-                ", dimensoes='" + dimensoes + '\'' +
                 ", transportadoras=" + transportadoras +
+                ", devolução=" + devolucao +
                 '}';
+    }
+
+    public String toString(Object o) {
+        return "publicado=" + publicado +
+                ", premium=" + premium +
+                ", estado='" + estado + '\'' +
+                ", NumeroDonos=" + NumeroDonos +
+                ", descricao='" + descricao + '\'' +
+                ", Brand='" + Brand + '\'' +
+                ", ID='" + ID + '\'' +
+                ", preco=" + preco +
+                ", precobase=" + precobase +
+                ", desconto=" + desconto +
+                ", colecao=" + colecao +
+                ", transportadoras=" + transportadoras +
+                ", devolução=" + devolucao;
     }
 
     public Artigo clone(){
         return new Artigo(this);
     }
 
-
-
-
-
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Artigo artigo = (Artigo) o;
+        return publicado == artigo.publicado
+                && premium == artigo.premium
+                && NumeroDonos == artigo.NumeroDonos
+                && devolucao == artigo.devolucao
+                && Double.compare(artigo.preco, preco) == 0
+                && Double.compare(artigo.precobase, precobase) == 0
+                && Double.compare(artigo.desconto, desconto) == 0
+                && Objects.equals(estado, artigo.estado)
+                && Objects.equals(descricao, artigo.descricao)
+                && Objects.equals(Brand, artigo.Brand)
+                && Objects.equals(ID, artigo.ID)
+                && Objects.equals(colecao, artigo.colecao)
+                && Objects.equals(transportadoras, artigo.transportadoras);
+    }
 
 }

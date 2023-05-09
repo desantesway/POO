@@ -8,16 +8,83 @@ public class Transportadoras {
     private LocalDate dataEnviado;
     private int diasAtraso;
 
-    // faz conta do o 1º elemento com o 2ª elemento e da return do resultado
-    public double ari(double st,String operador, double nd){
-        double result = 0.0;
-        switch (operador){
-            case "*" -> result = st * nd;
-            case "+" -> result = st + nd;
-            case "-" -> result = st - nd;
-            case "/" -> result = st / nd;
+    //calcula o preço de expedição premium para todos os tamanhos a partir de uma formula em string
+    public void formulaPremium(String formula){
+        this.setPrecoPremium(evaluate(formula));
+    }
+
+    //calcula o preço de expedição para todos os tamanhos a partir de uma formula em string
+    public void formula(String formula){
+        this.setPrecoExp(evaluate(formula));
+    }
+
+    // analisa os parenteses e faz conta por ordem
+    public Tamanhos evaluate(String formula) {
+        formula = formula.replaceAll("\\s+", "");
+
+        while (formula.contains("(")) {
+            int startIndex = formula.lastIndexOf("(");
+            int endIndex = formula.indexOf(")", startIndex);
+            String innerFormula = formula.substring(startIndex + 1, endIndex);
+            Tamanhos result = evaluateInnermost(innerFormula);
+            formula = formula.substring(0, startIndex) + result + formula.substring(endIndex + 1);
         }
-        return result;
+
+        // Evaluate the remaining formula using myfunc
+        return evaluateInnermost(formula);
+    }
+
+    // analisa a string para como ha de fazer conta (se o operador é +, -, ..., o tipo dos operandos etc.)
+    public Tamanhos evaluateInnermost(String formula) {
+        if(formula.contains("Tamanhos{pequeno=") && formula.contains("medio=") && formula.contains("grande=") && formula.contains("}")
+        && !(formula.contains("*") || formula.contains("+") || formula.contains("-") || formula.contains("/") )){
+            double p=-1.0, m=-1.0, g=-1.0;
+            int tmp=0;
+            for (int i = 0; i < formula.length(); i++) {
+                char c = formula.charAt(i);
+                if (c == ',' || c == '}'){
+                    if(p == -1.0){
+                        p = Double.parseDouble(formula.substring(17,i));
+                        tmp = i;
+                    } else if(m == -1.0){
+                        m = Double.parseDouble(formula.substring(tmp+8,i));
+                        tmp = i;
+                    } else {
+                        g = Double.parseDouble(formula.substring(tmp+9,i));
+                        break;
+                    }
+                }
+            }
+            return new Tamanhos(p,m,g);
+        }if (formula.equals("valor")){
+            return this.getValorBase();
+        }if (formula.equals("imposto")){
+            return new Tamanhos(this.getImposto());
+        } try {
+            double p = Double.parseDouble(formula);
+            return new Tamanhos(p);
+        } catch (NumberFormatException e) {
+            for (int i = formula.length() - 1; i >= 0; i--) {
+                char c = formula.charAt(i);
+                if (c == '+' || c == '-' || c == '*' || c == '/') {
+                    String operator = String.valueOf(c);
+                    Tamanhos leftOperand = evaluateInnermost(formula.substring(0, i));
+                    Tamanhos rightOperand = evaluateInnermost(formula.substring(i + 1));
+                    return ari(leftOperand, operator, rightOperand);
+                }
+
+            }
+            throw new IllegalArgumentException("Invalid formula: " + formula);
+        }
+    }
+
+    // faz conta com um operador
+    public Tamanhos ari(Tamanhos st, String operador, Tamanhos nd){
+        if(st.getGrande() == st.getMedio() && st.getMedio() == st.getPequeno()){
+            return ari(st.getGrande(), operador, nd);
+        } else{
+            return ari(st, operador, nd.getGrande());
+        }
     }
 
     // faz conta com todos os elementos do 1º com o 2ª elemento e da return do resultado
@@ -87,7 +154,9 @@ public class Transportadoras {
         this.setPremium(false);
     }
 
-    // constructor, clone, tostring, getters e setters
+    /*
+        construtores, getters, setters, clone, tostring e equals
+     */
     public Transportadoras(Transportadoras other) {
         this.precoPremium = new Tamanhos(other.getPrecoPremium());
         this.precoExp = new Tamanhos(other.getPrecoExp());

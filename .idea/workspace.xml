@@ -4,15 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dacbf7aa-37b9-4928-bf0e-36af9f396d26" name="Changes" comment="correçoes em todas as classes &amp;&amp; mockup de um menu com alguma funcionalidades">
+    <list default="true" id="dacbf7aa-37b9-4928-bf0e-36af9f396d26" name="Changes" comment="save &amp; load done">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Artigo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Artigo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Encomendas.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Encomendas.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Transportadoras.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transportadoras.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/UserApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/UserApp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Utilizador.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utilizador.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/sys.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/sys.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,7 +69,21 @@
       <option name="project" value="LOCAL" />
       <updated>1683652499091</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="list -&gt; map &amp;&amp; almost save obj done">
+      <created>1683737072907</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1683737072907</updated>
+    </task>
+    <task id="LOCAL-00004" summary="save &amp; load done">
+      <created>1683737282711</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1683737282711</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -92,6 +100,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="encomendas + transportadoes (getters e setters)" />
     <MESSAGE value="correçoes em todas as classes &amp;&amp; mockup de um menu com alguma funcionalidades" />
-    <option name="LAST_COMMIT_MESSAGE" value="correçoes em todas as classes &amp;&amp; mockup de um menu com alguma funcionalidades" />
+    <MESSAGE value="list -&gt; map &amp;&amp; almost save obj done" />
+    <MESSAGE value="save &amp; load done" />
+    <option name="LAST_COMMIT_MESSAGE" value="save &amp; load done" />
   </component>
 </project>

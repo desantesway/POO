@@ -37,13 +37,21 @@ public class UserApp {
     }
 
     private void closeApp(){
-        try{
-            this.getModel().save("sys.obj");
-        } catch (IOException e){
+        String y;
 
+        System.out.println("Queres guardar as mudanças [y/m]?");
+        y = scin.nextLine();
+
+        if(y.equals("y")){
+            try{
+                this.getModel().save("sys.obj");
+            } catch (IOException e){
+                System.out.println("Erro a registar ficheiro: " + e);
+            }
         }
 
-        System.out.println("bye bye, registar num ficheiro");
+        System.out.println("Turning off...");
+
     }
 
     private void admin(){
@@ -101,10 +109,43 @@ public class UserApp {
         });
 
         loginMenu.setHandler(1, this::loginuser);
-        //loginMenu.setHandler(2, this::logintransportadora);
+        loginMenu.setHandler(2, this::logintransportadora);
         loginMenu.setHandler(3, this::admin);
 
         loginMenu.run();
+    }
+
+    private void logintransportadora(){
+        String email;
+
+        System.out.println("E-mail/ID: ");
+        email = scin.nextLine();
+
+        if(this.getModel().existsEmail(email) || this.getModel().getUser().containsKey(email)){
+            Utilizador logged = model.getUser(email);
+
+            NewMenu userMenu = new NewMenu(new String[]{
+                    "Dados Pessoais", "Alterar Configurações", "Criar Novo Artigo", "Publicar Artigo",
+                    "Remover Artigo", "Fazer Encomenda", "Receita",
+                    "Ver Produtos Comprados", "Ver produtos Vendidos", "Ver produtos Á Venda"
+            });
+
+            /*userMenu.setHandler(1, this::details);
+            userMenu.setHandler(2, this::changeconfig);
+            userMenu.setHandler(3, this::newartigo);
+            userMenu.setHandler(4, this::addartigo);
+            userMenu.setHandler(5, this::publishartigo);
+            userMenu.setHandler(6, this::rmartigo);
+            userMenu.setHandler(7, this::encomendar);
+            userMenu.setHandler(8, this::receita);
+            userMenu.setHandler(9, this::bought);
+            userMenu.setHandler(10, this::sold);
+            userMenu.setHandler(11, this::selling);*/
+
+            userMenu.run();
+        } else{
+            System.out.println("E-mail ainda não registado.");
+        }
     }
 
     private void loginuser(){

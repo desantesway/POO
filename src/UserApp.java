@@ -11,13 +11,13 @@ public class UserApp {
     }
     private UserApp(){
         model = new sys();
-        /*try{
+        try{
             this.setModel(this.getModel().load("sys.obj"));
         } catch (ClassNotFoundException | IOException e) {
             System.out.println("Erro ao ler ficheiro: " + e);
 
             throw new RuntimeException(e);
-        }*/
+        }
         scin = new Scanner(System.in);
     }
 

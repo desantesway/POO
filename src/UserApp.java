@@ -296,11 +296,54 @@ public class UserApp {
     }
 
     private void user_details(Utilizador logged){
-        System.out.println("opção por implementar");
+            System.out.println("Email = " + logged.getEmail() + "\n"
+                    + "Nome = " + logged.getNome() + "\n"
+                    + "Morada = " + logged.getMorada() + "\n"
+                    + "Nif = " + logged.getNif() + "\n"
+                    + "User ID =" + logged.getID() + "\n"
+                    + "Produtos a venda = " + logged.getProdutosAVenda()+ "\n"
+                    + "Vendas efetuadas =" + logged.getVendasEfetuadas() + "\n"
+                    + "Artigos = " + logged.getArtigos() + "\n"
+                    + "Encomendas = " + logged.getEncomendas()
+            );
     }
 
     private void user_change_config(Utilizador logged){
-        System.out.println("opção por implementar");
+        NewMenu config_user_Menu = new NewMenu(new String[]{
+                "Mudar email" , "Mudar nome", "Mudar morada", "Mudar nif"
+        });
+
+        config_user_Menu.setHandler(1, ()-> this.email_user(logged));
+        config_user_Menu.setHandler(2, ()-> this.nome_user(logged));
+        config_user_Menu.setHandler(3, ()-> this.morada_user(logged));
+        config_user_Menu.setHandler(4, ()-> this.nif_user(logged));
+
+        config_user_Menu.run();
+    }
+
+    private void email_user(Utilizador logged){
+        System.out.println("Introduza novo email:\n");
+        String email = scin.nextLine();
+        logged.setEmail(email);
+        System.out.println(logged.getEmail());
+    }
+    private void nome_user(Utilizador logged){
+        System.out.println("Introduza novo nome:\n");
+        String nome = scin.nextLine();
+        logged.setNome(nome);
+        System.out.println(logged.getNome());
+    }
+    private void morada_user(Utilizador logged){
+        System.out.println("Introduza nova morada:\n");
+        String m = scin.nextLine();
+        logged.setMorada(m);
+        System.out.println(logged.getMorada());
+    }
+    private void nif_user(Utilizador logged){
+        System.out.println("Introduza nova nif:\n");
+        String m = scin.nextLine();
+        logged.setNif(m);
+        System.out.println(logged.getNif());
     }
 
     private void user_new_artigo(Utilizador logged){

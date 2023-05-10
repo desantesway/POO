@@ -1,4 +1,6 @@
-public class Tamanhos {
+import java.io.Serializable;
+
+public class Tamanhos implements Serializable {
 
     private double pequeno, medio, grande;
 

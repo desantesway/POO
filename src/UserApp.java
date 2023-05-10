@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -11,14 +13,18 @@ public class UserApp {
     }
     private UserApp(){
         model = new sys();
-        try{
-            this.setModel(this.getModel().load("sys.obj"));
-        } catch (ClassNotFoundException | IOException e) {
-            System.out.println("Erro ao ler ficheiro: " + e);
-
-            throw new RuntimeException(e);
-        }
         scin = new Scanner(System.in);
+        File file = new File("sys.obj");
+        if(file.exists()){
+            try{
+                this.setModel(this.getModel().load("sys.obj"));
+            } catch (ClassNotFoundException | IOException e) {
+                System.out.println("Erro ao ler ficheiro: " + e);
+
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 
     private void run(){
@@ -39,7 +45,7 @@ public class UserApp {
     private void closeApp(){
         String y;
 
-        System.out.println("Queres guardar as mudanças [y/m]?");
+        System.out.println("Queres guardar as mudanças [y/n]?");
         y = scin.nextLine();
 
         if(y.equals("y")){
@@ -116,31 +122,20 @@ public class UserApp {
     }
 
     private void logintransportadora(){
-        String email;
+        String id;
 
-        System.out.println("E-mail/ID: ");
-        email = scin.nextLine();
+        System.out.println("Número da transportadora: ");
+        id = scin.nextLine();
 
-        if(this.getModel().existsEmail(email) || this.getModel().getUser().containsKey(email)){
-            Utilizador logged = model.getUser(email);
+        if(this.getModel().getTransportadora().containsKey(id)){
+            Transportadoras logged = model.getTransportadora().get(id);
 
             NewMenu userMenu = new NewMenu(new String[]{
-                    "Dados Pessoais", "Alterar Configurações", "Criar Novo Artigo", "Publicar Artigo",
-                    "Remover Artigo", "Fazer Encomenda", "Receita",
-                    "Ver Produtos Comprados", "Ver produtos Vendidos", "Ver produtos Á Venda"
+                    "Dados", "Alterar Dados"
             });
 
             /*userMenu.setHandler(1, this::details);
-            userMenu.setHandler(2, this::changeconfig);
-            userMenu.setHandler(3, this::newartigo);
-            userMenu.setHandler(4, this::addartigo);
-            userMenu.setHandler(5, this::publishartigo);
-            userMenu.setHandler(6, this::rmartigo);
-            userMenu.setHandler(7, this::encomendar);
-            userMenu.setHandler(8, this::receita);
-            userMenu.setHandler(9, this::bought);
-            userMenu.setHandler(10, this::sold);
-            userMenu.setHandler(11, this::selling);*/
+            userMenu.setHandler(2, this::changeconfig);*/
 
             userMenu.run();
         } else{

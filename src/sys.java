@@ -13,16 +13,18 @@ public class sys implements Serializable{
             oos.close();
         } catch (IOException e) {
             System.out.println("Error saving object: " + e.getMessage());
+            System.out.println("File name: " + nomef);
             throw e;
         }
     }
 
-    public sys load(String nomef) throws IOException, ClassNotFoundException{
+    public sys load(String nomef) throws IOException, ClassNotFoundException {
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nomef));
             return (sys) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error loading object: " + e.getMessage());
+            System.out.println("File name: " + nomef);
             throw e;
         }
     }
@@ -75,7 +77,7 @@ public class sys implements Serializable{
             for (Map.Entry<String, Utilizador> entry : this.getUser().entrySet()) {
                 Utilizador art = entry.getValue();
                 if(art.getEmail().equals(id)){
-                    this.user.remove(id);
+                    this.user.remove(entry.getKey());
                 }
             }
         }else {

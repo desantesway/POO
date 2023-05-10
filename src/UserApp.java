@@ -1,5 +1,4 @@
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -72,10 +71,10 @@ public class UserApp {
                     "Ver todas as transportadoras", "Eliminar transportadora"
             });
 
-            adminMenu.setHandler(1, this::seeusers);
-            adminMenu.setHandler(2, this::deluser);
-            adminMenu.setHandler(3, this::seetransportadora);
-            adminMenu.setHandler(4, this::deltransportadora);
+            adminMenu.setHandler(1, this::see_users);
+            adminMenu.setHandler(2, this::del_user);
+            adminMenu.setHandler(3, this::see_transportadora);
+            adminMenu.setHandler(4, this::del_transportadora);
 
             adminMenu.run();
         } else{
@@ -83,11 +82,11 @@ public class UserApp {
         }
     }
 
-    private void seetransportadora(){
+    private void see_transportadora(){
         System.out.println(model.getTransportadora());
     }
 
-    private void deltransportadora(){
+    private void del_transportadora(){
         String id;
 
         System.out.println("Número da transportadora a eliminar: ");
@@ -96,11 +95,11 @@ public class UserApp {
         this.getModel().getTransportadora().remove(id);
     }
 
-    private void seeusers(){
+    private void see_users(){
         System.out.println(model.getUser());
     }
 
-    private  void deluser(){
+    private  void del_user(){
         String email;
 
         System.out.println("E-mail/ID do user a eliminar: ");
@@ -114,14 +113,17 @@ public class UserApp {
                  "User" , "Transportadora", "Admin"
         });
 
-        loginMenu.setHandler(1, this::loginuser);
-        loginMenu.setHandler(2, this::logintransportadora);
+        loginMenu.setHandler(1, this::login_user);
+        loginMenu.setHandler(2, this::login_transportadora);
         loginMenu.setHandler(3, this::admin);
+
+        loginMenu.setPreCondition(1, ()-> this.getModel().getUser().size()>0);
+        loginMenu.setPreCondition(2, ()-> this.getModel().getTransportadora().size()>0);
 
         loginMenu.run();
     }
 
-    private void logintransportadora(){
+    private void login_transportadora(){
         String id;
 
         System.out.println("Número da transportadora: ");
@@ -134,16 +136,114 @@ public class UserApp {
                     "Dados", "Alterar Dados"
             });
 
-            /*userMenu.setHandler(1, this::details);
-            userMenu.setHandler(2, this::changeconfig);*/
+            userMenu.setHandler(1, ()->this.details_transportadora(logged));
+            userMenu.setHandler(2, ()->this.change_config_transportadora(logged));
 
             userMenu.run();
         } else{
-            System.out.println("E-mail ainda não registado.");
+            System.out.println("Transportadora ainda não registada.");
         }
     }
 
-    private void loginuser(){
+    private void details_transportadora(Transportadoras logged){
+        if(logged.getPremium()){
+            System.out.println("Imposto = " + logged.getImposto() + "\n"
+                    + "Dias de atraso = " + logged.getDiasAtraso() + "\n"
+                    + "Valores Base = " + logged.getValorBase().getPequeno() + ", "
+                    + logged.getValorBase().getMedio() + ", "
+                    + logged.getValorBase().getGrande() + ", " + "\n"
+                    + "Valores de Expedição = " + logged.getPrecoExp().getPequeno() + ", "
+                    + logged.getPrecoExp().getMedio() + ", "
+                    + logged.getPrecoExp().getGrande() + ", " + "\n"
+                    + "Valores de Expedição Premium = " + logged.getPrecoPremium().getPequeno() + ", "
+                    + logged.getPrecoPremium().getMedio() + ", "
+                    + logged.getPrecoPremium().getGrande() + "\n"
+                    + "Formula: " + logged.getFormula() + "\n"
+                    + "Formula Premium: " + logged.getFpremium()
+            );
+        } else{
+            System.out.println("Imposto = " + logged.getImposto() + "\n"
+                    + "Dias de atraso = " + logged.getDiasAtraso() + "\n"
+                    + "Valores Base = " + logged.getValorBase().getPequeno() + ", "
+                    + logged.getValorBase().getMedio() + ", "
+                    + logged.getValorBase().getGrande() + ", " + "\n"
+                    + "Valores de Expedição = " + logged.getPrecoExp().getPequeno() + ", "
+                    + logged.getPrecoExp().getMedio() + ", "
+                    + logged.getPrecoExp().getGrande() + "\n"
+                    + "Formula: " + logged.getFormula()
+            );
+        }
+
+    }
+
+    private void change_config_transportadora(Transportadoras logged){
+        NewMenu config_trans_Menu = new NewMenu(new String[]{
+                "Ativar/Desativar Premium" , "Mudar Valores Base", "Mudar Formula Expedição", "Mudar Formula Expedição Premium"
+        });
+
+        config_trans_Menu.setHandler(1, ()-> this.premium_transportadora(logged));
+        config_trans_Menu.setHandler(2, ()-> this.base_transportadora(logged));
+        config_trans_Menu.setHandler(3, ()-> this.formula_transportadora(logged));
+        config_trans_Menu.setHandler(4, ()-> this.formula_premium_transportadora(logged));
+
+        config_trans_Menu.setPreCondition(4, logged::getPremium);
+
+        config_trans_Menu.run();
+    }
+
+    private void formula_premium_transportadora(Transportadoras logged){
+        System.out.println("Formula nova para os preços de expedição Premium:\nkeys:\nvalor - valor base dos 3 tamanhos\nimposto - imposto");
+        String formula = scin.nextLine();
+        logged.setFpremium(formula);
+        logged.formulaPremium(formula);
+
+        System.out.println(logged.getPrecoPremium());
+    }
+
+    private void formula_transportadora(Transportadoras logged){
+        System.out.println("Formula nova para os preços de expedição:\nkeys:\nvalor - valor base dos 3 tamanhos\nimposto - imposto");
+        String formula = scin.nextLine();
+        logged.setFormula(formula);
+        logged.formula(formula);
+
+        System.out.println(logged.getPrecoExp());
+    }
+
+    private void base_transportadora(Transportadoras logged){
+        String base;
+
+        System.out.println("Preço para encomendas pequenas (1 artigo): ");
+        base = scin.nextLine();
+        logged.getValorBase().setPequeno(Double.parseDouble(base));
+        System.out.println("Preço para encomendas médias (2 a 5 artigos): ");
+        base = scin.nextLine();
+        logged.getValorBase().setMedio(Double.parseDouble(base));
+        System.out.println("Preço para encomendas grandes (mais que 5 artigos): ");
+        base = scin.nextLine();
+        logged.getValorBase().setGrande(Double.parseDouble(base));
+
+        logged.formula(logged.getFormula());
+
+        if(logged.getPremium()){
+            logged.formulaPremium(logged.getFpremium());
+            System.out.println("Valores base: " + logged.getValorBase() + "\n" + "Valores expedição: " +
+                    logged.getPrecoExp() +"\n"+ "Valores expedição Premium: " + logged.getPrecoPremium());
+        }else{
+            System.out.println("Valores base: " + logged.getValorBase() + "\n" + "Valores expedição: " +
+                    logged.getPrecoExp());
+        }
+
+    }
+
+    private void premium_transportadora(Transportadoras logged){
+        if(logged.getPremium()){
+            logged.desativaPremium();
+        } else{
+            logged.ativaPremium();
+        }
+    }
+
+    private void login_user(){
         String email;
 
         System.out.println("E-mail/ID: ");
@@ -153,22 +253,13 @@ public class UserApp {
             Utilizador logged = model.getUser(email);
 
             NewMenu userMenu = new NewMenu(new String[]{
-                    "Dados Pessoais", "Alterar Configurações", "Criar Novo Artigo", "Publicar Artigo",
-                    "Remover Artigo", "Fazer Encomenda", "Receita",
-                    "Ver Produtos Comprados", "Ver produtos Vendidos", "Ver produtos Á Venda"
+                    "Dados Pessoais", "Alterar Configurações", "Central de Cliente", "Centro de Vendedor"
             });
 
-            /*userMenu.setHandler(1, this::details);
-            userMenu.setHandler(2, this::changeconfig);
-            userMenu.setHandler(3, this::newartigo);
-            userMenu.setHandler(4, this::addartigo);
-            userMenu.setHandler(5, this::publishartigo);
-            userMenu.setHandler(6, this::rmartigo);
-            userMenu.setHandler(7, this::encomendar);
-            userMenu.setHandler(8, this::receita);
-            userMenu.setHandler(9, this::bought);
-            userMenu.setHandler(10, this::sold);
-            userMenu.setHandler(11, this::selling);*/
+            userMenu.setHandler(1, () -> this.user_details(logged));
+            userMenu.setHandler(2, () -> this.user_change_config(logged));
+            userMenu.setHandler(3, () -> this.user_central_cliente(logged));
+            userMenu.setHandler(4, () -> this.user_central_vendedor(logged));
 
             userMenu.run();
         } else{
@@ -176,19 +267,91 @@ public class UserApp {
         }
     }
 
+    private void user_central_cliente(Utilizador logged){
+        NewMenu userMenu = new NewMenu(new String[]{
+                "Encomendar", "Ver produtos comprados"
+        });
+
+        userMenu.setHandler(1, () -> this.user_encomendar(logged));
+        userMenu.setHandler(2, () -> this.user_bought(logged));
+
+        userMenu.run();
+    }
+
+    private void user_central_vendedor(Utilizador logged){
+        NewMenu userMenu = new NewMenu(new String[]{
+                "Criar Novo Artigo", "Publicar Artigo",
+                "Remover Artigo", "Receita",
+                "Ver produtos Vendidos", "Ver produtos Á Venda"
+        });
+
+        userMenu.setHandler(1, () -> this.user_new_artigo(logged));
+        userMenu.setHandler(2, () -> this.user_publish_artigo(logged));
+        userMenu.setHandler(3, () -> this.user_rm_artigo(logged));
+        userMenu.setHandler(4, () -> this.user_receita(logged));
+        userMenu.setHandler(5, () ->this.user_sold(logged));
+        userMenu.setHandler(6, () -> this.user_selling(logged));
+
+        userMenu.run();
+    }
+
+    private void user_details(Utilizador logged){
+        System.out.println("opção por implementar");
+    }
+
+    private void user_change_config(Utilizador logged){
+        System.out.println("opção por implementar");
+    }
+
+    private void user_new_artigo(Utilizador logged){
+        System.out.println("opção por implementar");
+    }
+
+    private void user_add_artigo(Utilizador logged){
+        System.out.println("opção por implementar");
+    }
+
+    private void user_publish_artigo(Utilizador logged){
+        System.out.println("opção por implementar");
+    }
+
+    private void user_rm_artigo(Utilizador logged){
+        System.out.println("opção por implementar");
+    }
+
+    private void user_encomendar(Utilizador logged){
+        System.out.println("opção por implementar");
+    }
+
+    private void user_receita(Utilizador logged){
+        System.out.println("opção por implementar");
+    }
+
+    private void user_bought(Utilizador logged){
+        System.out.println("opção por implementar");
+    }
+
+    private void user_sold(Utilizador logged){
+        System.out.println("opção por implementar");
+    }
+
+    private void user_selling(Utilizador logged){
+        System.out.println("opção por implementar");
+    }
+
     private void registar(){
         NewMenu registarMenu = new NewMenu(new String[]{
                 "User", "Transportadora"
         });
 
-        registarMenu.setHandler(1, this::registaruser);
-        registarMenu.setHandler(2, this::registartransportadora);
+        registarMenu.setHandler(1, this::registar_user);
+        registarMenu.setHandler(2, this::registar_transportadora);
 
         registarMenu.run();
 
     }
 
-    public void registaruser(){
+    private void registar_user(){
         String email= "", nome, morada, nif="";
 
         while(!(email.contains("@"))){
@@ -217,7 +380,7 @@ public class UserApp {
         System.out.println("Id de login:" + user.getID());
     }
 
-    public void registartransportadora(){
+    private void registar_transportadora(){
         String imposto, p, m, g, premium, formula, diasatraso;
         Transportadoras transportadora;
 
@@ -235,6 +398,7 @@ public class UserApp {
 
         System.out.println("Formula de Cálculo\nkeys:\nvalor - valor base dos 3 tamanhos\nimposto - imposto");
         formula = scin.nextLine();
+        transportadora.setFormula(formula);
         transportadora.formula(formula);
 
         System.out.println("Ativar Premium [y/n]? ");
@@ -243,6 +407,7 @@ public class UserApp {
             transportadora.ativaPremium();
             System.out.println("Formula de Cálculo Premium\nkeys:\nvalor - valor base dos 3 tamanhos\nimposto - imposto");
             formula = scin.nextLine();
+            transportadora.setFpremium(formula);
             transportadora.formulaPremium(formula);
         }
 
@@ -251,22 +416,24 @@ public class UserApp {
 
         transportadora.setDiasAtraso(Integer.parseInt(diasatraso));
 
+        System.out.println("Numero de login: " + this.getModel().getTransportadora().size());
+
         model.addTransportadora(transportadora);
     }
 
-    public sys getModel() {
+    private sys getModel() {
         return model;
     }
 
-    public void setModel(sys model) {
+    private void setModel(sys model) {
         this.model = model;
     }
 
-    public Scanner getScin() {
+    private Scanner getScin() {
         return scin;
     }
 
-    public void setScin(Scanner scin) {
+    private void setScin(Scanner scin) {
         this.scin = scin;
     }
 }

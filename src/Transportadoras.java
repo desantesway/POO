@@ -8,6 +8,7 @@ public class Transportadoras implements Serializable {
     private Boolean premium, enviado;
     private LocalDate dataEnviado;
     private int diasAtraso;
+    private String formula, fpremium;
 
     //calcula o preço de expedição premium para todos os tamanhos a partir de uma formula em string
     public void formulaPremium(String formula){
@@ -198,6 +199,22 @@ public class Transportadoras implements Serializable {
 
     public void setValorBase(double left, double middle, double right) {
         this.valorBase = new Tamanhos(left,middle,right);
+    }
+
+    public String getFormula() {
+        return formula;
+    }
+
+    public void setFormula(String formula) {
+        this.formula = formula;
+    }
+
+    public String getFpremium() {
+        return fpremium;
+    }
+
+    public void setFpremium(String fpremium) {
+        this.fpremium = fpremium;
     }
 
     public Tamanhos getPrecoExp() {

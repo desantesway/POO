@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Transportadoras {
+public class Transportadoras implements Serializable {
     private double imposto;
     private Tamanhos valorBase, precoExp, precoPremium;
     private Boolean premium, enviado;

@@ -3,10 +3,15 @@ import java.util.UUID;
 public class Artigo {
     private boolean publicado, premium;
     private String estado, descricao, Brand, ID;
-    private int NumeroDonos, devolucao;
+    private int NumeroDonos, devolucao, sold;
     private double preco, precobase, desconto;
     private Colecao colecao;
     private Transportadoras transportadoras;
+
+    //fez uma venda
+    public void sold(){
+        this.setSold(this.getSold()+1);
+    }
 
     /*
         construtores, getters, setters, clone, tostring e equals
@@ -27,6 +32,7 @@ public class Artigo {
         this.colecao = colecao;
         this.transportadoras = transportadoras;
         this.devolucao = 14;
+        this.sold = 0;
     }
 
     public Artigo(boolean publicado, boolean premium, String estado, int numeroDonos,
@@ -45,6 +51,7 @@ public class Artigo {
         this.colecao = colecao;
         this.transportadoras = transportadoras;
         this.devolucao = 14;
+        this.sold = 0;
     }
 
     public Artigo() {
@@ -60,6 +67,7 @@ public class Artigo {
         this.desconto=0;
         this.colecao=new Colecao();
         this.devolucao = 14;
+        this.sold = 0;
     }
 
     public Artigo(Transportadoras transportadoras) {
@@ -76,6 +84,7 @@ public class Artigo {
         this.colecao=new Colecao();
         this.transportadoras = transportadoras;
         this.devolucao = 14;
+        this.sold = 0;
     }
 
     public Artigo(Artigo l){
@@ -92,6 +101,15 @@ public class Artigo {
         this.colecao=l.getColecao();
         this.transportadoras=l.getTransportadoras();
         this.devolucao = l.getDevolucao();
+        this.sold = l.getSold();
+    }
+
+    public int getSold() {
+        return sold;
+    }
+
+    public void setSold(int sold) {
+        this.sold = sold;
     }
 
     public int getDevolucao() {

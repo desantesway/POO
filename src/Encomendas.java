@@ -1,10 +1,10 @@
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class Encomendas {
-    private List<Artigo> artigos;
+    private Map<String, Artigo> artigos;
     private String dimensao;
     private double precoFinal;
     private int estado, devolucao; // 0, 1, 2
@@ -28,7 +28,8 @@ public class Encomendas {
         this.setDimensao();
         double preco = 0;
         Tamanhos tam;
-        for (Artigo art : artigos) {
+        for (Map.Entry<String, Artigo> entry : this.getArtigos().entrySet()) {
+            Artigo art = entry.getValue();
             tam = art.getTransportadoras().getPrecoExp();
             if (art.isPremium()){
                 tam = art.getTransportadoras().getPrecoPremium();
@@ -50,20 +51,21 @@ public class Encomendas {
     }
 
     // funçao para remover um artigo a encomenda
-    public void rmArtigo(Artigo artigo){
-        this.artigos.remove(artigo);
+    public void rmArtigo(String key){
+        this.artigos.remove(key);
         this.setDimensao();
     }
+
     // funçao para adicionar um artigo a encomenda
     public void addArtigo(Artigo artigo){
-        this.artigos.add(artigo);
+        this.artigos.put(artigo.getID(), artigo);
         this.setDimensao();
     }
 
     /*
         construtores, getters, setters, clone, tostring e equals
      */
-    public Encomendas(List<Artigo> artigos) {
+    public Encomendas(Map<String, Artigo> artigos) {
         this.artigos = artigos;
         this.setDimensao();
         this.setPrecoFinal(0);
@@ -82,7 +84,7 @@ public class Encomendas {
     }
 
     public Encomendas() {
-        this.artigos = new ArrayList<Artigo>();
+        this.artigos = new HashMap<>();
         this.setDimensao("pequeno");
         this.setPrecoFinal(0);
         this.setEstado(0);
@@ -98,11 +100,11 @@ public class Encomendas {
         this.devolucao = devolucao;
     }
 
-    public List<Artigo> getArtigos() {
+    public Map<String, Artigo> getArtigos() {
         return artigos;
     }
 
-    public void setArtigos(List<Artigo> artigos) {
+    public void setArtigos(Map<String, Artigo> artigos) {
         this.artigos = artigos;
     }
 
@@ -139,7 +141,8 @@ public class Encomendas {
         boolean done;
         done = true;
         if(this.getEstado() == 1){
-            for(Artigo art: artigos) {
+            for (Map.Entry<String, Artigo> entry : this.getArtigos().entrySet()) {
+                Artigo art = entry.getValue();
                 if (this.getData().plusDays(art.getTransportadoras().getDiasAtraso()).isAfter(LocalDate.now())) {
                     art.getTransportadoras().enviar();
                 }
@@ -185,8 +188,8 @@ public class Encomendas {
                 ", dimensao='" + dimensao + '\'' +
                 ", precoFinal=" + precoFinal +
                 ", estado=" + estado +
+                ", devolucao=" + devolucao +
                 ", data=" + data +
-                ", Devolução=" + devolucao +
                 '}';
     }
 

@@ -1,24 +1,86 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-public class Utilizador {
-    private int ID;
-    private String email, nome, morada, nif;
-    private List<Artigo> produtosAVenda, produtosComprados, vendasEfetuadas;
-    private static Random random = new Random();
+import java.io.Serializable;
+import java.util.*;
+
+public class Utilizador implements Serializable {
+    private String email, nome, morada, nif, ID;
+    private Map<String, Artigo> produtosAVenda, vendasEfetuadas, artigos;
+    private Map<String, Encomendas> encomendas;
+
+    // adiciona um artigo a venda
+    public void adicionarProdutoAVenda(Artigo venda) {
+        this.produtosAVenda.put(venda.getID(), venda);
+    }
+
+    // remove um artigo a venda
+    public void removerProdutoAVenda(String key) {
+        this.produtosAVenda.remove(key);
+    }
+
+    public Map<String, Artigo> getComprados(){
+        Map<String, Artigo> ret = new HashMap<>();
+        for (Map.Entry<String, Encomendas> entry : this.getEncomendas().entrySet()) {
+            ret.putAll(entry.getValue().getArtigos());
+        }
+        return ret;
+    }
+
+    // adiciona uma encomenda
+    public void adicionarEncomenda(Encomendas encomenda) {
+        this.encomendas.put(Integer.toString(this.encomendas.size()) ,encomenda);
+    }
+
+    // elimina uma encomenda (apenas se nao foi efetuado a compra)
+    public void eliminarEncomenda(String key) {
+        if(this.encomendas.get(key).getEstado() == 0){
+            this.encomendas.remove(key);
+        } else{
+            System.out.println("Eliminação não possivel, compra já foi realizada nesta encomenda.");
+        }
+
+    }
+
+    // adiciona um artigo vendido
+    public void adicionarVendaEfetuada(Artigo venda) {
+        this.vendasEfetuadas.put(venda.getID(), venda);
+    }
+
+    // remove um artigo vendido
+    public void removerVendaEfetuada(String key) {
+        this.vendasEfetuadas.remove(key);
+    }
+
+    // obtem o o valor total das vendas
+    public double getRevenue() {
+        double revenue = 0.0;
+        for (Map.Entry<String, Artigo> entry : this.getVendasEfetuadas().entrySet()) {
+            revenue += entry.getValue().getPreco();
+        }
+        return revenue;
+    }
+
+    // gera um id aleatorio para o utilizador
+    private static int gerarIDAleatorio() {
+        Random random = new Random();
+        int ID = 0;
+        do {
+            ID = random.nextInt(1000000);
+        } while (ID < 100000);
+        return ID;
+    }
 
     /*
         construtores, getters, setters, clone, tostring e equals
      */
     public Utilizador(){
-        this.ID=0;
+        this.ID="";
         this.email="";
         this.nome="";
         this.morada="";
         this.nif="";
-        this.produtosAVenda=new ArrayList<Artigo>();
-        this.produtosComprados=new ArrayList<Artigo>();
-        this.vendasEfetuadas=new ArrayList<Artigo>();
+        this.encomendas = new HashMap<>();
+        this.produtosAVenda = new HashMap<>();
+        this.vendasEfetuadas = new HashMap<>();
+        this.artigos = new HashMap<>();
     }
     public Utilizador(Utilizador l){
         this.ID=l.getID();
@@ -26,39 +88,81 @@ public class Utilizador {
         this.nome=l.getNome();
         this.morada=l.getMorada();
         this.nif=l.getNif();
-        this.produtosAVenda=new ArrayList<Artigo>();
-        this.produtosComprados=new ArrayList<Artigo>();
-        this.vendasEfetuadas=new ArrayList<Artigo>();
+        this.encomendas = l.getEncomendas();
+        this.produtosAVenda = l.getProdutosAVenda();
+        this.vendasEfetuadas = l.getVendasEfetuadas();
+        this.artigos = l.getArtigos();
     }
 
     public Utilizador(String email,String nome,String morada,String nif){
-        this.ID=gerarIDAleatorio();
+        this.ID=generateID();
         this.email=email;
         this.nome=nome;
         this.morada=morada;
         this.setNif(nif);
-        this.produtosAVenda=new ArrayList<Artigo>();
-        this.produtosComprados=new ArrayList<Artigo>();
-        this.vendasEfetuadas=new ArrayList<Artigo>();
+        this.encomendas = new HashMap<>();
+        this.produtosAVenda = new HashMap<>();
+        this.vendasEfetuadas = new HashMap<>();
+        this.artigos = new HashMap<>();
     }
 
+    public String generateID(){
+        ID=UUID.randomUUID().toString().toUpperCase().substring(0,6);
+        return ID;
+    }
 
-    public int getID(){
-    return this.ID;
+    public void setID(String ID) {
+        this.ID = ID;
+    }
+
+    public Map<String, Artigo> getProdutosAVenda() {
+        return produtosAVenda;
+    }
+
+    public void setProdutosAVenda(Map<String, Artigo> produtosAVenda) {
+        this.produtosAVenda = produtosAVenda;
+    }
+
+    public Map<String, Artigo> getVendasEfetuadas() {
+        return vendasEfetuadas;
+    }
+
+    public void setVendasEfetuadas(Map<String, Artigo> vendasEfetuadas) {
+        this.vendasEfetuadas = vendasEfetuadas;
+    }
+
+    public Map<String, Artigo> getArtigos() {
+        return artigos;
+    }
+
+    public void setArtigos(Map<String, Artigo> artigos) {
+        this.artigos = artigos;
+    }
+
+    public Map<String, Encomendas> getEncomendas() {
+        return encomendas;
+    }
+
+    public void setEncomendas(Map<String, Encomendas> encomendas) {
+        this.encomendas = encomendas;
+    }
+
+    public String getID(){
+        return this.ID;
     }
     public String getEmail(){
-    return this.email;
+        return this.email;
     }
     public String getNome(){
-    return this.nome;
+        return this.nome;
     }
 
     public String getMorada(){
-    return this.morada;
+        return this.morada;
     }
 
     public String getNif(){
-    return this.nif;
+        return this.nif;
     }
 
     public void setNif(String nif) {
@@ -67,11 +171,7 @@ public class Utilizador {
     }
 
     public void setMorada(String morada) {
-    this.morada = morada;
-    }
-
-    public void setId(int id) {
-    this.ID = id;
+        this.morada = morada;
     }
 
     public void setEmail(String email) {
@@ -82,124 +182,30 @@ public class Utilizador {
     this.nome = nome;
     }
 
-    // Obtem lista dos produtos à venda
-    public ArrayList<Artigo> getprodutosAVenda(){
-        ArrayList<Artigo> resultado=new ArrayList<>();
-        for(Artigo le:this.produtosAVenda){
-            resultado.add(le.clone());
-        }
-        return  resultado;
-    }
-
-    // Obtem lista dos produtos comprados
-    public ArrayList<Artigo> getprodutosComprados(){
-        ArrayList<Artigo> resultado=new ArrayList<>();
-        for(Artigo le:this.produtosComprados){
-            resultado.add(le.clone());
-        }
-        return  resultado;
-    }
-
-    // Obtem lista dos produtos vendidos
-    public ArrayList<Artigo> getvendasEfetuadas(){
-        ArrayList<Artigo> resultado=new ArrayList<>();
-        for(Artigo le:this.vendasEfetuadas){
-            resultado.add(le.clone());
-        }
-    return  resultado;
-    }
-
-    public void setprodutosAVenda(ArrayList<Artigo> produtosAVenda) {
-        this.produtosAVenda = new ArrayList<>();
-        for (Artigo le : produtosAVenda) {
-        this.produtosAVenda.add(le.clone());
-        }
-    }
-
-    public void setProdutosComprados(ArrayList<Artigo> produtosComprados) {
-        this.produtosComprados = new ArrayList<>();
-        for (Artigo le : produtosComprados) {
-        this.produtosComprados.add(le.clone());
-        }
-    }
-    public void setVendasEfetuadas(ArrayList<Artigo> vendasEfetuadas) {
-        this.vendasEfetuadas = new ArrayList<>();
-        for (Artigo le : vendasEfetuadas) {
-        this.vendasEfetuadas.add(le.clone());
-        }
-    }
-
-    // adiciona um artigo a venda
-    public void adicionarProdutoAVenda(Artigo produto) {
-        this.produtosAVenda.add(produto);
-    }
-
-    // remove um artigo a venda
-    public void removerProdutoAVenda(Artigo produto) {
-        this.produtosAVenda.remove(produto);
-    }
-
-    // adiciona um artigo comprado
-    public void adicionarProdutoComprado(Artigo produto) {
-    this.produtosComprados.add(produto);
-    }
-
-    // remove um artigo comprado
-    public void removerProdutoComprado(Artigo produto) {
-    this.produtosComprados.remove(produto);
-    }
-
-    // adiciona um artigo vendido
-    public void adicionarVendaEfetuada(Artigo venda) {
-    this.vendasEfetuadas.add(venda);
-    }
-
-    // remove um artigo vendido
-    public void removerVendaEfetuada(Artigo produto) {
-        this.vendasEfetuadas.remove(produto);
-    }
-
-    // obtem o o valor total das vendas
-    public double getRevenue(ArrayList<Artigo> vendasEfetuadas) {
-        double revenue = 0.0;
-        for (Artigo artigo : vendasEfetuadas) {
-            revenue += artigo.getPreco();
-        }
-        return revenue;
-    }
-
-    // gera um id aleatorio para o utilizador
-    private static int gerarIDAleatorio() {
-        int ID = 0;
-        do {
-            ID = random.nextInt(1000000);
-        } while (ID < 100000);
-        return ID;
-    }
-
     public boolean equals(Object o){
         if (this==o) return true;
         if ((o == null) || (this.getClass() != o.getClass())) return false;
         Utilizador l = (Utilizador) o;
-        return l.getID() == this.ID &&
-            l.getEmail() == this.email &&
-            l.getNome() == this.nome &&
-            l.getNif() == this.nif &&
-            l.getMorada() == this.morada;
+        return l.getID().equals(this.ID) &&
+            l.getEmail().equals(this.email) &&
+            l.getNome().equals(this.nome) &&
+            l.getNif().equals(this.nif) &&
+            l.getMorada().equals(this.morada);
     }
 
     @Override
     public String toString() {
         return "Utilizador{" +
-            "ID=" + ID +
-            ", email='" + email + '\'' +
-            ", nome='" + nome + '\'' +
-            ", morada='" + morada + '\'' +
-            ", nif='" + nif + '\'' +
-            ", produtosAVenda=" + produtosAVenda +
-            ", produtosComprados=" + produtosComprados +
-            ", vendasEfetuadas=" + vendasEfetuadas +
-            '}';
+                "ID=" + ID + '\'' +
+                ", email='" + email + '\'' +
+                ", nome='" + nome + '\'' +
+                ", morada='" + morada + '\'' +
+                ", nif='" + nif + '\'' +
+                ", produtosAVenda=" + produtosAVenda +
+                ", vendasEfetuadas=" + vendasEfetuadas +
+                ", artigos=" + artigos +
+                ", encomendas=" + encomendas +
+                '}';
     }
 
     public Utilizador clone(){

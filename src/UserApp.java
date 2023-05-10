@@ -1,5 +1,4 @@
-import jdk.jshell.execution.Util;
-
+import java.io.IOException;
 import java.util.Scanner;
 
 public class UserApp {
@@ -12,6 +11,13 @@ public class UserApp {
     }
     private UserApp(){
         model = new sys();
+        /*try{
+            this.setModel(this.getModel().load("sys.obj"));
+        } catch (ClassNotFoundException | IOException e) {
+            System.out.println("Erro ao ler ficheiro: " + e);
+
+            throw new RuntimeException(e);
+        }*/
         scin = new Scanner(System.in);
     }
 
@@ -31,6 +37,12 @@ public class UserApp {
     }
 
     private void closeApp(){
+        try{
+            this.getModel().save("sys.obj");
+        } catch (IOException e){
+
+        }
+
         System.out.println("bye bye, registar num ficheiro");
     }
 
@@ -42,16 +54,32 @@ public class UserApp {
 
         if(login.equals("admin")){
             NewMenu adminMenu = new NewMenu(new String[]{
-                    "Ver usuarios registados", "Eliminar usuário"
+                    "Ver usuarios registados", "Eliminar usuário",
+                    "Ver todas as transportadoras", "Eliminar transportadora"
             });
 
             adminMenu.setHandler(1, this::seeusers);
             adminMenu.setHandler(2, this::deluser);
+            adminMenu.setHandler(3, this::seetransportadora);
+            adminMenu.setHandler(4, this::deltransportadora);
 
             adminMenu.run();
         } else{
             System.out.println("Login Inválido!");
         }
+    }
+
+    private void seetransportadora(){
+        System.out.println(model.getTransportadora());
+    }
+
+    private void deltransportadora(){
+        String id;
+
+        System.out.println("Número da transportadora a eliminar: ");
+        id = scin.nextLine();
+
+        this.getModel().getTransportadora().remove(id);
     }
 
     private void seeusers(){
@@ -61,7 +89,7 @@ public class UserApp {
     private  void deluser(){
         String email;
 
-        System.out.println("E-mail do user a eliminar: ");
+        System.out.println("E-mail/ID do user a eliminar: ");
         email = scin.nextLine();
 
         model.DelUser(email);
@@ -82,10 +110,10 @@ public class UserApp {
     private void loginuser(){
         String email;
 
-        System.out.println("E-mail: ");
+        System.out.println("E-mail/ID: ");
         email = scin.nextLine();
 
-        if(model.UserExists(email)){
+        if(this.getModel().existsEmail(email) || this.getModel().getUser().containsKey(email)){
             Utilizador logged = model.getUser(email);
 
             NewMenu userMenu = new NewMenu(new String[]{
@@ -105,6 +133,8 @@ public class UserApp {
             userMenu.setHandler(9, this::bought);
             userMenu.setHandler(10, this::sold);
             userMenu.setHandler(11, this::selling);*/
+
+            userMenu.run();
         } else{
             System.out.println("E-mail ainda não registado.");
         }
@@ -144,7 +174,11 @@ public class UserApp {
                 System.out.println("Nif Inválido!");
             }
         }
-        model.RegistarUser(new Utilizador(email, nome, morada, nif));
+
+        Utilizador user = new Utilizador(email, nome, morada, nif);
+        model.RegistarUser(user);
+
+        System.out.println("Id de login:" + user.getID());
     }
 
     public void registartransportadora(){
@@ -182,5 +216,21 @@ public class UserApp {
         transportadora.setDiasAtraso(Integer.parseInt(diasatraso));
 
         model.addTransportadora(transportadora);
+    }
+
+    public sys getModel() {
+        return model;
+    }
+
+    public void setModel(sys model) {
+        this.model = model;
+    }
+
+    public Scanner getScin() {
+        return scin;
+    }
+
+    public void setScin(Scanner scin) {
+        this.scin = scin;
     }
 }

@@ -1,121 +1,131 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
-public class sys {
-    private List<Utilizador> user;
-    private List<Encomendas> encomenda;
-    private List<Transportadoras> transportadora;
-    private List<Artigo> artigo; // mudar para map, mais facil para adicionar e remover;
+public class sys implements Serializable{
+    private Map<String, Utilizador> user;
+    private Map<String, Transportadoras> transportadora;
 
-    public void addArtigo(Artigo artigo){
-        if(this.artigo.contains(artigo)){
-            System.out.println("Esse artigo já existe na Vintage!");
-        } else{
-            this.artigo.add(artigo);
-            System.out.println("Adicionado com sucesso!");
+    public void save(String nomef) throws IOException {
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(nomef));
+            oos.writeObject(this);
+            oos.close();
+        } catch (IOException e) {
+            System.out.println("Error saving object: " + e.getMessage());
+            throw e;
         }
     }
 
-    public void addTransportadora(Transportadoras tr){
-        if(this.transportadora.contains(tr)){
-            System.out.println("Essa transportadora já está registada.");
-        } else{
-            this.transportadora.add(tr);
-            System.out.println("Adicionado com sucesso!");
+    public sys load(String nomef) throws IOException, ClassNotFoundException{
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nomef));
+            return (sys) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error loading object: " + e.getMessage());
+            throw e;
         }
     }
 
-    public void removeArtigo(Artigo artigo){
-        this.artigo.remove(artigo);
-    }
+    /*public void gravaCsv(String nomef) throws IOException {
+        FileWriter pw = new FileWriter(nomef);
+        pw.write(this.toString());
+        pw.close();
+    }*/
 
-    public Boolean UserExists(String email){
-        for(Utilizador le:this.user){
-            if(le.getEmail().equals(email)){
+    // ve se tem conta com esse email
+    public boolean existsEmail(String email){
+        for (Map.Entry<String, Utilizador> entry : this.getUser().entrySet()) {
+            Utilizador art = entry.getValue();
+            if(art.getEmail().equals(email)){
                 return true;
             }
         }
         return false;
     }
 
+    //adiciona transportadora ao sistema
 
+    public void addTransportadora(Transportadoras tr){
+        if(this.transportadora.containsValue(tr)){
+            System.out.println("Essa transportadora já está registada.");
+        } else{
+            this.transportadora.put(Integer.toString(this.getTransportadora().size()),tr);
+            System.out.println("Adicionado com sucesso!");
+        }
+    }
+
+    //adiciona user ao sistema
     public void RegistarUser(Utilizador user){
-        boolean add = true;
-        for(Utilizador le:this.user){
-            if(le.getEmail().equals(user.getEmail())){
-                System.out.println("E-mail already registered!");
-                add = false;
-            }
-        }
-        if(add) {
-            this.user.add(user);
+        if(this.user.containsValue(user)){
+            System.out.println("E-mail already registered!");
+        } else{
+            this.user.put(user.getID(), user);
         }
     }
 
+    //remove user do sistema
     public void DelUser(Utilizador user){
-        this.user.remove(user);
+        this.user.remove(user.getID());
     }
 
-    public void DelUser(String email){
-        for(Utilizador le:this.user){
-            if(le.getEmail().equals(email)){
-                DelUser(le);
-                System.out.println("Eliminado com exito!");
-                return;
+    //remove user do sistema com email/id
+    public void DelUser(String id){
+        if(id.contains("@")){
+            for (Map.Entry<String, Utilizador> entry : this.getUser().entrySet()) {
+                Utilizador art = entry.getValue();
+                if(art.getEmail().equals(id)){
+                    this.user.remove(id);
+                }
             }
+        }else {
+            this.user.remove(id);
         }
-        System.out.println("Não existe user com e-mail:" + email);
     }
 
     /*
         construtores, getters, setters, clone, tostring e equals
      */
     public sys(){
-        this.user = new ArrayList<>();
-        this.encomenda = new ArrayList<>();
-        this.artigo = new ArrayList<>();
-        this.transportadora = new ArrayList<>();
+        this.user = new HashMap<>();
+        this.transportadora = new HashMap<>();
     }
 
-    public List<Transportadoras> getTransportadora() {
-        return transportadora;
-    }
-
-    public void setTransportadora(List<Transportadoras> transportadora) {
-        this.transportadora = transportadora;
-    }
-
-    public List<Artigo> getArtigo() {
-        return artigo;
-    }
-
-    public void setArtigo(List<Artigo> artigo) {
-        this.artigo = artigo;
-    }
-
-    public List<Utilizador> getUser() {
+    public Map<String, Utilizador> getUser() {
         return user;
     }
 
-    public Utilizador getUser(String email) {
-        for(Utilizador le:this.user){
-            if(le.getEmail().equals(email)){
-                return le;
-            }
-        }
-        System.out.println("Este e-mail não está registado:" + email);
-        return new Utilizador();
-    }
-
-    public void setUser(List<Utilizador> user) {
+    public void setUser(Map<String, Utilizador> user) {
         this.user = user;
     }
 
-    public List<Encomendas> getEncomenda() {
-        return encomenda;
+    public Map<String, Transportadoras> getTransportadora() {
+        return transportadora;
     }
 
-    public void setEncomenda(List<Encomendas> encomenda) {
-        this.encomenda = encomenda;
+    public void setTransportadora(Map<String, Transportadoras> transportadora) {
+        this.transportadora = transportadora;
     }
+
+    public Utilizador getUser(String email) {
+        if(email.contains("@")){
+            for (Map.Entry<String, Utilizador> entry : this.getUser().entrySet()) {
+                Utilizador art = entry.getValue();
+                if(art.getEmail().equals(email)){
+                    return art;
+                }
+            }
+        }
+        return this.user.get(email);
+    }
+
+    @Override
+    public String toString() {
+        return "sys{" +
+                "user=" + user +
+                ", transportadora=" + transportadora +
+                '}';
+    }
+
+
 }

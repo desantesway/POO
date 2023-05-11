@@ -73,19 +73,48 @@ public class UserApp {
 
         if(login.equals("admin")){
             NewMenu adminMenu = new NewMenu(new String[]{
-                    "Ver usuarios registados", "Eliminar usuário",
-                    "Ver todas as transportadoras", "Eliminar transportadora"
+                    "Mudar % da vintage", "Ver % da vintage", "Ver usuarios registados", "Eliminar usuário",
+                    "Ver todas as transportadoras", "Eliminar transportadora", "Ver todas as encomendas", "Ver todos artigos",
+                    "Ver cardapio"
             });
 
-            adminMenu.setHandler(1, this::see_users);
-            adminMenu.setHandler(2, this::del_user);
-            adminMenu.setHandler(3, this::see_transportadora);
-            adminMenu.setHandler(4, this::del_transportadora);
+            adminMenu.setHandler(1, this::change_cut_vintage);
+            adminMenu.setHandler(2, this::see_vintage);
+            adminMenu.setHandler(3, this::see_users);
+            adminMenu.setHandler(4, this::del_user);
+            adminMenu.setHandler(5, this::see_transportadora);
+            adminMenu.setHandler(6, this::del_transportadora);
+            adminMenu.setHandler(7, this::see_encomendas);
+            adminMenu.setHandler(8, this::see_artigos);
+            adminMenu.setHandler(9, this::encomenda_cardapio);
 
             adminMenu.run();
         } else{
             System.out.println("Login Inválido!");
         }
+    }
+
+    public void see_artigos(){
+        for(Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()){
+            System.out.println("Email: " + entry.getValue().getEmail() + " criou os artigos: " + entry.getValue().getArtigos());
+        }
+    }
+
+    public void see_encomendas(){
+        for(Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()){
+            System.out.println(entry.getValue().getEncomendas());
+        }
+    }
+
+    public void see_vintage(){
+        System.out.println(this.getModel().getVintagecut() * 100 + " %");
+    }
+
+    public void change_cut_vintage(){
+        String cut;
+        System.out.println("Nova: % da plataforma para cada");
+        cut = scin.nextLine();
+        this.getModel().setVintagecut((double) Integer.parseInt(cut) / 100);
     }
 
     private void see_transportadora(){
@@ -428,7 +457,7 @@ public class UserApp {
         });
 
         Encomendas finalCurrent = current;
-        user_encomendar.setHandler(1, ()-> this.encomenda_comprar(finalCurrent));
+        user_encomendar.setHandler(1, ()-> this.encomenda_comprar(finalCurrent, logged));
         user_encomendar.setHandler(2, ()-> this.encomenda_add(finalCurrent));
         user_encomendar.setHandler(3, ()-> this.encomenda_rm(finalCurrent));
         user_encomendar.setHandler(4, ()-> this.encomenda_see(finalCurrent));
@@ -447,12 +476,13 @@ public class UserApp {
         System.out.println(this.getModel().getCardapio());
     }
 
-    private void encomenda_comprar(Encomendas current){
+    private void encomenda_comprar(Encomendas current, Utilizador logged){
         current.enviar();
         for (Map.Entry<String, Artigo> entry : current.getArtigos().entrySet()) {
             Artigo art = this.getModel().getArtigos().get(entry.getKey());
             art.setSold(art.getSold() + 1);
         }
+        logged.adicionarEncomenda(current);
     }
 
     private void encomenda_add(Encomendas current){

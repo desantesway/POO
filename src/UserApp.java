@@ -304,7 +304,7 @@ public class UserApp {
 
     private void user_central_cliente(Utilizador logged){
         NewMenu userMenu = new NewMenu(new String[]{
-                "Encomendar", "Ver produtos comprados"
+                "Encomendar", "Ver Artigos comprados"
         });
 
         userMenu.setHandler(1, () -> this.user_encomendar(logged));
@@ -316,19 +316,24 @@ public class UserApp {
     private void user_central_vendedor(Utilizador logged){
         NewMenu userMenu = new NewMenu(new String[]{
                 "Criar novo artigo", "Publicar/Privar artigo",
-                "Remover artigo", "Ver receita",
-                "Ver produtos vendidos", "Ver produtos á venda", "Alterar configurações de um artigo"
+                "Remover artigo", "Ver receita", "Ver artigos criados",
+                "Ver Artigos vendidos", "Ver Artigos á venda", "Alterar configurações de um artigo"
         });
 
         userMenu.setHandler(1, () -> this.user_new_artigo(logged));
         userMenu.setHandler(2, () -> this.user_publish_artigo(logged));
         userMenu.setHandler(3, () -> this.user_rm_artigo(logged));
         userMenu.setHandler(4, () -> this.user_receita(logged));
-        userMenu.setHandler(5, () ->this.user_sold(logged));
-        userMenu.setHandler(6, () -> this.user_selling(logged));
-        userMenu.setHandler(7, () -> this.user_artigo_config(logged));
+        userMenu.setHandler(5, () ->this.user_artigo_created(logged));
+        userMenu.setHandler(6, () ->this.user_sold(logged));
+        userMenu.setHandler(7, () -> this.user_selling(logged));
+        userMenu.setHandler(8, () -> this.user_artigo_config(logged));
 
         userMenu.run();
+    }
+
+    private void user_artigo_created(Utilizador logged){
+        System.out.println(logged.getArtigos());
     }
 
     private void user_artigo_config(Utilizador logged){
@@ -342,7 +347,7 @@ public class UserApp {
                     + "Nif: " + logged.getNif() + "\n"
                     + "User ID: " + logged.getID() + "\n"
                     + "Receita: " + logged.getRevenue() + "\n"
-                    + "Produtos a venda: " + logged.getProdutosAVenda()+ "\n"
+                    + "Artigos a venda: " + logged.getProdutosAVenda()+ "\n"
                     + "Vendas efetuadas: " + logged.getVendasEfetuadas() + "\n"
                     + "Artigos á venda: " + logged.getArtigos() + "\n"
                     + "Encomendas Realizadas: " + logged.getEncomendas()

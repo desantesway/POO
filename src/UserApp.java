@@ -280,9 +280,9 @@ public class UserApp {
 
     private void user_central_vendedor(Utilizador logged){
         NewMenu userMenu = new NewMenu(new String[]{
-                "Criar Novo Artigo", "Publicar Artigo",
-                "Remover Artigo", "Receita",
-                "Ver produtos Vendidos", "Ver produtos Á Venda"
+                "Criar novo artigo", "Publicar artigo",
+                "Remover artigo", "Ver receita",
+                "Ver produtos vendidos", "Ver produtos á venda"
         });
 
         userMenu.setHandler(1, () -> this.user_new_artigo(logged));
@@ -300,11 +300,12 @@ public class UserApp {
                     + "Nome = " + logged.getNome() + "\n"
                     + "Morada = " + logged.getMorada() + "\n"
                     + "Nif = " + logged.getNif() + "\n"
-                    + "User ID =" + logged.getID() + "\n"
+                    + "User ID = " + logged.getID() + "\n"
+                    + "Receota: " + logged.getRevenue() + "\n"
                     + "Produtos a venda = " + logged.getProdutosAVenda()+ "\n"
                     + "Vendas efetuadas =" + logged.getVendasEfetuadas() + "\n"
                     + "Artigos = " + logged.getArtigos() + "\n"
-                    + "Encomendas = " + logged.getEncomendas()
+                    + "Encomendas Realizadas = " + logged.getEncomendas()
             );
     }
 
@@ -322,35 +323,53 @@ public class UserApp {
     }
 
     private void email_user(Utilizador logged){
-        System.out.println("Introduza novo email:\n");
-        String email = scin.nextLine();
+        System.out.println("Introduza o novo email:");
+        String email = scin.nextLine(), cancel = "";
+        while(!(email.contains("@")) || this.getModel().existsEmail(email)){
+            if(!(email.contains("@"))){
+                System.out.println("E-mail Inválido! (não contém @)");
+            }if(this.getModel().existsEmail(email)){
+                System.out.println("Este e-mail já esta registado!");
+            }
+            System.out.println("Cancelar a mudança [y/n]?");
+            cancel = scin.nextLine();
+            if(cancel.contains("y")) break;
+            System.out.println("E-mail: ");
+            email = scin.nextLine();
+        }
+        if(cancel.contains("y")) return;
         logged.setEmail(email);
-        System.out.println(logged.getEmail());
+        System.out.println("Novo email: " + logged.getEmail());
     }
     private void nome_user(Utilizador logged){
-        System.out.println("Introduza novo nome:\n");
+        System.out.println("Introduza novo nome:");
         String nome = scin.nextLine();
         logged.setNome(nome);
-        System.out.println(logged.getNome());
+        System.out.println("Novo nome: " + logged.getNome());
     }
     private void morada_user(Utilizador logged){
-        System.out.println("Introduza nova morada:\n");
+        System.out.println("Introduza nova morada:");
         String m = scin.nextLine();
         logged.setMorada(m);
-        System.out.println(logged.getMorada());
+        System.out.println("Nova morada: " + logged.getMorada());
     }
     private void nif_user(Utilizador logged){
-        System.out.println("Introduza nova nif:\n");
-        String m = scin.nextLine();
-        logged.setNif(m);
-        System.out.println(logged.getNif());
+        System.out.println("Introduza novo nif:");
+        String nif = scin.nextLine(), cancel = "";
+        while(nif.length() != 9){
+            System.out.println("Nif Inválido!");
+            System.out.println("Cancelar a mudança [y/n]?");
+            cancel = scin.nextLine();
+            if(cancel.contains("y")) break;
+            System.out.println("Nif (123456789): ");
+            nif = scin.nextLine();
+        }
+        if(cancel.contains("y")) return;
+        logged.setNif(nif);
+        System.out.println("Novo nif: " + logged.getNif());
     }
 
     private void user_new_artigo(Utilizador logged){
-        System.out.println("opção por implementar");
-    }
-
-    private void user_add_artigo(Utilizador logged){
         System.out.println("opção por implementar");
     }
 
@@ -367,7 +386,7 @@ public class UserApp {
     }
 
     private void user_receita(Utilizador logged){
-        System.out.println("opção por implementar");
+        System.out.println("Receita até ao momento: " + logged.getRevenue());
     }
 
     private void user_bought(Utilizador logged){
@@ -395,32 +414,43 @@ public class UserApp {
     }
 
     private void registar_user(){
-        String email= "", nome, morada, nif="";
-
-        while(!(email.contains("@"))){
-            System.out.println("E-mail: ");
-            email = scin.nextLine();
+        String email= "", nome, morada, nif="", cancel = "";
+        System.out.println("Introduza o novo email:");
+        email = scin.nextLine();
+        while(!(email.contains("@")) || this.getModel().existsEmail(email)){
             if(!(email.contains("@"))){
                 System.out.println("E-mail Inválido! (não contém @)");
+            }if(this.getModel().existsEmail(email)){
+                System.out.println("Este e-mail já esta registado!");
             }
+            System.out.println("Cancelar o registo [y/n]?");
+            cancel = scin.nextLine();
+            if(cancel.contains("y")) break;
+            System.out.println("E-mail: ");
+            email = scin.nextLine();
         }
+        if(cancel.contains("y")) return;
         System.out.println("Nome: ");
         nome = scin.nextLine();
         System.out.println("Morada: ");
         morada = scin.nextLine();
 
+        System.out.println("Introduza o nif:");
+        nif = scin.nextLine();
         while(nif.length() != 9){
+            System.out.println("Nif Inválido!");
+            System.out.println("Cancelar o registo [y/n]?");
+            cancel = scin.nextLine();
+            if(cancel.contains("y")) break;
             System.out.println("Nif (123456789): ");
             nif = scin.nextLine();
-            if(nif.length() != 9){
-                System.out.println("Nif Inválido!");
-            }
         }
+        if(cancel.contains("y")) return;
 
         Utilizador user = new Utilizador(email, nome, morada, nif);
         model.RegistarUser(user);
 
-        System.out.println("Id de login:" + user.getID());
+        System.out.println("Id de login: " + user.getID());
     }
 
     private void registar_transportadora(){

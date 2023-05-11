@@ -3,9 +3,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class sys implements Serializable{
+    private double vintagecut;
     private Map<String, Utilizador> user;
     private Map<String, Transportadoras> transportadora;
 
+    // guarda o sistema num ficheiro
     public void save(String nomef) throws IOException {
         try {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(nomef));
@@ -18,6 +20,7 @@ public class sys implements Serializable{
         }
     }
 
+    // carrega o ficheiro salvo e retorna o sistema
     public sys load(String nomef) throws IOException, ClassNotFoundException {
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nomef));
@@ -91,6 +94,15 @@ public class sys implements Serializable{
     public sys(){
         this.user = new HashMap<>();
         this.transportadora = new HashMap<>();
+        this.vintagecut = 0.0;
+    }
+
+    public double getVintagecut() {
+        return vintagecut;
+    }
+
+    public void setVintagecut(double vintagecut) {
+        this.vintagecut = vintagecut;
     }
 
     public Map<String, Utilizador> getUser() {
@@ -124,10 +136,9 @@ public class sys implements Serializable{
     @Override
     public String toString() {
         return "sys{" +
-                "user=" + user +
+                "vintagecut=" + vintagecut +
+                ", user=" + user +
                 ", transportadora=" + transportadora +
                 '}';
     }
-
-
 }

@@ -1,10 +1,11 @@
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
-public class Artigo {
+public class Artigo implements Serializable {
     private boolean publicado, premium;
     private String estado, descricao, Brand, ID;
     private int NumeroDonos, devolucao, sold;
-    private double preco, precobase, desconto;
+    private double preco, precobase;
     private Colecao colecao;
     private Transportadoras transportadoras;
 
@@ -17,8 +18,7 @@ public class Artigo {
         construtores, getters, setters, clone, tostring e equals
      */
     public Artigo(boolean publicado, boolean premium, String estado, int numeroDonos,
-                  String descricao, String brand, double precobase,
-                  double desconto, Colecao colecao, Transportadoras transportadoras) {
+                  String descricao, String brand, double precobase, Colecao colecao, Transportadoras transportadoras) {
         this.publicado = publicado;
         this.premium = premium;
         this.estado = estado;
@@ -28,7 +28,6 @@ public class Artigo {
         this.ID =generateID();
         this.preco = -1.0;
         this.precobase = precobase;
-        this.desconto = desconto;
         this.colecao = colecao;
         this.transportadoras = transportadoras;
         this.devolucao = 14;
@@ -37,7 +36,7 @@ public class Artigo {
 
     public Artigo(boolean publicado, boolean premium, String estado, int numeroDonos,
                   String descricao, String brand, double precobase, double preco,
-                  double desconto, Colecao colecao, Transportadoras transportadoras) {
+                  Colecao colecao, Transportadoras transportadoras) {
         this.publicado = publicado;
         this.premium = premium;
         this.estado = estado;
@@ -47,7 +46,6 @@ public class Artigo {
         this.ID =generateID();
         this.preco = preco;
         this.precobase = precobase;
-        this.desconto = desconto;
         this.colecao = colecao;
         this.transportadoras = transportadoras;
         this.devolucao = 14;
@@ -64,7 +62,6 @@ public class Artigo {
         this.ID = generateID();
         this.preco=0;
         this.precobase=0;
-        this.desconto=0;
         this.colecao=new Colecao();
         this.devolucao = 14;
         this.sold = 0;
@@ -80,7 +77,6 @@ public class Artigo {
         this.ID = generateID();
         this.preco=0;
         this.precobase=0;
-        this.desconto=0;
         this.colecao=new Colecao();
         this.transportadoras = transportadoras;
         this.devolucao = 14;
@@ -97,7 +93,6 @@ public class Artigo {
         this.ID=l.getID();
         this.preco=l.getPreco();
         this.precobase=l.getPrecobase();
-        this.desconto=l.getDesconto();
         this.colecao=l.getColecao();
         this.transportadoras=l.getTransportadoras();
         this.devolucao = l.getDevolucao();
@@ -192,14 +187,6 @@ public class Artigo {
         this.precobase = precobase;
     }
 
-    public double getDesconto() {
-        return desconto;
-    }
-
-    public void setDesconto(double desconto) {
-        this.desconto = desconto;
-    }
-
     public Colecao getColecao() {
         return colecao;
     }
@@ -248,7 +235,6 @@ public class Artigo {
                 ", ID='" + ID + '\'' +
                 ", preco=" + preco +
                 ", precobase=" + precobase +
-                ", desconto=" + desconto +
                 ", colecao=" + colecao +
                 ", transportadoras=" + transportadoras +
                 ", devolução=" + devolucao +
@@ -265,7 +251,6 @@ public class Artigo {
                 ", ID='" + ID + '\'' +
                 ", preco=" + preco +
                 ", precobase=" + precobase +
-                ", desconto=" + desconto +
                 ", colecao=" + colecao +
                 ", transportadoras=" + transportadoras +
                 ", devolução=" + devolucao;
@@ -286,7 +271,6 @@ public class Artigo {
                 && devolucao == artigo.devolucao
                 && Double.compare(artigo.preco, preco) == 0
                 && Double.compare(artigo.precobase, precobase) == 0
-                && Double.compare(artigo.desconto, desconto) == 0
                 && Objects.equals(estado, artigo.estado)
                 && Objects.equals(descricao, artigo.descricao)
                 && Objects.equals(Brand, artigo.Brand)

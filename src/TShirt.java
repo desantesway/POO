@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.util.Objects;
 
-public class TShirt extends Artigo {
+public class TShirt extends Artigo implements Serializable {
     private String Padrao, tamanho;
 
     //calcula o preço da T-shirt
@@ -26,10 +27,10 @@ public class TShirt extends Artigo {
     }
 
     public TShirt(boolean publicado, boolean premium, String estado, int numeroDonos, String descricao, String brand,
-                  double precobase, double desconto, Colecao colecao,
+                  double precobase, Colecao colecao,
                   Transportadoras transportadoras, String Padrao, String tamanho) {
         super(publicado, premium, estado, numeroDonos,
-                descricao, brand, precobase, desconto, colecao, transportadoras);
+                descricao, brand, precobase, colecao, transportadoras);
         this.Padrao=Padrao;
         this.tamanho = tamanho;
     }
@@ -41,7 +42,7 @@ public class TShirt extends Artigo {
     }
     public TShirt(TShirt s){
         super(s.isPublicado(), s.isPremium(), s.getEstado(), s.getNumeroDonos(), s.getDescricao(), s.getBrand(),
-                s.getPreco(), s.getPrecobase(), s.getDesconto(), s.getColecao(),
+                s.getPreco(), s.getPrecobase(), s.getColecao(),
                 s.getTransportadoras());
         this.Padrao=s.getPadrao();
         this.tamanho = s.getTamanho();

@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Colecao {
+public class Colecao implements Serializable {
     private String nome;
     private LocalDate data;
 

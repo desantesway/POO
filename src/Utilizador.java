@@ -53,7 +53,7 @@ public class Utilizador implements Serializable {
     public double getRevenue() {
         double revenue = 0.0;
         for (Map.Entry<String, Artigo> entry : this.getVendasEfetuadas().entrySet()) {
-            revenue += entry.getValue().getPreco();
+            revenue += entry.getValue().getPreco() * entry.getValue().getSold();
         }
         return revenue;
     }
@@ -129,6 +129,10 @@ public class Utilizador implements Serializable {
 
     public void setVendasEfetuadas(Map<String, Artigo> vendasEfetuadas) {
         this.vendasEfetuadas = vendasEfetuadas;
+    }
+
+    public void addArtigo(Artigo artigo) {
+        this.getArtigos().put(artigo.getID(), artigo);
     }
 
     public Map<String, Artigo> getArtigos() {

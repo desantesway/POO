@@ -1,8 +1,9 @@
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
-public class Malas extends Artigo{
+public class Malas extends Artigo implements Serializable {
     private LocalDate dataPremium;
     private String tamanho, material;
     private double valorizacao;
@@ -27,9 +28,9 @@ public class Malas extends Artigo{
      */
 
     public Malas(boolean publicado, boolean premium, String estado, int numeroDonos, String descricao, String brand,
-                 double precobase, double desconto, Colecao colecao,
+                 double precobase, Colecao colecao,
                  Transportadoras transportadoras) {
-        super(publicado, premium, estado, numeroDonos, descricao, brand, precobase, desconto, colecao, transportadoras);
+        super(publicado, premium, estado, numeroDonos, descricao, brand, precobase, colecao, transportadoras);
         calcPreco();
         this.tamanho = "";
         this.material = "";
@@ -38,9 +39,9 @@ public class Malas extends Artigo{
     }
 
     public Malas(boolean publicado, boolean premium, String estado, int numeroDonos, String descricao, String brand,
-                 double precobase, double desconto, Colecao colecao,
+                 double precobase, Colecao colecao,
                  Transportadoras transportadoras, String tamanho, String material, double valorizacao) {
-        super(publicado, premium, estado, numeroDonos, descricao, brand, precobase, desconto, colecao, transportadoras);
+        super(publicado, premium, estado, numeroDonos, descricao, brand, precobase, colecao, transportadoras);
         calcPreco();
         this.tamanho = tamanho;
         this.material = material;
@@ -58,7 +59,7 @@ public class Malas extends Artigo{
 
     public Malas(Malas m){
         super(m.isPublicado(), m.isPremium(), m.getEstado(), m.getNumeroDonos(), m.getDescricao(), m.getBrand(),
-                m.getPreco(), m.getPrecobase(), m.getDesconto(), m.getColecao(), m.getTransportadoras());
+                m.getPreco(), m.getPrecobase(), m.getColecao(), m.getTransportadoras());
         this.tamanho = m.getTamanho();
         this.dataPremium=m.getDataPremium();
         this.material=m.getMaterial();

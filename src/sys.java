@@ -1,12 +1,16 @@
 import java.io.*;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
 public class sys implements Serializable{
     private double vintagecut;
+    private int now;
     private Map<String, Utilizador> user;
     private Map<String, Transportadoras> transportadora;
+    private Map<String, Colecao> colecao;
 
+    // mostra todos os artigos do sistema
     public Map<String, Artigo> getArtigos(){
         Map<String, Artigo> ret = new HashMap<>();
         for(Map.Entry<String, Utilizador> entry : this.getUser().entrySet()){
@@ -15,6 +19,7 @@ public class sys implements Serializable{
         return ret;
     }
 
+    // mostra todos os artigos do sistema publicados
     public Map<String, Artigo> getCardapio(){
         Map<String, Artigo> ret = new HashMap<>();
         for(Map.Entry<String, Utilizador> entry : this.getUser().entrySet()){
@@ -57,6 +62,11 @@ public class sys implements Serializable{
         pw.write(this.toString());
         pw.close();
     }*/
+
+    //adiciona coleção ao sistema
+    public void addColecao(Colecao col){
+        this.getColecao().put(col.getnome(), col);
+    }
 
     // ve se tem conta com esse email
     public boolean existsEmail(String email){
@@ -108,13 +118,36 @@ public class sys implements Serializable{
         }
     }
 
+    // obtem o dia de hoje + os dias adiantados
+    public LocalDate now(){
+        return LocalDate.now().plusDays(this.getNow());
+    }
+
     /*
         construtores, getters, setters, clone, tostring e equals
      */
     public sys(){
         this.user = new HashMap<>();
         this.transportadora = new HashMap<>();
+        this.colecao = new HashMap<>();
         this.vintagecut = 0.0;
+        this.now = 0;
+    }
+
+    public int getNow() {
+        return now;
+    }
+
+    public void setNow(int now) {
+        this.now = now;
+    }
+
+    public Map<String, Colecao> getColecao() {
+        return colecao;
+    }
+
+    public void setColecao(Map<String, Colecao> colecao) {
+        this.colecao = colecao;
     }
 
     public double getVintagecut() {
@@ -159,6 +192,7 @@ public class sys implements Serializable{
                 "vintagecut=" + vintagecut +
                 ", user=" + user +
                 ", transportadora=" + transportadora +
+                ", colecao=" + colecao +
                 '}';
     }
 }

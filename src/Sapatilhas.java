@@ -1,9 +1,11 @@
+import java.io.Serializable;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.time.LocalDate;
 
-public class Sapatilhas extends Artigo {
-    private int Atacadores, tamanho;
+public class Sapatilhas extends Artigo implements Serializable {
+    private int tamanho;
+    private boolean atacadores;
     private String Cor;
     private LocalDate dataPremium;
 
@@ -32,35 +34,35 @@ public class Sapatilhas extends Artigo {
      */
     public Sapatilhas(){
         super();
-        this.Atacadores=0;
+        this.atacadores=true;
         this.Cor="N/A";
         this.dataPremium= null;
     }
 
     public Sapatilhas(boolean publicado, boolean premium, String estado, int numeroDonos, String descricao, String brand,
-                      double precobase, double desconto, Colecao colecao,
+                      double precobase, Colecao colecao,
                       Transportadoras transportadoras) {
         super(publicado, premium, estado, numeroDonos,
-                descricao, brand, precobase, desconto, colecao, transportadoras);
-        this.Atacadores=0;
+                descricao, brand, precobase, colecao, transportadoras);
+        this.atacadores=true;
         this.Cor="N/A";
         this.dataPremium= null;
     }
 
     public Sapatilhas(boolean publicado, boolean premium, String estado, int numeroDonos, String descricao, String brand,
                  double precobase, double desconto, Colecao colecao,
-                 Transportadoras transportadoras, int Atacadores, String cor, LocalDate dataPremium, int tamanho) {
+                 Transportadoras transportadoras, boolean Atacadores, String cor, LocalDate dataPremium, int tamanho) {
         super(publicado, premium, estado, numeroDonos,
                 descricao, brand, precobase, desconto, colecao, transportadoras);
-        this.Atacadores = Atacadores;
+        this.atacadores = Atacadores;
         this.Cor = cor;
         this.dataPremium = dataPremium;
         this.tamanho = tamanho;
     }
 
-    public Sapatilhas(int Atacadores, String cor, LocalDate dataPremium, int tamanho) {
+    public Sapatilhas(boolean Atacadores, String cor, LocalDate dataPremium, int tamanho) {
         super();
-        this.Atacadores = Atacadores;
+        this.atacadores = Atacadores;
         this.Cor = cor;
         this.dataPremium = dataPremium;
         this.tamanho = tamanho;
@@ -68,9 +70,9 @@ public class Sapatilhas extends Artigo {
 
     public Sapatilhas(Sapatilhas s) {
         super(s.isPublicado(), s.isPremium(), s.getEstado(), s.getNumeroDonos(), s.getDescricao(), s.getBrand(),
-                s.getPreco(), s.getPrecobase(), s.getDesconto(), s.getColecao(),
+                s.getPreco(), s.getPrecobase(), s.getColecao(),
                 s.getTransportadoras());
-        this.Atacadores = s.getAtacadores();
+        this.atacadores = s.getAtacadores();
         this.Cor = s.getCor();
         this.dataPremium = s.getDataPremium();
         this.tamanho = s.getTamanho();
@@ -84,12 +86,12 @@ public class Sapatilhas extends Artigo {
         this.tamanho = tamanho;
     }
 
-    public int getAtacadores() {
-        return Atacadores;
+    public boolean getAtacadores() {
+        return atacadores;
     }
 
-    public void setAtacadores(int atacadores) {
-        Atacadores = atacadores;
+    public void setAtacadores(boolean atacadores) {
+        this.atacadores = atacadores;
     }
 
     public String getCor() {
@@ -97,7 +99,7 @@ public class Sapatilhas extends Artigo {
     }
 
     public void setCor(String cor) {
-        Cor = cor;
+        this.Cor = cor;
     }
 
     public LocalDate getDataPremium() {
@@ -114,7 +116,7 @@ public class Sapatilhas extends Artigo {
     public String toString() {
         return "Sapatilhas{" +
                 ", Tamanho=" + tamanho +
-                ", Atacadores=" + Atacadores +
+                ", Atacadores=" + atacadores +
                 ", Cor='" + Cor + '\'' +
                 ", dataPremium=" + dataPremium +
                 ", " +
@@ -127,7 +129,7 @@ public class Sapatilhas extends Artigo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Sapatilhas that = (Sapatilhas) o;
-        return Atacadores == that.Atacadores
+        return atacadores && that.atacadores
                 && Objects.equals(Cor, that.Cor)
                 && Objects.equals(dataPremium, that.dataPremium)
                 && super.equals(that);

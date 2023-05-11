@@ -703,7 +703,7 @@ public class UserApp {
                 System.out.println("Publicado com sucesso!");
             }
         } else{
-            System.out.println("Artigo" + id + "não existe");
+            System.out.println("Artigo " + id + " não existe");
         }
     }
 
@@ -721,7 +721,7 @@ public class UserApp {
                 System.out.println("Cancelado com successo!");
             }
         } else{
-            System.out.println("Artigo" + id + "não existe");
+            System.out.println("Artigo " + id + " não existe");
         }
     }
 

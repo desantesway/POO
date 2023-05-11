@@ -61,7 +61,7 @@ public class Artigo {
         this.NumeroDonos=0;
         this.descricao="";
         this.Brand="";
-        this.ID="";
+        this.ID = generateID();
         this.preco=0;
         this.precobase=0;
         this.desconto=0;
@@ -77,7 +77,7 @@ public class Artigo {
         this.NumeroDonos=0;
         this.descricao="";
         this.Brand="";
-        this.ID="";
+        this.ID = generateID();
         this.preco=0;
         this.precobase=0;
         this.desconto=0;
@@ -145,7 +145,7 @@ public class Artigo {
     }
 
     public int getNumeroDonos() {
-        return NumeroDonos;
+        return this.NumeroDonos;
     }
 
     public void setNumeroDonos(int numeroDonos) {

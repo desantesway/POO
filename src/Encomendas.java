@@ -10,6 +10,16 @@ public class Encomendas {
     private int estado, devolucao; // 0, 1, 2
     private LocalDate data;
 
+    //limpa a encomenda
+    public void clean(){
+        this.artigos = new HashMap<>();
+        this.setDimensao("pequeno");
+        this.setPrecoFinal(0);
+        this.setEstado(0);
+        this.data = null;
+        this.setDevolucao(14);
+    }
+
     // funçao para ver se pode pedir devolução ou não
     public Boolean devolucao(){
         setEstado();

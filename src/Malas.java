@@ -11,11 +11,9 @@ public class Malas extends Artigo{
     public void calcPreco(){
         double desconto = 0, preco = super.getPrecobase();
         switch (this.getTamanho()) {
-            case "S" -> desconto = 0.3;
-            case "M" -> desconto = 0.25;
-            case "L" -> desconto = 0.2;
-            case "XL" -> desconto = 0.15;
-            case "XXL" -> desconto = 0.1;
+            case "Pequeno" -> desconto = 0.3;
+            case "Medio" -> desconto = 0.25;
+            case "Grande" -> desconto = 0.2;
         }
         preco -= preco * desconto;
         if(super.isPremium()){

@@ -7,6 +7,26 @@ public class sys implements Serializable{
     private Map<String, Utilizador> user;
     private Map<String, Transportadoras> transportadora;
 
+    public Map<String, Artigo> getArtigos(){
+        Map<String, Artigo> ret = new HashMap<>();
+        for(Map.Entry<String, Utilizador> entry : this.getUser().entrySet()){
+            ret.putAll(entry.getValue().getArtigos());
+        }
+        return ret;
+    }
+
+    public Map<String, Artigo> getCardapio(){
+        Map<String, Artigo> ret = new HashMap<>();
+        for(Map.Entry<String, Utilizador> entry : this.getUser().entrySet()){
+            for(Map.Entry<String, Artigo> entry2 : entry.getValue().getArtigos().entrySet()){
+                if(entry2.getValue().isPublicado()){
+                    ret.put(entry2.getKey(), entry2.getValue());
+                }
+            }
+        }
+        return ret;
+    }
+
     // guarda o sistema num ficheiro
     public void save(String nomef) throws IOException {
         try {

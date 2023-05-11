@@ -1,10 +1,15 @@
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Scanner;
 
 public class UserApp {
     private sys model;
     private Scanner scin;
+
+    public void viagem_tempo(){
+        System.out.println("Era bom");
+    }
 
     public static void main(String[] args) {
         UserApp app = new UserApp();
@@ -28,11 +33,12 @@ public class UserApp {
 
     private void run(){
         NewMenu mainMenu = new NewMenu(new String[]{
-                "Log-in", "Registar"
+                "Log-in", "Registar", "Viagem no Tempo"
         });
 
         mainMenu.setHandler(1, this::login);
         mainMenu.setHandler(2, this::registar);
+        mainMenu.setHandler(3, this::viagem_tempo);
 
         mainMenu.setPreCondition(1, ()-> model.getUser().size()  > 0 || model.getTransportadora().size() > 0);
 
@@ -280,7 +286,7 @@ public class UserApp {
 
     private void user_central_vendedor(Utilizador logged){
         NewMenu userMenu = new NewMenu(new String[]{
-                "Criar novo artigo", "Publicar artigo",
+                "Criar novo artigo", "Publicar/Privar artigo",
                 "Remover artigo", "Ver receita",
                 "Ver produtos vendidos", "Ver produtos á venda"
         });
@@ -296,16 +302,16 @@ public class UserApp {
     }
 
     private void user_details(Utilizador logged){
-            System.out.println("Email = " + logged.getEmail() + "\n"
-                    + "Nome = " + logged.getNome() + "\n"
-                    + "Morada = " + logged.getMorada() + "\n"
-                    + "Nif = " + logged.getNif() + "\n"
-                    + "User ID = " + logged.getID() + "\n"
-                    + "Receota: " + logged.getRevenue() + "\n"
-                    + "Produtos a venda = " + logged.getProdutosAVenda()+ "\n"
-                    + "Vendas efetuadas =" + logged.getVendasEfetuadas() + "\n"
-                    + "Artigos = " + logged.getArtigos() + "\n"
-                    + "Encomendas Realizadas = " + logged.getEncomendas()
+            System.out.println("Email: " + logged.getEmail() + "\n"
+                    + "Nome: " + logged.getNome() + "\n"
+                    + "Morada: " + logged.getMorada() + "\n"
+                    + "Nif: " + logged.getNif() + "\n"
+                    + "User ID: " + logged.getID() + "\n"
+                    + "Receita: " + logged.getRevenue() + "\n"
+                    + "Produtos a venda: " + logged.getProdutosAVenda()+ "\n"
+                    + "Vendas efetuadas: " + logged.getVendasEfetuadas() + "\n"
+                    + "Artigos á venda: " + logged.getArtigos() + "\n"
+                    + "Encomendas Realizadas: " + logged.getEncomendas()
             );
     }
 
@@ -329,7 +335,7 @@ public class UserApp {
             if(!(email.contains("@"))){
                 System.out.println("E-mail Inválido! (não contém @)");
             }if(this.getModel().existsEmail(email)){
-                System.out.println("Este e-mail já esta registado!");
+                System.out.println("Este e-mail já está registado!");
             }
             System.out.println("Cancelar a mudança [y/n]?");
             cancel = scin.nextLine();
@@ -339,7 +345,7 @@ public class UserApp {
         }
         if(cancel.contains("y")) return;
         logged.setEmail(email);
-        System.out.println("Novo email: " + logged.getEmail());
+        System.out.println("Novo e-mail: " + logged.getEmail());
     }
     private void nome_user(Utilizador logged){
         System.out.println("Introduza novo nome:");
@@ -370,19 +376,137 @@ public class UserApp {
     }
 
     private void user_new_artigo(Utilizador logged){
+
         System.out.println("opção por implementar");
     }
 
     private void user_publish_artigo(Utilizador logged){
-        System.out.println("opção por implementar");
+        System.out.println("Insira o ID do artigo a publicar: ");
+        String id = scin.nextLine();
+        if(logged.getArtigos().containsKey(id)){
+            if(logged.getArtigos().get(id).isPublicado()){
+                logged.getArtigos().get(id).privar();
+                System.out.println("Privado com sucesso!");
+            } else {
+                logged.getArtigos().get(id).publicar();
+                System.out.println("Publicado com sucesso!");
+            }
+        } else{
+            System.out.println("Artigo" + id + "não existe");
+        }
     }
 
     private void user_rm_artigo(Utilizador logged){
-        System.out.println("opção por implementar");
+
+        System.out.println("Insira o ID do artigo a remover: ");
+        String id = scin.nextLine();
+        if(logged.getArtigos().containsKey(id)){
+            System.out.println("Tem a certeza que quer remover o artigo [y/n]?");
+            String clean = scin.nextLine();
+            if(clean.contains("y")){
+                logged.getArtigos().remove(id);
+                System.out.println("Artigo removido com sucesso!");
+            }else{
+                System.out.println("Cancelado com successo!");
+            }
+        } else{
+            System.out.println("Artigo" + id + "não existe");
+        }
     }
 
     private void user_encomendar(Utilizador logged){
-        System.out.println("opção por implementar");
+        Encomendas current = new Encomendas();
+        for(Map.Entry<String, Encomendas> entry : logged.getEncomendas().entrySet()){
+            if(entry.getValue().getEstado() == 0){
+                current = entry.getValue();
+            }
+        }
+
+        NewMenu user_encomendar = new NewMenu(new String[]{
+                "Comprar", "Adicionar artigo" , "Remover artigo", "Ver carrinho", "Limpar Carrinho",
+                "Ver cardapio"
+        });
+
+        Encomendas finalCurrent = current;
+        user_encomendar.setHandler(1, ()-> this.encomenda_comprar(finalCurrent));
+        user_encomendar.setHandler(2, ()-> this.encomenda_add(finalCurrent));
+        user_encomendar.setHandler(3, ()-> this.encomenda_rm(finalCurrent));
+        user_encomendar.setHandler(4, ()-> this.encomenda_see(finalCurrent));
+        user_encomendar.setHandler(5, ()-> this.encomenda_clean(finalCurrent));
+        user_encomendar.setHandler(6, this::encomenda_cardapio);
+
+        user_encomendar.setPreCondition(1, ()-> finalCurrent.getArtigos().size() > 0);
+        user_encomendar.setPreCondition(3, ()-> finalCurrent.getArtigos().size() > 0);
+        user_encomendar.setPreCondition(5, ()-> finalCurrent.getArtigos().size() > 0);
+        user_encomendar.setPreCondition(6, ()-> this.getModel().getArtigos().size() > 0);
+
+        user_encomendar.run();
+    }
+
+    public void encomenda_cardapio(){
+        System.out.println(this.getModel().getCardapio());
+    }
+
+    private void encomenda_comprar(Encomendas current){
+        current.enviar();
+        for (Map.Entry<String, Artigo> entry : current.getArtigos().entrySet()) {
+            Artigo art = this.getModel().getArtigos().get(entry.getKey());
+            art.setSold(art.getSold() + 1);
+        }
+    }
+
+    private void encomenda_add(Encomendas current){
+        System.out.println("Id do artigo a adicionar: ");
+        String id = scin.nextLine();
+
+        if(current.getArtigos().containsKey(id)){
+            current.addArtigo(this.getModel().getArtigos().get(id));
+        } else{
+            System.out.println("Artigo com id: " + id + " não existe");
+        }
+    }
+
+    private void encomenda_rm(Encomendas current){
+        System.out.println("Id do artigo a remover: ");
+        String id = scin.nextLine();
+
+        if(current.getArtigos().containsKey(id)){
+            System.out.println("Tem a certeza que quer remover o artigo do carrinho [y/n]?");
+            String clean = scin.nextLine();
+
+            if(clean.contains("y")){
+                current.getArtigos().remove(id);
+                System.out.println("Limpado com successo!");
+            }else{
+                System.out.println("Cancelado com successo!");
+            }
+        } else{
+            System.out.println("Artigo com id: " + id + " não existe");
+        }
+    }
+
+    private void encomenda_see(Encomendas current){
+        double preco = 0.0;
+        for (Map.Entry<String, Artigo> entry : current.getArtigos().entrySet()) {
+            if(entry.getValue().getPreco() != -1.0){
+                preco += entry.getValue().getPreco();
+            }
+        }
+        System.out.println("Artigos:" + current.getArtigos() + "\n"
+                + "Preço total:" + preco + "\n"
+        );
+    }
+
+    private void encomenda_clean(Encomendas current){
+        System.out.println("Tem a certeza que quer limpar o carrinho [y/n]?");
+        String clean = scin.nextLine();
+
+        if(clean.contains("y")){
+            current.clean();
+            System.out.println("Limpado com successo!");
+        }else{
+            System.out.println("Cancelado com successo!");
+        }
     }
 
     private void user_receita(Utilizador logged){
@@ -390,15 +514,30 @@ public class UserApp {
     }
 
     private void user_bought(Utilizador logged){
-        System.out.println("opção por implementar");
+        boolean s = true;
+        for (Map.Entry<String, Encomendas> entry : logged.getEncomendas().entrySet()) {
+            if(!(entry.getValue().getEstado() == 0)){
+                s = false;
+                System.out.println(entry.getValue().getArtigos());
+            }
+        }
+        if(s){
+            System.out.println("Ainda não comprou nenhum artigo!");
+        }
     }
 
     private void user_sold(Utilizador logged){
-        System.out.println("opção por implementar");
+        for (Map.Entry<String, Artigo> entry : logged.getVendasEfetuadas().entrySet()) {
+            System.out.println(entry.getValue());
+        }
     }
 
     private void user_selling(Utilizador logged){
-        System.out.println("opção por implementar");
+        boolean s = true;
+        for (Map.Entry<String, Artigo> entry : logged.getProdutosAVenda().entrySet()) {
+            s = false;
+            System.out.println(entry.getValue());
+        }
     }
 
     private void registar(){

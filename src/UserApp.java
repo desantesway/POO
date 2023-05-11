@@ -326,7 +326,7 @@ public class UserApp {
         userMenu.setHandler(4, () -> this.user_receita(logged));
         userMenu.setHandler(5, () ->this.user_sold(logged));
         userMenu.setHandler(6, () -> this.user_selling(logged));
-        userMenu.setHandler(6, () -> this.user_artigo_config(logged));
+        userMenu.setHandler(7, () -> this.user_artigo_config(logged));
 
         userMenu.run();
     }

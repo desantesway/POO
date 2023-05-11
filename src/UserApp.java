@@ -317,7 +317,7 @@ public class UserApp {
         NewMenu userMenu = new NewMenu(new String[]{
                 "Criar novo artigo", "Publicar/Privar artigo",
                 "Remover artigo", "Ver receita",
-                "Ver produtos vendidos", "Ver produtos á venda"
+                "Ver produtos vendidos", "Ver produtos á venda", "Alterar configurações de um artigo"
         });
 
         userMenu.setHandler(1, () -> this.user_new_artigo(logged));
@@ -326,8 +326,13 @@ public class UserApp {
         userMenu.setHandler(4, () -> this.user_receita(logged));
         userMenu.setHandler(5, () ->this.user_sold(logged));
         userMenu.setHandler(6, () -> this.user_selling(logged));
+        userMenu.setHandler(6, () -> this.user_artigo_config(logged));
 
         userMenu.run();
+    }
+
+    private void user_artigo_config(Utilizador logged){
+        System.out.println("Introduza o id do artigo a editar: ");
     }
 
     private void user_details(Utilizador logged){

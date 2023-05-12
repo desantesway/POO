@@ -1,8 +1,10 @@
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserApp {
     private sys model;
@@ -11,6 +13,18 @@ public class UserApp {
     public static void main(String[] args) {
         UserApp app = new UserApp();
         app.run();
+    }
+
+    private void updates(){
+        //update nos produtos vendidos
+        for (Map.Entry<String, Utilizador> entry1 : this.getModel().getUser().entrySet()) {
+            Utilizador logged = entry1.getValue();
+            for (Map.Entry<String, Artigo> entry : logged.getProdutosAVenda().entrySet()) {
+                if(entry.getValue().getSold() > 0){
+                    logged.adicionarVendaEfetuada(entry.getValue());
+                }
+            }
+        }
     }
 
     private void viagem_tempo(){
@@ -105,6 +119,15 @@ public class UserApp {
         closeApp();
     }
 
+    private void save(){
+        try{
+            this.getModel().save("sys.obj");
+            System.out.println("Salvo!");
+        } catch (IOException e){
+            System.out.println("Erro a registar ficheiro: " + e);
+        }
+    }
+
     private void closeApp(){
         String y;
 
@@ -112,11 +135,7 @@ public class UserApp {
         y = scin.nextLine();
 
         if(y.equals("y")){
-            try{
-                this.getModel().save("sys.obj");
-            } catch (IOException e){
-                System.out.println("Erro a registar ficheiro: " + e);
-            }
+            save();
         }
 
         System.out.println("Turning off...");
@@ -133,7 +152,7 @@ public class UserApp {
             NewMenu adminMenu = new NewMenu(new String[]{
                     "Mudar % da vintage", "Ver % da vintage", "Ver usuarios registados", "Eliminar usuário",
                     "Ver todas as transportadoras", "Eliminar transportadora", "Ver todas as encomendas", "Ver todos artigos",
-                    "Ver cardapio"
+                    "Ver cardapio", "Ver receita da vintage", "Ver quem vendeu mais","Guardar o sistema"
             });
 
             adminMenu.setHandler(1, this::change_cut_vintage);
@@ -145,6 +164,9 @@ public class UserApp {
             adminMenu.setHandler(7, this::see_encomendas);
             adminMenu.setHandler(8, this::see_artigos);
             adminMenu.setHandler(9, this::encomenda_cardapio);
+            adminMenu.setHandler(10, this::admin_receita);
+            //adminMenu.setHandler(11, this::admin_receita);
+            adminMenu.setHandler(12, this::save);
 
             adminMenu.run();
         } else{
@@ -152,15 +174,23 @@ public class UserApp {
         }
     }
 
-    public void see_artigos(){
+    private void admin_receita(){
+        System.out.println("Receita total da Vintage: " + this.getModel().getRev());
+    }
+
+    private void see_artigos(){
         for(Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()){
-            System.out.println("Email: " + entry.getValue().getEmail() + " criou os artigos: " + entry.getValue().getArtigos());
+            if (entry.getValue().getArtigos().size() > 0) {
+                System.out.println(entry.getValue().getEmail() + ": " + entry.getValue().getArtigos());
+            }
         }
     }
 
     public void see_encomendas(){
         for(Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()){
-            System.out.println(entry.getValue().getEncomendas());
+            if (entry.getValue().getEncomendas().size() > 0) {
+                System.out.println(entry.getValue().getEmail() +": " +  entry.getValue().getEncomendas());
+            }
         }
     }
 
@@ -226,16 +256,21 @@ public class UserApp {
             Transportadoras logged = model.getTransportadora().get(id);
 
             NewMenu userMenu = new NewMenu(new String[]{
-                    "Dados", "Alterar Dados"
+                    "Dados", "Alterar Dados", "Ver Receita"
             });
 
             userMenu.setHandler(1, ()->this.details_transportadora(logged));
             userMenu.setHandler(2, ()->this.change_config_transportadora(logged));
+            userMenu.setHandler(3, ()->this.rev_transportadora(logged));
 
             userMenu.run();
         } else{
             System.out.println("Transportadora ainda não registada.");
         }
+    }
+
+    private void rev_transportadora(Transportadoras logged){
+        System.out.println("Receita até ao momento: " + (logged.getRev() - (logged.getRev()*this.getModel().getVintagecut())));
     }
 
     private void details_transportadora(Transportadoras logged){
@@ -372,6 +407,7 @@ public class UserApp {
     }
 
     private void user_central_vendedor(Utilizador logged){
+
         NewMenu userMenu = new NewMenu(new String[]{
                 "Criar novo artigo", "Publicar/Privar artigo",
                 "Remover artigo", "Ver receita", "Ver artigos criados",
@@ -537,13 +573,19 @@ public class UserApp {
     private void artigo_transportadora(Artigo artigo){
         System.out.println("Id da nova transportadora:");
         String idt = scin.nextLine(),cancel="";
-        while(!(this.getModel().getTransportadora().containsKey(idt))){
-            System.out.println("Não existe transportadora com id: " + idt);
+        boolean loop;
+        loop = !(this.getModel().getTransportadora().containsKey(idt));
+        if(!loop) loop = artigo.isPremium() && !this.getModel().getTransportadora().get(idt).getPremium();
+        while(loop){
+            if(!(this.getModel().getTransportadora().containsKey(idt))) System.out.println("Não existe transportadora com id: " + idt);
+            else if(artigo.isPremium() && !this.getModel().getTransportadora().get(idt).getPremium()) System.out.println("Essa transportadora não tem expedição premium!");
             System.out.println("Cancelar a adição [y/n]?");
             cancel = scin.nextLine();
             if(cancel.contains("y")) break;
             System.out.println("Introduza o id da transportadora: ");
             idt = scin.nextLine();
+            loop = !(this.getModel().getTransportadora().containsKey(idt));
+            if(!loop) loop = artigo.isPremium() && !this.getModel().getTransportadora().get(idt).getPremium();
         }
 
         artigo.setTransportadoras(this.getModel().getTransportadora().get(idt));
@@ -901,7 +943,7 @@ public class UserApp {
         String brand=scin.nextLine();
         artigo.setBrand(brand);
 
-        double precobase=0,desconto=0;
+        double precobase=0;
         System.out.println("Introduza o preco base (sem calculos): ");
         String price = scin.nextLine();
         precobase=Integer.parseInt(price);
@@ -1008,7 +1050,8 @@ public class UserApp {
         });
 
         Encomendas finalCurrent = current;
-        user_encomendar.setHandler(1, ()-> this.encomenda_comprar(finalCurrent, logged));
+        AtomicInteger c = new AtomicInteger();
+        user_encomendar.setHandler(1, ()-> c.set(this.encomenda_comprar(finalCurrent, logged)));
         user_encomendar.setHandler(2, ()-> this.encomenda_add(finalCurrent));
         user_encomendar.setHandler(3, ()-> this.encomenda_rm(finalCurrent));
         user_encomendar.setHandler(4, ()-> this.encomenda_see(finalCurrent));
@@ -1022,20 +1065,75 @@ public class UserApp {
 
         user_encomendar.run();
 
-        logged.adicionarEncomenda(finalCurrent);
+        if(c.get()!=1){
+            logged.adicionarEncomenda(finalCurrent);
+        }
     }
 
     public void encomenda_cardapio(){
         System.out.println(this.getModel().getCardapio());
     }
 
-    private void encomenda_comprar(Encomendas current, Utilizador logged){
+    private int encomenda_comprar(Encomendas current, Utilizador logged){
+
+        Map<String, Transportadoras> adicionadas = new HashMap<>();
+        Map<String, Integer> quantidade = new HashMap<>();
+        Map<String, Transportadoras> adicionadasp = new HashMap<>();
+        Map<String, Integer> quantidadep = new HashMap<>();
+
+        transportadoras_price(current, adicionadas, quantidade, adicionadasp, quantidadep);
+        double transportadoras = 0.0;
+
+        for (Map.Entry<String, Transportadoras> entry : adicionadas.entrySet()){
+            if(quantidade.get(entry.getKey()) <= 1){
+                transportadoras += entry.getValue().getPrecoExp().getPequeno();
+                entry.getValue().setRev(entry.getValue().getPrecoExp().getPequeno()
+                        + entry.getValue().getRev());
+            }else if(quantidade.get(entry.getKey()) <= 5){
+                transportadoras += entry.getValue().getPrecoExp().getMedio();
+                entry.getValue().setRev(entry.getValue().getPrecoExp().getMedio()
+                        + entry.getValue().getRev());
+            }else if(quantidade.get(entry.getKey()) > 5){
+                transportadoras += entry.getValue().getPrecoExp().getGrande();
+                entry.getValue().setRev(entry.getValue().getPrecoExp().getGrande()
+                        + entry.getValue().getRev());
+            }
+        }
+
+        for (Map.Entry<String, Transportadoras> entry : adicionadasp.entrySet()){
+            if(quantidadep.get(entry.getKey()) <= 1){
+                transportadoras += entry.getValue().getPrecoExp().getPequeno();
+                entry.getValue().setRev(entry.getValue().getPrecoPremium().getPequeno()
+                        + entry.getValue().getRev());
+            }else if(quantidadep.get(entry.getKey()) <= 5){
+                transportadoras += entry.getValue().getPrecoExp().getMedio();
+                entry.getValue().setRev(entry.getValue().getPrecoPremium().getMedio()
+                        + entry.getValue().getRev());
+            }else if(quantidadep.get(entry.getKey()) > 5){
+                transportadoras += entry.getValue().getPrecoExp().getGrande();
+                entry.getValue().setRev(entry.getValue().getPrecoPremium().getGrande()
+                        + entry.getValue().getRev());
+            }
+        }
+
+        double preco = 0.0;
+        for (Map.Entry<String, Artigo> entry : current.getArtigos().entrySet()) {
+            if(entry.getValue().getPreco() != -1.0){
+                preco += entry.getValue().getPreco();
+            }
+        }
+
+        this.getModel().setRev(this.getModel().getRev() + ((preco + transportadoras) * this.getModel().getVintagecut()));
+
         current.enviar(this.getModel().now());
         for (Map.Entry<String, Artigo> entry : current.getArtigos().entrySet()) {
             Artigo art = this.getModel().getArtigos().get(entry.getKey());
             art.setSold(art.getSold() + 1);
         }
         logged.adicionarEncomenda(current);
+        this.updates();
+        System.out.println("Obrigado e volte sempre!");
+        return 1;
     }
 
     private void encomenda_add(Encomendas current){
@@ -1068,7 +1166,82 @@ public class UserApp {
         }
     }
 
+    // analisa o numero de artigos por transportadora, por ex: se ha 2 transportadoras e 4 artigos, sendo 1 associado a uma e 3 a outra:
+    // o preço das tranportadoras vai ser o pequeno da 1 + medio do 2.
+    // aplicar a lógica de cima com premium tmb
+    private void transportadoras_price(Encomendas current,
+                                       Map<String, Transportadoras> adicionadas, Map<String, Integer> quantidade,
+                                       Map<String, Transportadoras> adicionadasp, Map<String, Integer> quantidadep){
+        boolean equal;
+        for (Map.Entry<String, Artigo> entry : current.getArtigos().entrySet()) {
+            if(entry.getValue().isPremium()){
+                if(adicionadasp.size() == 0){
+                    quantidadep.put("0", 1);
+                    adicionadasp.put("0", entry.getValue().getTransportadoras());
+                } else{
+                    equal = false;
+                    for (Map.Entry<String, Transportadoras> entry2 : adicionadasp.entrySet()){
+                        if(entry.getValue().getTransportadoras().equals(entry2.getValue())){
+                            quantidadep.put(entry2.getKey(), quantidadep.get(entry2.getKey()) + 1);
+                            equal = true;
+                        }
+                    }
+                    if(!equal){
+                        quantidadep.put(Integer.toString(adicionadasp.size()), 1);
+                        adicionadasp.put(Integer.toString(adicionadasp.size()), entry.getValue().getTransportadoras());
+                    }
+                }
+            } else{
+                if(adicionadas.size() == 0){
+                    quantidade.put("0", 1);
+                    adicionadas.put("0", entry.getValue().getTransportadoras());
+                } else{
+                    equal = false;
+                    for (Map.Entry<String, Transportadoras> entry2 : adicionadas.entrySet()){
+                        if(entry.getValue().getTransportadoras().equals(entry2.getValue())){
+                            quantidade.put(entry2.getKey(), quantidade.get(entry2.getKey()) + 1);
+                            equal = true;
+                        }
+                    }
+                    if(!equal){
+                        quantidade.put(Integer.toString(adicionadas.size()), 1);
+                        adicionadas.put(Integer.toString(adicionadas.size()), entry.getValue().getTransportadoras());
+                    }
+                }
+            }
+        }
+    }
+
     private void encomenda_see(Encomendas current){
+        Map<String, Transportadoras> adicionadas = new HashMap<>();
+        Map<String, Integer> quantidade = new HashMap<>();
+        Map<String, Transportadoras> adicionadasp = new HashMap<>();
+        Map<String, Integer> quantidadep = new HashMap<>();
+
+        transportadoras_price(current, adicionadas, quantidade, adicionadasp, quantidadep);
+
+        double transportadoras = 0.0;
+
+        for (Map.Entry<String, Transportadoras> entry : adicionadas.entrySet()){
+            if(quantidade.get(entry.getKey()) <= 1){
+                transportadoras += entry.getValue().getPrecoExp().getPequeno();
+            }else if(quantidade.get(entry.getKey()) <= 5){
+                transportadoras += entry.getValue().getPrecoExp().getMedio();
+            }else if(quantidade.get(entry.getKey()) > 5){
+                transportadoras += entry.getValue().getPrecoExp().getGrande();
+            }
+        }
+
+        for (Map.Entry<String, Transportadoras> entry : adicionadasp.entrySet()){
+            if(quantidadep.get(entry.getKey()) <= 1){
+                transportadoras += entry.getValue().getPrecoPremium().getPequeno();
+            }else if(quantidadep.get(entry.getKey()) <= 5){
+                transportadoras += entry.getValue().getPrecoPremium().getMedio();
+            }else if(quantidadep.get(entry.getKey()) > 5){
+                transportadoras += entry.getValue().getPrecoPremium().getGrande();
+            }
+        }
+
         double preco = 0.0;
         for (Map.Entry<String, Artigo> entry : current.getArtigos().entrySet()) {
             if(entry.getValue().getPreco() != -1.0){
@@ -1076,7 +1249,9 @@ public class UserApp {
             }
         }
         System.out.println("Artigos: " + current.getArtigos() + "\n"
-                + "Preço total: " + preco + "\n"
+                + "Preço dos artigos: " + preco + "\n"
+                + "Preço das transportadoras: " + transportadoras  + "\n"
+                + "Preço total: " + (preco + transportadoras)
         );
     }
 
@@ -1093,7 +1268,7 @@ public class UserApp {
     }
 
     private void user_receita(Utilizador logged){
-        System.out.println("Receita até ao momento: " + logged.getRevenue());
+        System.out.println("Receita até ao momento: " + (logged.getRevenue() - (logged.getRevenue()*this.getModel().getVintagecut())));
     }
 
     private void user_bought(Utilizador logged){
@@ -1110,11 +1285,6 @@ public class UserApp {
     }
 
     private void user_sold(Utilizador logged){
-        for (Map.Entry<String, Artigo> entry : logged.getProdutosAVenda().entrySet()) {
-            if(entry.getValue().getSold() > 0){
-                logged.adicionarVendaEfetuada(entry.getValue());
-            }
-        }
         for (Map.Entry<String, Artigo> entry : logged.getVendasEfetuadas().entrySet()) {
             System.out.println(entry.getValue() + " vendeu: " + entry.getValue().getSold());
         }
@@ -1247,13 +1417,5 @@ public class UserApp {
 
     private void setModel(sys model) {
         this.model = model;
-    }
-
-    private Scanner getScin() {
-        return scin;
-    }
-
-    private void setScin(Scanner scin) {
-        this.scin = scin;
     }
 }

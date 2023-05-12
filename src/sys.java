@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class sys implements Serializable{
-    private double vintagecut;
+    private double vintagecut, rev;
     private int now;
     private Map<String, Utilizador> user;
     private Map<String, Transportadoras> transportadora;
@@ -57,11 +57,11 @@ public class sys implements Serializable{
         }
     }
 
-    /*public void gravaCsv(String nomef) throws IOException {
+    public void gravaCsv(String nomef) throws IOException {
         FileWriter pw = new FileWriter(nomef);
         pw.write(this.toString());
         pw.close();
-    }*/
+    }
 
     //adiciona coleção ao sistema
     public void addColecao(Colecao col){
@@ -82,10 +82,10 @@ public class sys implements Serializable{
     //adiciona transportadora ao sistema
 
     public void addTransportadora(Transportadoras tr){
-        if(this.transportadora.containsValue(tr)){
+        if(this.getTransportadora().containsValue(tr)){
             System.out.println("Essa transportadora já está registada.");
         } else{
-            this.transportadora.put(Integer.toString(this.getTransportadora().size()),tr);
+            this.getTransportadora().put(Integer.toString(this.getTransportadora().size()),tr);
             System.out.println("Adicionado com sucesso!");
         }
     }
@@ -118,6 +118,14 @@ public class sys implements Serializable{
         }
     }
 
+    public double getRev() {
+        return rev;
+    }
+
+    public void setRev(double rev) {
+        this.rev = rev;
+    }
+
     public void past(int days){
         this.setNow(this.getNow() - days);
     }
@@ -138,7 +146,7 @@ public class sys implements Serializable{
         this.user = new HashMap<>();
         this.transportadora = new HashMap<>();
         this.colecao = new HashMap<>();
-        this.vintagecut = 0.0;
+        this.vintagecut = 0.025;
         this.now = 0;
     }
 

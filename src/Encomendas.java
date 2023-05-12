@@ -194,7 +194,7 @@ public class Encomendas implements Serializable {
 
     @Override
     public String toString() {
-        return "Encomendas{" +
+        return "\n" + "Encomendas{" +
                 "artigos=" + artigos +
                 ", dimensao='" + dimensao + '\'' +
                 ", precoFinal=" + precoFinal +

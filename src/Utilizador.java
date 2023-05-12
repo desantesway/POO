@@ -199,7 +199,7 @@ public class Utilizador implements Serializable {
 
     @Override
     public String toString() {
-        return "Utilizador{" +
+        return "\n" + "Utilizador{" +
                 "ID=" + ID + '\'' +
                 ", email='" + email + '\'' +
                 ", nome='" + nome + '\'' +

@@ -3,7 +3,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class Transportadoras implements Serializable {
-    private double imposto;
+    private double imposto, rev;
     private Tamanhos valorBase, precoExp, precoPremium;
     private Boolean premium, enviado;
     private LocalDate dataEnviado;
@@ -168,6 +168,7 @@ public class Transportadoras implements Serializable {
         this.enviado = other.getEnviado();
         this.dataEnviado = other.getDataEnviado();
         this.diasAtraso = other.getDiasAtraso();
+        this.rev = other.getRev();
     }
 
     public Transportadoras(double valorBaseP, double valorBaseM, double valorBaseG, double imposto) {
@@ -179,6 +180,15 @@ public class Transportadoras implements Serializable {
         this.setDataEnviado(null);
         this.precoExp = new Tamanhos();
         this.precoPremium = new Tamanhos();
+        this.rev = 0;
+    }
+
+    public double getRev() {
+        return rev;
+    }
+
+    public void setRev(double rev) {
+        this.rev = rev;
     }
 
     public int getDiasAtraso() {
@@ -292,7 +302,7 @@ public class Transportadoras implements Serializable {
     //to string on triple
     @Override
     public String toString() {
-        return "Transportadoras{" +
+        return "\n" + "Transportadoras{" +
                 "imposto=" + imposto +
                 ", valorBase=" + valorBase.toString() +
                 ", precoExp=" + precoExp.toString() +

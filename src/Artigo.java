@@ -238,7 +238,7 @@ public class Artigo implements Serializable {
                 ", colecao=" + colecao +
                 ", transportadoras=" + transportadoras +
                 ", devolução=" + devolucao +
-                '}';
+                '}' + "\n";
     }
 
     public String toString(Object o) {

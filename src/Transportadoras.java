@@ -118,7 +118,7 @@ public class Transportadoras implements Serializable {
     }
 
     //a transportadora envia o artigo
-    public void enviar(){
+    public void enviar(LocalDate now){
         if(this.getEnviado()){
             System.out.println("A transportadora já enviou este artigo!");
         } else{
@@ -139,7 +139,7 @@ public class Transportadoras implements Serializable {
             }
             if (quit == 0){
                 this.setEnviado(true);
-                this.setDataEnviado(LocalDate.now());
+                this.setDataEnviado(now);
             } else{
                 System.out.println("Erro ao enviar artigo");
             }

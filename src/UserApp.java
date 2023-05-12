@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -7,14 +8,71 @@ public class UserApp {
     private sys model;
     private Scanner scin;
 
-    public void viagem_tempo(){
-        System.out.println("Era bom");
-    }
-
     public static void main(String[] args) {
         UserApp app = new UserApp();
         app.run();
     }
+
+    private void viagem_tempo(){
+        NewMenu viagem = new NewMenu(new String[]{
+                "Futuro", "Presente", "Passado", "Ver dia"
+        });
+
+        viagem.setHandler(1, this::futuro);
+        viagem.setHandler(2, this::presente);
+        viagem.setHandler(3, this::passado);
+        viagem.setHandler(4, this::day);
+
+        viagem.setPreCondition(2, ()-> !(LocalDate.now().isEqual(this.getModel().now())));
+
+        viagem.run();
+    }
+
+    // CALCULAR PREÇO NOVAMENTE DE TODOS OS PRODUTOS
+    private void timechange(){
+        System.out.println("Alterações de tempo ainda nao feitas");
+    }
+
+    private void day(){
+        System.out.println("Estamos no dia: " + this.getModel().now());
+    }
+
+    private void passado(){
+        System.out.println("Dias para o passado: ");
+        String days = scin.nextLine(), cancel ="";
+        while(Integer.parseInt(days) < 1){
+            System.out.println("Dias de atraso inválido!");
+            System.out.println("Cancelar a viagem no tempo [y/n]?");
+            cancel = scin.nextLine();
+            if(cancel.contains("y")) return;
+            System.out.println("Dias para o passado: ");
+            days = scin.nextLine();
+        }
+        this.getModel().past(Integer.parseInt(days));
+        timechange();
+    }
+
+    private void futuro(){
+        System.out.println("Dias para o futuro: ");
+        String days = scin.nextLine(), cancel ="";
+        while(Integer.parseInt(days) < 1){
+            System.out.println("Dias de avanço inválido!");
+            System.out.println("Cancelar a viagem no tempo [y/n]?");
+            cancel = scin.nextLine();
+            if(cancel.contains("y")) return;
+            System.out.println("Dias para o futuro: ");
+            days = scin.nextLine();
+        }
+        this.getModel().future(Integer.parseInt(days));
+        timechange();
+    }
+
+    private void presente(){
+        this.getModel().setNow(0);
+        timechange();
+        System.out.println("Viagem para o presente concluída!");
+    }
+
     private UserApp(){
         model = new sys();
         scin = new Scanner(System.in);
@@ -317,7 +375,7 @@ public class UserApp {
         NewMenu userMenu = new NewMenu(new String[]{
                 "Criar novo artigo", "Publicar/Privar artigo",
                 "Remover artigo", "Ver receita", "Ver artigos criados",
-                "Ver Artigos vendidos", "Ver Artigos á venda", "Alterar configurações de um artigo"
+                "Ver Artigos vendidos", "Ver Artigos á venda", "Alterar configurações de um artigo", "Duplicar artigo"
         });
 
         userMenu.setHandler(1, () -> this.user_new_artigo(logged));
@@ -328,8 +386,33 @@ public class UserApp {
         userMenu.setHandler(6, () ->this.user_sold(logged));
         userMenu.setHandler(7, () -> this.user_selling(logged));
         userMenu.setHandler(8, () -> this.user_artigo_config(logged));
+        userMenu.setHandler(9, () -> this.user_artigo_clone(logged));
 
         userMenu.run();
+    }
+
+    private void user_artigo_clone(Utilizador logged){
+        System.out.println("Introduza o id do artigo a duplicar: ");
+        String id = scin.nextLine(), cancel = "";
+        while(!(logged.getArtigos().containsKey(id))){
+            System.out.println("Não existe artigo com id " + id + " na sua conta.");
+            System.out.println("Cancelar a mudança [y/n]?");
+            cancel = scin.nextLine();
+            if(cancel.contains("y")) break;
+            System.out.println("id: ");
+            id = scin.nextLine();
+        }
+        if(cancel.contains("y")) return;
+
+        Artigo nArtigo = logged.getArtigos().get(id).clone();
+
+        while(this.getModel().getArtigos().containsKey(nArtigo.getID())){
+            nArtigo.setID(nArtigo.generateID());
+        }
+        System.out.println("Id do novo artigo: " + nArtigo.getID());
+
+        logged.addArtigo(nArtigo);
+
     }
 
     private void user_artigo_created(Utilizador logged){
@@ -338,8 +421,135 @@ public class UserApp {
 
     private void user_artigo_config(Utilizador logged){
         System.out.println("Introduza o id do artigo a editar: ");
+        String id = scin.nextLine();
+
+        if(logged.getArtigos().containsKey(id)){
+            NewMenu artigo_Menu = new NewMenu(new String[]{
+                    "Mudar estado", "Mudar descricao",
+                    "Mudar Marca", "Mudar Numero de Donos",
+                    "Mudar preco base","Mudar colecao","Mudar transportadora"
+
+            });
+            Artigo artigo = logged.getArtigos().get(id);
+            artigo_Menu.setHandler(1, () -> this.artigo_estado(artigo));
+            artigo_Menu.setHandler(2, () -> this.artigo_descricao(artigo));
+            artigo_Menu.setHandler(3, () -> this.artigo_brand(artigo));
+            artigo_Menu.setHandler(4, () -> this.artigo_NDonos(artigo));
+            artigo_Menu.setHandler(5, () -> this.artigo_precobase(artigo));
+            artigo_Menu.setHandler(6, () -> this.artigo_colecao(artigo));
+            artigo_Menu.setHandler(7, () -> this.artigo_transportadora(artigo));
+
+            artigo_Menu.setPreCondition(1, ()-> artigo.getNumeroDonos() > 0);
+
+            artigo_Menu.run();
+        } else{
+            System.out.println("Artigo com id " + id + " não existe.");
+        }
     }
 
+    // CALCULAR PREÇO NOVAMENTE
+    private void artigo_estado(Artigo artigo) {
+        String estado="", cancel="";
+        System.out.println("Introduza o estado (Pouco usado, Usado, Muito usado):");
+        estado = scin.nextLine();
+        while(!( estado.equals("Pouco usado") ||  estado.equals("Usado") ||  estado.equals("Muito usado"))){
+            System.out.println("Tipo de estado invalido!");
+            System.out.println("Cancelar a adição [y/n]?");
+            cancel = scin.nextLine();
+            if(cancel.contains("y")) break;
+            System.out.println("Introduza o estado (Pouco usado, Usado, Muito usado):");
+            estado = scin.nextLine();
+        }
+        if(cancel.contains("y")) return;
+        artigo.setEstado(estado);
+    }
+
+    private void artigo_descricao(Artigo artigo) {
+        System.out.println("Nova descricao:");
+        String descricao= scin.nextLine();
+        artigo.setDescricao(descricao);
+    }
+
+    private void artigo_brand(Artigo artigo){
+        System.out.println("Nova marca:");
+        String brand= scin.nextLine();
+        artigo.setBrand(brand);
+    }
+
+    private void artigo_NDonos(Artigo artigo){
+        int numerodonos=0;
+        System.out.println("Introduza o numero de donos: ");
+        String nd = scin.nextLine(), cancel="";
+        numerodonos=Integer.parseInt(nd);
+        while(numerodonos < 0){
+            System.out.println("Numero de donos invalido");
+            System.out.println("Cancelar a adição [y/n]?");
+            cancel = scin.nextLine();
+            if(cancel.contains("y")) break;
+            System.out.println("Introduza o numero de donos:");
+            nd = scin.nextLine();
+            numerodonos=Integer.parseInt(nd);
+        }
+        if(cancel.contains("y")) return;
+        artigo.setNumeroDonos(numerodonos);
+
+        if(numerodonos != 0){
+            artigo_estado(artigo);
+        } else{
+            artigo.setEstado("Novo");
+        }
+    }
+
+    // CALCULAR PREÇO NOVAMENTE
+    private void artigo_precobase(Artigo artigo){
+        System.out.println("Novo preco base:");
+        double val = Integer.parseInt(scin.nextLine());
+        String cancel="";
+        while(val < 0){
+            System.out.println("Preço invalido");
+            System.out.println("Cancelar a adição [y/n]?");
+            cancel = scin.nextLine();
+            if(cancel.contains("y")) break;
+            System.out.println("Introduza o preço:");
+            val = Integer.parseInt(scin.nextLine());
+        }
+        if(cancel.contains("y")) return;
+
+        artigo.setPrecobase(val);
+    }
+
+    // CALCULAR PREÇO NOVAMENTE
+    private void artigo_colecao(Artigo artigo){
+        System.out.println("Nome da nova coleção:");
+        String id = scin.nextLine(),cancel="";
+        while(!(this.getModel().getColecao().containsKey(id))){
+            System.out.println("Não existe coleção com id/nome: " + id);
+            System.out.println("Cancelar a adição [y/n]?");
+            cancel = scin.nextLine();
+            if(cancel.contains("y")) break;
+            System.out.println("Introduza um Id/nome da colecao: ");
+            id = scin.nextLine();
+        }
+
+        artigo.setColecao(this.getModel().getColecao().get(id));
+    }
+
+    private void artigo_transportadora(Artigo artigo){
+        System.out.println("Id da nova transportadora:");
+        String idt = scin.nextLine(),cancel="";
+        while(!(this.getModel().getTransportadora().containsKey(idt))){
+            System.out.println("Não existe transportadora com id: " + idt);
+            System.out.println("Cancelar a adição [y/n]?");
+            cancel = scin.nextLine();
+            if(cancel.contains("y")) break;
+            System.out.println("Introduza o id da transportadora: ");
+            idt = scin.nextLine();
+        }
+
+        artigo.setTransportadoras(this.getModel().getTransportadora().get(idt));
+    }
+
+    // MUDAR PARA MOSTRAR SE != VAZIO E != 0
     private void user_details(Utilizador logged){
             System.out.println("Email: " + logged.getEmail() + "\n"
                     + "Nome: " + logged.getNome() + "\n"
@@ -447,17 +657,17 @@ public class UserApp {
         String material=scin.nextLine();
         mala.setMaterial(material);
 
-        Artigo artigo = common_artigo();
-
         String bool;
         System.out.println("Deseja ativar premium [y/n]:");
         bool=scin.nextLine();
+        int p= 0;
         if(bool.contains("y")){
+            p = 1;
             mala.ativaPremium();
             mala.setDataPremium(this.getModel().now());
 
             System.out.println("Valorização do premium ao ano (0-100): ");
-            int val = Integer.parseInt(scin.nextLine());
+            double val = Integer.parseInt(scin.nextLine());
 
             while(val < 0 || val > 100){
                 System.out.println("A valorização só pode ser entre 0% e 100%");
@@ -468,7 +678,14 @@ public class UserApp {
                 val = Integer.parseInt(scin.nextLine());
             }
             if(cancel.contains("y")) return;
-            mala.setValorizacao(val);
+            mala.setValorizacao(val/100);
+
+            mala.setDataPremium(this.getModel().now());
+        }
+
+        Artigo artigo = common_artigo(p);
+        if(artigo.getTransportadoras() == null){
+            return;
         }
 
         mala.setNumeroDonos(artigo.getNumeroDonos());
@@ -476,16 +693,27 @@ public class UserApp {
         mala.setBrand(artigo.getBrand());
         mala.setPrecobase(artigo.getPrecobase());
         mala.setDescricao(artigo.getDescricao());
+        mala.setTransportadoras(artigo.getTransportadoras());
+        mala.setColecao(artigo.getColecao());
+        mala.calcPreco(this.getModel().now());
 
         System.out.println("Tamanho da mala: " + mala.getTamanho());
         System.out.println("Material da mala: " + mala.getMaterial());
-        if(mala.isPremium()) System.out.println("Valorização ao ano: " + mala.getValorizacao() + "%");
+        if(mala.isPremium()) System.out.println("Valorização ao ano: " + mala.getValorizacao()*100 + "%");
 
         System.out.println("Numero de donos: " + mala.getNumeroDonos());
         System.out.println("Estado: " + mala.getEstado());
         System.out.println("Marca: " + mala.getBrand());
-        System.out.println("Precobase: " + mala.getPrecobase());
         System.out.println("Descricao do artigo: "+ mala.getDescricao());
+
+        System.out.println("Preco base: " + mala.getPrecobase());
+        System.out.println("Preco após cálculos: " + mala.getPreco());
+
+        while(this.getModel().getArtigos().containsKey(mala.getID())){
+            mala.setID(mala.generateID());
+        }
+        System.out.println("Id do artigo: " + mala.getID());
+
 
         logged.addArtigo(mala);
     }
@@ -506,7 +734,7 @@ public class UserApp {
         tshirt.setTamanho(tamanho);
 
 
-        System.out.println("Introduza o padrao da TShirt (liso, riscas, palmeiras: ");
+        System.out.println("Introduza o padrao da TShirt (liso, riscas, palmeiras): ");
         String padrao=scin.nextLine();
         while(!(padrao.equals("palmeiras") || padrao.equals("riscas") || padrao.equals("liso"))){
             System.out.println("Padrão Inválido");
@@ -518,13 +746,19 @@ public class UserApp {
         }
         tshirt.setPadrao(padrao);
 
-        Artigo artigo = common_artigo();
+        Artigo artigo = common_artigo(0);
+        if(artigo.getTransportadoras() == null){
+            return;
+        }
 
         tshirt.setNumeroDonos(artigo.getNumeroDonos());
         tshirt.setEstado(artigo.getEstado());
         tshirt.setBrand(artigo.getBrand());
         tshirt.setPrecobase(artigo.getPrecobase());
         tshirt.setDescricao(artigo.getDescricao());
+        tshirt.setTransportadoras(artigo.getTransportadoras());
+        tshirt.setColecao(artigo.getColecao());
+        tshirt.calcPreco();
 
         System.out.println("Tamanho da tshirt: " + tshirt.getTamanho());
         System.out.println("Padrao da tshirt: " + tshirt.getPadrao());
@@ -532,8 +766,15 @@ public class UserApp {
         System.out.println("Numero de donos: " + tshirt.getNumeroDonos());
         System.out.println("Estado: " + tshirt.getEstado());
         System.out.println("Marca: " + tshirt.getBrand());
-        System.out.println("Precobase: " + tshirt.getPrecobase());
         System.out.println("Descricao do artigo: "+ tshirt.getDescricao());
+
+        System.out.println("Preco base: " + tshirt.getPrecobase());
+        System.out.println("Preco após cálculos: " + tshirt.getPreco());
+
+        while(this.getModel().getArtigos().containsKey(tshirt.getID())){
+            tshirt.setID(tshirt.generateID());
+        }
+        System.out.println("Id do artigo: " + tshirt.getID());
 
         logged.addArtigo(tshirt);
     }
@@ -557,6 +798,7 @@ public class UserApp {
 
         sapatilha.setTamanho(tamanho);
 
+
         System.out.println("Atacador ou fio?");
         String ata=scin.nextLine();
         while(!(ata.equals("Atacador") || ata.equals("fio") || ata.equals("atacador") || ata.equals("Fio"))){
@@ -574,14 +816,19 @@ public class UserApp {
         String cor=scin.nextLine();
         sapatilha.setCor(cor);
 
-        Artigo artigo = common_artigo();
-
         String bool;
         System.out.println("Deseja ativar premium [y/n]:");
         bool=scin.nextLine();
+        int p = 0;
         if(bool.contains("y")){
+            p=1;
             sapatilha.ativaPremium();
             sapatilha.setDataPremium(this.getModel().now());
+        }
+
+        Artigo artigo = common_artigo(p);
+        if(artigo.getTransportadoras() == null){
+            return;
         }
 
         sapatilha.setNumeroDonos(artigo.getNumeroDonos());
@@ -589,6 +836,9 @@ public class UserApp {
         sapatilha.setBrand(artigo.getBrand());
         sapatilha.setPrecobase(artigo.getPrecobase());
         sapatilha.setDescricao(artigo.getDescricao());
+        sapatilha.setTransportadoras(artigo.getTransportadoras());
+        sapatilha.setColecao(artigo.getColecao());
+        sapatilha.calcPreco(this.getModel().now());
 
         System.out.println("Cor da sapatilha: " + sapatilha.getCor());
         System.out.println("Tamanho da sapatilha: " + sapatilha.getTamanho());
@@ -597,13 +847,20 @@ public class UserApp {
         System.out.println("Numero de donos: " + sapatilha.getNumeroDonos());
         System.out.println("Estado: " + sapatilha.getEstado());
         System.out.println("Marca: " + sapatilha.getBrand());
-        System.out.println("Precobase: " + sapatilha.getPrecobase());
+
         System.out.println("Descricao do artigo: "+ sapatilha.getDescricao());
+        System.out.println("Preco base: " + sapatilha.getPrecobase());
+        System.out.println("Preco após cálculos: " + sapatilha.getPreco());
+
+        while(this.getModel().getArtigos().containsKey(sapatilha.getID())){
+            sapatilha.setID(sapatilha.generateID());
+        }
+        System.out.println("Id do artigo: " + sapatilha.getID());
 
         logged.addArtigo(sapatilha);
     }
 
-    public Artigo common_artigo(){
+    public Artigo common_artigo(int p){
         Artigo artigo=new Artigo();
         String cancel="";
         int numerodonos=0;
@@ -622,19 +879,23 @@ public class UserApp {
         if(cancel.contains("y")) return new Artigo();
         artigo.setNumeroDonos(numerodonos);
 
-        String estado="";
-        System.out.println("Introduza o estado (Pouco usado, Usado, Muito usado):");
-        estado = scin.nextLine();
-        while(!( estado.equals("Pouco usado") ||  estado.equals("Usado") ||  estado.equals("Muito usado"))){
-            System.out.println("Tipo de estado invalido!");
-            System.out.println("Cancelar a adição [y/n]?");
-            cancel = scin.nextLine();
-            if(cancel.contains("y")) break;
+        if(numerodonos != 0){
+            String estado="";
             System.out.println("Introduza o estado (Pouco usado, Usado, Muito usado):");
             estado = scin.nextLine();
+            while(!( estado.equals("Pouco usado") ||  estado.equals("Usado") ||  estado.equals("Muito usado"))){
+                System.out.println("Tipo de estado invalido!");
+                System.out.println("Cancelar a adição [y/n]?");
+                cancel = scin.nextLine();
+                if(cancel.contains("y")) break;
+                System.out.println("Introduza o estado (Pouco usado, Usado, Muito usado):");
+                estado = scin.nextLine();
+            }
+            if(cancel.contains("y")) return new Artigo();
+            artigo.setEstado(estado);
+        } else{
+            artigo.setEstado("Novo");
         }
-        if(cancel.contains("y")) return new Artigo();
-        artigo.setEstado(estado);
 
         System.out.println("Introduza a marca do artigo: ");
         String brand=scin.nextLine();
@@ -662,7 +923,7 @@ public class UserApp {
         artigo.setDescricao(descricao);
 
 
-        System.out.println("Id/nome da colecao do artigo:");
+        System.out.println("Nome da colecao do artigo:");
         String id = scin.nextLine();
         while(!(this.getModel().getColecao().containsKey(id))){
             System.out.println("Não existe coleção com id/nome: " + id);
@@ -677,15 +938,20 @@ public class UserApp {
 
         System.out.println("Id da transportadora:");
         String idt = scin.nextLine();
-        while(!(this.getModel().getColecao().containsKey(idt))){
-            System.out.println("Não existe transportadora com id: " + idt);
+        boolean loop;
+        loop = !(this.getModel().getTransportadora().containsKey(idt));
+        if(!loop) loop = p == 1 && !this.getModel().getTransportadora().get(idt).getPremium();
+        while(loop){
+            if(!(this.getModel().getTransportadora().containsKey(idt))) System.out.println("Não existe transportadora com id: " + idt);
+            else if(p == 1 && !this.getModel().getTransportadora().get(idt).getPremium()) System.out.println("Essa transportadora não tem expedição premium!");
             System.out.println("Cancelar a adição [y/n]?");
             cancel = scin.nextLine();
             if(cancel.contains("y")) break;
             System.out.println("Introduza o id da transportadora: ");
             idt = scin.nextLine();
+            loop = !(this.getModel().getTransportadora().containsKey(idt));
+            if(!loop) loop = p == 1 && !this.getModel().getTransportadora().get(idt).getPremium();
         }
-
         artigo.setTransportadoras(this.getModel().getTransportadora().get(idt));
 
         return artigo;
@@ -697,9 +963,11 @@ public class UserApp {
         if(logged.getArtigos().containsKey(id)){
             if(logged.getArtigos().get(id).isPublicado()){
                 logged.getArtigos().get(id).privar();
+                logged.getProdutosAVenda().remove(id);
                 System.out.println("Privado com sucesso!");
             } else {
                 logged.getArtigos().get(id).publicar();
+                logged.getProdutosAVenda().put(id, logged.getArtigos().get(id));
                 System.out.println("Publicado com sucesso!");
             }
         } else{
@@ -730,6 +998,7 @@ public class UserApp {
         for(Map.Entry<String, Encomendas> entry : logged.getEncomendas().entrySet()){
             if(entry.getValue().getEstado() == 0){
                 current = entry.getValue();
+                logged.getEncomendas().remove(entry.getKey());
             }
         }
 
@@ -752,6 +1021,8 @@ public class UserApp {
         user_encomendar.setPreCondition(6, ()-> this.getModel().getArtigos().size() > 0);
 
         user_encomendar.run();
+
+        logged.adicionarEncomenda(finalCurrent);
     }
 
     public void encomenda_cardapio(){
@@ -759,31 +1030,19 @@ public class UserApp {
     }
 
     private void encomenda_comprar(Encomendas current, Utilizador logged){
-        boolean send = true;
+        current.enviar(this.getModel().now());
         for (Map.Entry<String, Artigo> entry : current.getArtigos().entrySet()) {
             Artigo art = this.getModel().getArtigos().get(entry.getKey());
-            if(!(art.isPremium() && art.getTransportadoras().getPremium())){
-                send = false;
-            }
+            art.setSold(art.getSold() + 1);
         }
-        if(send){
-            current.enviar();
-            for (Map.Entry<String, Artigo> entry : current.getArtigos().entrySet()) {
-                Artigo art = this.getModel().getArtigos().get(entry.getKey());
-                art.setSold(art.getSold() + 1);
-            }
-            logged.adicionarEncomenda(current);
-        } else{
-            System.out.println("Exista pelo menos uma transportadora sem premium ativado para um artigo premium!");
-        }
-
+        logged.adicionarEncomenda(current);
     }
 
     private void encomenda_add(Encomendas current){
         System.out.println("Id do artigo a adicionar: ");
         String id = scin.nextLine();
 
-        if(current.getArtigos().containsKey(id)){
+        if(this.getModel().getArtigos().containsKey(id)){
             current.addArtigo(this.getModel().getArtigos().get(id));
         } else{
             System.out.println("Artigo com id: " + id + " não existe");
@@ -816,8 +1075,8 @@ public class UserApp {
                 preco += entry.getValue().getPreco();
             }
         }
-        System.out.println("Artigos:" + current.getArtigos() + "\n"
-                + "Preço total:" + preco + "\n"
+        System.out.println("Artigos: " + current.getArtigos() + "\n"
+                + "Preço total: " + preco + "\n"
         );
     }
 
@@ -851,15 +1110,18 @@ public class UserApp {
     }
 
     private void user_sold(Utilizador logged){
+        for (Map.Entry<String, Artigo> entry : logged.getProdutosAVenda().entrySet()) {
+            if(entry.getValue().getSold() > 0){
+                logged.adicionarVendaEfetuada(entry.getValue());
+            }
+        }
         for (Map.Entry<String, Artigo> entry : logged.getVendasEfetuadas().entrySet()) {
-            System.out.println(entry.getValue());
+            System.out.println(entry.getValue() + " vendeu: " + entry.getValue().getSold());
         }
     }
 
     private void user_selling(Utilizador logged){
-        boolean s = true;
         for (Map.Entry<String, Artigo> entry : logged.getProdutosAVenda().entrySet()) {
-            s = false;
             System.out.println(entry.getValue());
         }
     }
@@ -892,7 +1154,7 @@ public class UserApp {
         }
         if(cancel.contains("y")) return;
 
-        Colecao cole = new Colecao(col);
+        Colecao cole = new Colecao(col, this.getModel().now());
         cole.setData(this.getModel().now());
 
         this.getModel().addColecao(cole);

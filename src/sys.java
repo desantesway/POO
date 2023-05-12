@@ -118,6 +118,14 @@ public class sys implements Serializable{
         }
     }
 
+    public void past(int days){
+        this.setNow(this.getNow() - days);
+    }
+
+    public void future(int days){
+        this.setNow(this.getNow() + days);
+    }
+
     // obtem o dia de hoje + os dias adiantados
     public LocalDate now(){
         return LocalDate.now().plusDays(this.getNow());
@@ -193,6 +201,6 @@ public class sys implements Serializable{
                 ", user=" + user +
                 ", transportadora=" + transportadora +
                 ", colecao=" + colecao +
-                '}';
+                '}' + "\n";
     }
 }

@@ -10,7 +10,7 @@ public class Sapatilhas extends Artigo implements Serializable {
     private LocalDate dataPremium;
 
     //calcula o preço da sapatilha
-    public void calcPreco(){
+    public void calcPreco(LocalDate now){
         double desconto = 0, preco = super.getPrecobase();
         if(super.getNumeroDonos() != 0){
             desconto += super.getPrecobase() / super.getNumeroDonos();
@@ -19,12 +19,12 @@ public class Sapatilhas extends Artigo implements Serializable {
             case "Pouco usado" -> desconto *= 2;
             case "Usado" -> desconto *= 3;
             case "Muito usado" -> desconto *= 4;
-        } if (!(super.getColecao().getdata().plusDays(365).isAfter(LocalDate.now()))
+        } if (!(super.getColecao().getdata().plusDays(365).isAfter(now))
                 || this.getTamanho() >= 45){
             preco -= desconto;
         } if(super.isPremium()){
-            preco += 100 * (ChronoUnit.YEARS.between(LocalDate.now(), this.dataPremium) *
-                    (ChronoUnit.YEARS.between(LocalDate.now(), this.dataPremium)));
+            preco += 100 * (ChronoUnit.YEARS.between(now, this.dataPremium) *
+                    (ChronoUnit.YEARS.between(now, this.dataPremium)));
         }
         super.setPreco(preco);
     }
@@ -32,6 +32,15 @@ public class Sapatilhas extends Artigo implements Serializable {
     /*
         construtores, getters, setters, clone, tostring e equals
      */
+
+    public Sapatilhas(Artigo art){
+        super(art.isPublicado(), art.isPremium(), art.getEstado(), art.getNumeroDonos(), art.getDescricao(),
+                art.getBrand(), art.getPrecobase(), art.getColecao(), art.getTransportadoras());
+        super.setID(art.getID());
+        this.atacadores=true;
+        this.Cor="N/A";
+        this.dataPremium= null;
+    }
     public Sapatilhas(){
         super();
         this.atacadores=true;
@@ -114,8 +123,8 @@ public class Sapatilhas extends Artigo implements Serializable {
     }
 
     public String toString() {
-        return "Sapatilhas{" +
-                ", Tamanho=" + tamanho +
+        return  "\n" + "Sapatilhas{" +
+                " Tamanho=" + tamanho +
                 ", Atacadores=" + atacadores +
                 ", Cor='" + Cor + '\'' +
                 ", dataPremium=" + dataPremium +

@@ -9,7 +9,7 @@ public class Malas extends Artigo implements Serializable {
     private double valorizacao;
 
     //calcula o preço da mala
-    public void calcPreco(){
+    public void calcPreco(LocalDate now){
         double desconto = 0, preco = super.getPrecobase();
         switch (this.getTamanho()) {
             case "Pequeno" -> desconto = 0.3;
@@ -18,7 +18,7 @@ public class Malas extends Artigo implements Serializable {
         }
         preco -= preco * desconto;
         if(super.isPremium()){
-            preco += preco * this.getValorizacao() * (ChronoUnit.YEARS.between(LocalDate.now(), this.dataPremium));
+            preco += preco * this.getValorizacao() * (ChronoUnit.YEARS.between(now, this.dataPremium));
         }
         super.setPreco(preco);
     }
@@ -27,26 +27,13 @@ public class Malas extends Artigo implements Serializable {
         construtores, getters, setters, clone, tostring e equals
      */
 
-    public Malas(boolean publicado, boolean premium, String estado, int numeroDonos, String descricao, String brand,
-                 double precobase, Colecao colecao,
-                 Transportadoras transportadoras) {
-        super(publicado, premium, estado, numeroDonos, descricao, brand, precobase, colecao, transportadoras);
-        calcPreco();
+    public Malas(Artigo art){
+        super(art.isPublicado(), art.isPremium(), art.getEstado(), art.getNumeroDonos(), art.getDescricao(),
+                art.getBrand(), art.getPrecobase(), art.getColecao(), art.getTransportadoras());
+        super.setID(art.getID());
         this.tamanho = "";
         this.material = "";
-        this.dataPremium = LocalDate.now();
         this.valorizacao = 0.1;
-    }
-
-    public Malas(boolean publicado, boolean premium, String estado, int numeroDonos, String descricao, String brand,
-                 double precobase, Colecao colecao,
-                 Transportadoras transportadoras, String tamanho, String material, double valorizacao) {
-        super(publicado, premium, estado, numeroDonos, descricao, brand, precobase, colecao, transportadoras);
-        calcPreco();
-        this.tamanho = tamanho;
-        this.material = material;
-        this.dataPremium = LocalDate.now();
-        this.valorizacao = valorizacao;
     }
 
     public Malas(LocalDate dataPremium, String tamanho, String material, double valorizacao) {
@@ -112,8 +99,8 @@ public class Malas extends Artigo implements Serializable {
 
 
     public String toString() {
-        return "Malas {" +
-                ", dataPremium=" + dataPremium +
+        return "\n" + "Malas {" +
+                " dataPremium=" + dataPremium +
                 ", material=" + material +
                 ", tamanho=" + tamanho +
                 ", valorização=" + valorizacao +

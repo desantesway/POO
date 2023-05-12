@@ -9,7 +9,7 @@ public class TShirt extends Artigo implements Serializable {
         double desconto = 0, preco = super.getPrecobase();
         switch (super.getEstado()) {
             case "Pouco usado", "Usado", "Muito usado" -> desconto = 0.5;
-        } if (!(this.getPadrao().equals("liso"))){
+        } if (!(this.getPadrao().equals("liso")) && this.getNumeroDonos() > 0){
             preco *= desconto;
         }
         super.setPreco(preco);
@@ -33,6 +33,14 @@ public class TShirt extends Artigo implements Serializable {
                 descricao, brand, precobase, colecao, transportadoras);
         this.Padrao=Padrao;
         this.tamanho = tamanho;
+    }
+
+    public TShirt(Artigo art){
+        super(art.isPublicado(), art.isPremium(), art.getEstado(), art.getNumeroDonos(), art.getDescricao(),
+                art.getBrand(), art.getPrecobase(), art.getColecao(), art.getTransportadoras());
+        super.setID(art.getID());
+        this.Padrao="";
+        this.tamanho = "S";
     }
 
     public TShirt(){
@@ -70,9 +78,9 @@ public class TShirt extends Artigo implements Serializable {
     }
 
     public String toString() {
-        return "TShirt{" +
-                "Padrao='" + Padrao + '\'' +
-                "Tamanho='" + tamanho + '\'' +
+        return "\n" + "TShirt{" +
+                " Padrao='" + Padrao + '\'' +
+                " Tamanho='" + tamanho + '\'' +
                 ", " +
                 super.toString(this) +
                 '}';

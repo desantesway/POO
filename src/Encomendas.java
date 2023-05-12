@@ -1,9 +1,10 @@
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class Encomendas {
+public class Encomendas implements Serializable {
     private Map<String, Artigo> artigos;
     private String dimensao;
     private double precoFinal;
@@ -21,15 +22,15 @@ public class Encomendas {
     }
 
     // funçao para ver se pode pedir devolução ou não
-    public Boolean devolucao(){
-        setEstado();
-        return this.estado == 2 && (this.data.plusDays(this.getDevolucao()).isAfter(LocalDate.now()));
+    public Boolean devolucao(LocalDate now){
+        setEstado(now);
+        return this.estado == 2 && (this.data.plusDays(this.getDevolucao()).isAfter(now));
     }
 
     //envia a encomenda
-    public void enviar(){
+    public void enviar(LocalDate now){
         precoEncomenda();
-        this.data = LocalDate.now();
+        this.data = now;
         setEstado(1);
     }
 
@@ -147,14 +148,14 @@ public class Encomendas {
         return estado;
     }
 
-    public void setEstado() {
+    public void setEstado(LocalDate now) {
         boolean done;
         done = true;
         if(this.getEstado() == 1){
             for (Map.Entry<String, Artigo> entry : this.getArtigos().entrySet()) {
                 Artigo art = entry.getValue();
-                if (this.getData().plusDays(art.getTransportadoras().getDiasAtraso()).isAfter(LocalDate.now())) {
-                    art.getTransportadoras().enviar();
+                if (this.getData().plusDays(art.getTransportadoras().getDiasAtraso()).isAfter(now)) {
+                    art.getTransportadoras().enviar(now);
                 }
                 if (art.getTransportadoras().getDataEnviado() == null){
                     done = false;

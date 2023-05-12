@@ -15,6 +15,28 @@ public class UserApp {
         app.run();
     }
 
+    private void update_artigo(Artigo entry2, Utilizador entry){
+        if(entry2.getClass().equals(Malas.class)){
+            Malas mala = getMalaFromArtigo(entry2);
+            mala.calcPreco(this.getModel().now());
+
+            this.getModel().getUser().remove(entry2.getID());
+            entry.getArtigos().put(mala.getID(), mala);
+        } else if(entry2.getClass().equals(Sapatilhas.class)){
+            Sapatilhas shoe = getShoeFromArtigo(entry2);
+            shoe.calcPreco(this.getModel().now());
+
+            this.getModel().getUser().remove(entry2.getID());
+            entry.getArtigos().put(shoe.getID(), shoe);
+        } else if(entry2.getClass().equals(TShirt.class)){
+            TShirt tshirt = getTshirtFromArtigo(entry2);
+            tshirt.calcPreco();
+
+            this.getModel().getUser().remove(entry2.getID());
+            entry.getArtigos().put(tshirt.getID(), tshirt);
+        }
+    }
+
     private void updates(){
         //update nos produtos vendidos
         for (Map.Entry<String, Utilizador> entry1 : this.getModel().getUser().entrySet()) {
@@ -23,6 +45,37 @@ public class UserApp {
                 if(entry.getValue().getSold() > 0){
                     logged.adicionarVendaEfetuada(entry.getValue());
                 }
+            }
+        }
+        //update dos calculos de cada artigo
+        for (Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()) {
+            for (Map.Entry<String, Artigo> entry2 : entry.getValue().getArtigos().entrySet()) {
+                if(entry2.getValue().getClass().equals(Malas.class)){
+                    Malas mala = getMalaFromArtigo(entry2.getValue());
+                    mala.calcPreco(this.getModel().now());
+
+                    this.getModel().getUser().remove(entry2.getKey());
+                    entry.getValue().getArtigos().put(mala.getID(), mala);
+                } else if(entry2.getValue().getClass().equals(Sapatilhas.class)){
+                    Sapatilhas shoe = getShoeFromArtigo(entry2.getValue());
+                    shoe.calcPreco(this.getModel().now());
+
+                    this.getModel().getUser().remove(entry2.getKey());
+                    entry.getValue().getArtigos().put(shoe.getID(), shoe);
+                } else if(entry2.getValue().getClass().equals(TShirt.class)){
+                    TShirt tshirt = getTshirtFromArtigo(entry2.getValue());
+                    tshirt.calcPreco();
+
+                    this.getModel().getUser().remove(entry2.getKey());
+                    entry.getValue().getArtigos().put(tshirt.getID(), tshirt);
+                }
+            }
+        }
+
+        //update das encomendas
+        for (Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()) {
+            for (Map.Entry<String, Encomendas> entry2 : entry.getValue().getEncomendas().entrySet()) {
+                entry2.getValue().setEstado(this.getModel().now());
             }
         }
     }
@@ -42,9 +95,35 @@ public class UserApp {
         viagem.run();
     }
 
-    // CALCULAR PREÇO NOVAMENTE DE TODOS OS PRODUTOS
-    private void timechange(){
-        System.out.println("Alterações de tempo ainda nao feitas");
+    private Malas getMalaFromArtigo(Artigo entry2){
+        Malas mala = new Malas(entry2);
+        Malas mala2 = mala.fromString(entry2.toString());
+        mala.setDataPremium(mala2.getDataPremium());
+        mala.setMaterial(mala2.getMaterial());
+        mala.setValorizacao(mala2.getValorizacao());
+        mala.setTamanho(mala2.getTamanho());
+
+        return mala;
+    }
+
+    private Sapatilhas getShoeFromArtigo(Artigo entry2){
+        Sapatilhas shoe = new Sapatilhas(entry2);
+        Sapatilhas shoe2 = shoe.fromString(entry2.toString());
+        shoe.setDataPremium(shoe2.getDataPremium());
+        shoe.setAtacadores(shoe2.getAtacadores());
+        shoe.setCor(shoe2.getCor());
+        shoe.setTamanho(shoe2.getTamanho());
+
+        return shoe;
+    }
+
+    private TShirt getTshirtFromArtigo(Artigo entry2){
+        TShirt tshirt = new TShirt(entry2);
+        TShirt tshirt2 = tshirt.fromString(entry2.toString());
+        tshirt.setPadrao(tshirt2.getPadrao());
+        tshirt.setTamanho(tshirt2.getTamanho());
+
+        return tshirt;
     }
 
     private void day(){
@@ -63,7 +142,7 @@ public class UserApp {
             days = scin.nextLine();
         }
         this.getModel().past(Integer.parseInt(days));
-        timechange();
+        updates();
     }
 
     private void futuro(){
@@ -78,12 +157,12 @@ public class UserApp {
             days = scin.nextLine();
         }
         this.getModel().future(Integer.parseInt(days));
-        timechange();
+        updates();
     }
 
     private void presente(){
         this.getModel().setNow(0);
-        timechange();
+        updates();
         System.out.println("Viagem para o presente concluída!");
     }
 
@@ -104,6 +183,7 @@ public class UserApp {
     }
 
     private void run(){
+        updates();
         NewMenu mainMenu = new NewMenu(new String[]{
                 "Log-in", "Registar", "Viagem no Tempo"
         });
@@ -152,7 +232,8 @@ public class UserApp {
             NewMenu adminMenu = new NewMenu(new String[]{
                     "Mudar % da vintage", "Ver % da vintage", "Ver usuarios registados", "Eliminar usuário",
                     "Ver todas as transportadoras", "Eliminar transportadora", "Ver todas as encomendas", "Ver todos artigos",
-                    "Ver cardapio", "Ver receita da vintage", "Ver quem vendeu mais","Guardar o sistema"
+                    "Ver cardapio", "Ver receita da vintage", "Vendedor que vendeu mais",
+                    "Transportadora que faturou mais", "Guardar o sistema"
             });
 
             adminMenu.setHandler(1, this::change_cut_vintage);
@@ -165,13 +246,50 @@ public class UserApp {
             adminMenu.setHandler(8, this::see_artigos);
             adminMenu.setHandler(9, this::encomenda_cardapio);
             adminMenu.setHandler(10, this::admin_receita);
-            //adminMenu.setHandler(11, this::admin_receita);
-            adminMenu.setHandler(12, this::save);
+            adminMenu.setHandler(11, this::admin_seller_receita);
+            adminMenu.setHandler(12, this::admin_transportadora_receita);
+            adminMenu.setHandler(13, this::save);
+
+            adminMenu.setPreCondition(3, () -> this.getModel().getUser().size() > 0);
+            adminMenu.setPreCondition(4, () -> this.getModel().getUser().size() > 0);
+            adminMenu.setPreCondition(5, () -> this.getModel().getTransportadora().size() > 0);
+            adminMenu.setPreCondition(6, () -> this.getModel().getTransportadora().size() > 0);
+            adminMenu.setPreCondition(7, () -> this.getModel().getUser().size() > 0);
+            adminMenu.setPreCondition(12, () -> this.getModel().getTransportadora().size() > 0);
+            adminMenu.setPreCondition(11, () -> this.getModel().getUser().size() > 0);
 
             adminMenu.run();
         } else{
             System.out.println("Login Inválido!");
         }
+    }
+
+    private void admin_transportadora_receita(){
+        double maior = -1.0;
+        Transportadoras t = new Transportadoras(1,1,1,1);
+        for(Map.Entry<String, Transportadoras> entry : this.getModel().getTransportadora().entrySet()){
+            if(maior < entry.getValue().getRev()){
+                t = entry.getValue();
+                maior = t.getRev();
+            }
+        }
+        System.out.println("Transportadora que faturou mais: " + t
+                            + " Faturou: " + maior
+        );
+    }
+
+    private void admin_seller_receita(){
+        double maior = -1.0, temp = 0.0;
+        Utilizador t = new Utilizador();
+        for(Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()){
+            if(maior < entry.getValue().getRevenue()){
+                t = entry.getValue();
+                maior = t.getRevenue();
+            }
+        }
+        System.out.println("Vendedor que faturou mais: " + t
+                + " Faturou: " + maior
+        );
     }
 
     private void admin_receita(){
@@ -180,8 +298,11 @@ public class UserApp {
 
     private void see_artigos(){
         for(Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()){
-            if (entry.getValue().getArtigos().size() > 0) {
-                System.out.println(entry.getValue().getEmail() + ": " + entry.getValue().getArtigos());
+            System.out.println(entry.getValue().getEmail() + ": ");
+            for(Map.Entry<String, Artigo> entry2 : entry.getValue().getArtigos().entrySet()){
+                if(this.getModel().now().isBefore(entry2.getValue().getBorn())) {
+                    System.out.println(entry2.getValue());
+                }
             }
         }
     }
@@ -411,7 +532,9 @@ public class UserApp {
         NewMenu userMenu = new NewMenu(new String[]{
                 "Criar novo artigo", "Publicar/Privar artigo",
                 "Remover artigo", "Ver receita", "Ver artigos criados",
-                "Ver Artigos vendidos", "Ver Artigos á venda", "Alterar configurações de um artigo", "Duplicar artigo"
+                "Ver Artigos vendidos", "Ver Artigos á venda",
+                "Alterar configurações de um artigo", "Duplicar artigo",
+                "Ver encomendas enviadas"
         });
 
         userMenu.setHandler(1, () -> this.user_new_artigo(logged));
@@ -423,8 +546,30 @@ public class UserApp {
         userMenu.setHandler(7, () -> this.user_selling(logged));
         userMenu.setHandler(8, () -> this.user_artigo_config(logged));
         userMenu.setHandler(9, () -> this.user_artigo_clone(logged));
+        userMenu.setHandler(10, () -> this.user_sent(logged));
 
         userMenu.run();
+    }
+
+    private void user_sent(Utilizador logged){
+        int equals;
+        for(Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()){
+            for(Map.Entry<String, Encomendas> entry2 : entry.getValue().getEncomendas().entrySet()){
+                if(entry2.getValue().getEstado() != 0){
+                    equals = 0;
+                    for(Map.Entry<String, Artigo> entry3 : entry2.getValue().getArtigos().entrySet()){
+                        for(Map.Entry<String, Artigo> entry4 : logged.getVendasEfetuadas().entrySet()){
+                            if(entry3.getValue().equals(entry4.getValue())){
+                                equals +=1;
+                            }
+                        }
+                    }
+                    if(equals == entry2.getValue().getArtigos().size()){
+                        System.out.println(entry2.getValue());
+                    }
+                }
+            }
+        }
     }
 
     private void user_artigo_clone(Utilizador logged){
@@ -452,7 +597,11 @@ public class UserApp {
     }
 
     private void user_artigo_created(Utilizador logged){
-        System.out.println(logged.getArtigos());
+        for(Map.Entry<String, Artigo> entry : logged.getArtigos().entrySet()) {
+            if (!this.getModel().now().isBefore(entry.getValue().getBorn())) {
+                System.out.println(entry.getValue());
+            }
+        }
     }
 
     private void user_artigo_config(Utilizador logged){
@@ -467,12 +616,12 @@ public class UserApp {
 
             });
             Artigo artigo = logged.getArtigos().get(id);
-            artigo_Menu.setHandler(1, () -> this.artigo_estado(artigo));
+            artigo_Menu.setHandler(1, () -> this.artigo_estado(artigo, logged));
             artigo_Menu.setHandler(2, () -> this.artigo_descricao(artigo));
             artigo_Menu.setHandler(3, () -> this.artigo_brand(artigo));
-            artigo_Menu.setHandler(4, () -> this.artigo_NDonos(artigo));
-            artigo_Menu.setHandler(5, () -> this.artigo_precobase(artigo));
-            artigo_Menu.setHandler(6, () -> this.artigo_colecao(artigo));
+            artigo_Menu.setHandler(4, () -> this.artigo_NDonos(artigo, logged));
+            artigo_Menu.setHandler(5, () -> this.artigo_precobase(artigo, logged));
+            artigo_Menu.setHandler(6, () -> this.artigo_colecao(artigo, logged));
             artigo_Menu.setHandler(7, () -> this.artigo_transportadora(artigo));
 
             artigo_Menu.setPreCondition(1, ()-> artigo.getNumeroDonos() > 0);
@@ -483,8 +632,7 @@ public class UserApp {
         }
     }
 
-    // CALCULAR PREÇO NOVAMENTE
-    private void artigo_estado(Artigo artigo) {
+    private void artigo_estado(Artigo artigo, Utilizador logged) {
         String estado="", cancel="";
         System.out.println("Introduza o estado (Pouco usado, Usado, Muito usado):");
         estado = scin.nextLine();
@@ -498,6 +646,7 @@ public class UserApp {
         }
         if(cancel.contains("y")) return;
         artigo.setEstado(estado);
+        update_artigo(artigo, logged);
     }
 
     private void artigo_descricao(Artigo artigo) {
@@ -512,7 +661,7 @@ public class UserApp {
         artigo.setBrand(brand);
     }
 
-    private void artigo_NDonos(Artigo artigo){
+    private void artigo_NDonos(Artigo artigo, Utilizador logged){
         int numerodonos=0;
         System.out.println("Introduza o numero de donos: ");
         String nd = scin.nextLine(), cancel="";
@@ -530,14 +679,13 @@ public class UserApp {
         artigo.setNumeroDonos(numerodonos);
 
         if(numerodonos != 0){
-            artigo_estado(artigo);
+            artigo_estado(artigo, logged);
         } else{
             artigo.setEstado("Novo");
         }
     }
 
-    // CALCULAR PREÇO NOVAMENTE
-    private void artigo_precobase(Artigo artigo){
+    private void artigo_precobase(Artigo artigo, Utilizador logged){
         System.out.println("Novo preco base:");
         double val = Integer.parseInt(scin.nextLine());
         String cancel="";
@@ -552,10 +700,10 @@ public class UserApp {
         if(cancel.contains("y")) return;
 
         artigo.setPrecobase(val);
+        update_artigo(artigo, logged);
     }
 
-    // CALCULAR PREÇO NOVAMENTE
-    private void artigo_colecao(Artigo artigo){
+    private void artigo_colecao(Artigo artigo, Utilizador logged){
         System.out.println("Nome da nova coleção:");
         String id = scin.nextLine(),cancel="";
         while(!(this.getModel().getColecao().containsKey(id))){
@@ -563,11 +711,12 @@ public class UserApp {
             System.out.println("Cancelar a adição [y/n]?");
             cancel = scin.nextLine();
             if(cancel.contains("y")) break;
-            System.out.println("Introduza um Id/nome da colecao: ");
+            System.out.println("Introduza o nome da colecao: ");
             id = scin.nextLine();
         }
 
         artigo.setColecao(this.getModel().getColecao().get(id));
+        update_artigo(artigo, logged);
     }
 
     private void artigo_transportadora(Artigo artigo){
@@ -577,8 +726,10 @@ public class UserApp {
         loop = !(this.getModel().getTransportadora().containsKey(idt));
         if(!loop) loop = artigo.isPremium() && !this.getModel().getTransportadora().get(idt).getPremium();
         while(loop){
-            if(!(this.getModel().getTransportadora().containsKey(idt))) System.out.println("Não existe transportadora com id: " + idt);
-            else if(artigo.isPremium() && !this.getModel().getTransportadora().get(idt).getPremium()) System.out.println("Essa transportadora não tem expedição premium!");
+            if(!(this.getModel().getTransportadora().containsKey(idt))) System.out.println(
+                    "Não existe transportadora com id: " + idt);
+            else if(artigo.isPremium() && !this.getModel().getTransportadora().get(idt).getPremium()) System.out.println(
+                    "Essa transportadora não tem expedição premium!");
             System.out.println("Cancelar a adição [y/n]?");
             cancel = scin.nextLine();
             if(cancel.contains("y")) break;
@@ -591,19 +742,20 @@ public class UserApp {
         artigo.setTransportadoras(this.getModel().getTransportadora().get(idt));
     }
 
-    // MUDAR PARA MOSTRAR SE != VAZIO E != 0
     private void user_details(Utilizador logged){
-            System.out.println("Email: " + logged.getEmail() + "\n"
-                    + "Nome: " + logged.getNome() + "\n"
-                    + "Morada: " + logged.getMorada() + "\n"
-                    + "Nif: " + logged.getNif() + "\n"
-                    + "User ID: " + logged.getID() + "\n"
-                    + "Receita: " + logged.getRevenue() + "\n"
-                    + "Artigos a venda: " + logged.getProdutosAVenda()+ "\n"
-                    + "Vendas efetuadas: " + logged.getVendasEfetuadas() + "\n"
-                    + "Artigos á venda: " + logged.getArtigos() + "\n"
-                    + "Encomendas Realizadas: " + logged.getEncomendas()
-            );
+        String print="";
+        if(!(logged.getRevenue() == 0.0)) print += "Receita: " + logged.getRevenue() + "\n";
+        if(logged.getProdutosAVenda().size() > 0) print += "Artigos a venda: " + logged.getProdutosAVenda()+ "\n";
+        if(logged.getVendasEfetuadas().size() > 0) print += "Vendas efetuadas: " + logged.getVendasEfetuadas() + "\n";
+        if(logged.getArtigos().size() > 0) print += "Artigos á venda: " + logged.getArtigos() + "\n";
+        if(logged.getEncomendas().size() > 0) print += "Encomendas Realizadas: " + logged.getEncomendas();
+        System.out.println("Email: " + logged.getEmail() + "\n"
+                + "Nome: " + logged.getNome() + "\n"
+                + "Morada: " + logged.getMorada() + "\n"
+                + "Nif: " + logged.getNif() + "\n"
+                + "User ID: " + logged.getID() + "\n"
+                + print
+        );
     }
 
     private void user_change_config(Utilizador logged){
@@ -786,6 +938,7 @@ public class UserApp {
             System.out.println("Padrao: (liso, riscas, palmeiras: ");
             padrao = scin.nextLine();
         }
+        if(cancel.contains("y")) return;
         tshirt.setPadrao(padrao);
 
         Artigo artigo = common_artigo(0);
@@ -975,6 +1128,7 @@ public class UserApp {
             System.out.println("Introduza um Id/nome da colecao: ");
             id = scin.nextLine();
         }
+        if(cancel.contains("y")) return new Artigo();
 
         artigo.setColecao(this.getModel().getColecao().get(id));
 
@@ -1071,7 +1225,7 @@ public class UserApp {
     }
 
     public void encomenda_cardapio(){
-        System.out.println(this.getModel().getCardapio());
+        System.out.println(this.getModel().getCardapio(this.getModel().now()));
     }
 
     private int encomenda_comprar(Encomendas current, Utilizador logged){
@@ -1131,7 +1285,7 @@ public class UserApp {
             art.setSold(art.getSold() + 1);
         }
         logged.adicionarEncomenda(current);
-        this.updates();
+        updates();
         System.out.println("Obrigado e volte sempre!");
         return 1;
     }
@@ -1168,7 +1322,7 @@ public class UserApp {
 
     // analisa o numero de artigos por transportadora, por ex: se ha 2 transportadoras e 4 artigos, sendo 1 associado a uma e 3 a outra:
     // o preço das tranportadoras vai ser o pequeno da 1 + medio do 2.
-    // aplicar a lógica de cima com premium tmb
+    // aplicar a lógica de cima com premium também
     private void transportadoras_price(Encomendas current,
                                        Map<String, Transportadoras> adicionadas, Map<String, Integer> quantidade,
                                        Map<String, Transportadoras> adicionadasp, Map<String, Integer> quantidadep){

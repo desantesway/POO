@@ -149,21 +149,17 @@ public class Encomendas implements Serializable {
     }
 
     public void setEstado(LocalDate now) {
-        boolean done;
-        done = true;
+        LocalDate max = now;
         if(this.getEstado() == 1){
             for (Map.Entry<String, Artigo> entry : this.getArtigos().entrySet()) {
                 Artigo art = entry.getValue();
-                if (this.getData().plusDays(art.getTransportadoras().getDiasAtraso()).isAfter(now)) {
-                    art.getTransportadoras().enviar(now);
-                }
-                if (art.getTransportadoras().getDataEnviado() == null){
-                    done = false;
+                if(!(max.plusDays(-1).isAfter(now))){
+                    max = this.getData().plusDays(art.getTransportadoras().getDiasAtraso());
                 }
             }
-            if (done){
-                this.setEstado(2);
-            }
+        }
+        if(!(max.isBefore(now))){
+            this.setEstado(2);
         }
     }
 

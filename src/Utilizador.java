@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.*;
 
 public class Utilizador implements Serializable {
@@ -16,7 +17,7 @@ public class Utilizador implements Serializable {
         this.produtosAVenda.remove(key);
     }
 
-    public Map<String, Artigo> getComprados(){
+    public Map<String, Artigo> getComprados(LocalDate now){
         Map<String, Artigo> ret = new HashMap<>();
         for (Map.Entry<String, Encomendas> entry : this.getEncomendas().entrySet()) {
             ret.putAll(entry.getValue().getArtigos());

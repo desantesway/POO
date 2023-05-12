@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class TShirt extends Artigo implements Serializable {
@@ -13,6 +14,28 @@ public class TShirt extends Artigo implements Serializable {
             preco *= desconto;
         }
         super.setPreco(preco);
+    }
+
+    // string para tshirt
+    public TShirt fromString (String input){
+        int num = 0, bf = 0;
+        TShirt t = new TShirt();
+        for(int i = 0; i< input.length(); i++){
+
+            if(input.charAt(i) == '='){
+                bf=i+1;
+            }
+            if(input.charAt(i) == ','){
+                if(num == 0){
+                    if(bf+1<= i-1) t.setPadrao(input.substring(bf+1, i-1));
+                } else if(num == 1){
+                    if(bf+1<= i-1) t.setTamanho(input.substring(bf+1, i-1));
+                    break;
+                }
+                num += 1;
+            }
+        }
+        return t;
     }
 
     /*

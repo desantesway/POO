@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 public class Artigo implements Serializable {
@@ -8,6 +9,7 @@ public class Artigo implements Serializable {
     private double preco, precobase;
     private Colecao colecao;
     private Transportadoras transportadoras;
+    private LocalDate born;
 
     //fez uma venda
     public void sold(){
@@ -97,6 +99,14 @@ public class Artigo implements Serializable {
         this.transportadoras=l.getTransportadoras();
         this.devolucao = l.getDevolucao();
         this.sold = l.getSold();
+    }
+
+    public LocalDate getBorn() {
+        return born;
+    }
+
+    public void setBorn(LocalDate born) {
+        this.born = born;
     }
 
     public int getSold() {

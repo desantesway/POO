@@ -20,11 +20,11 @@ public class sys implements Serializable{
     }
 
     // mostra todos os artigos do sistema publicados
-    public Map<String, Artigo> getCardapio(){
+    public Map<String, Artigo> getCardapio(LocalDate now){
         Map<String, Artigo> ret = new HashMap<>();
         for(Map.Entry<String, Utilizador> entry : this.getUser().entrySet()){
             for(Map.Entry<String, Artigo> entry2 : entry.getValue().getArtigos().entrySet()){
-                if(entry2.getValue().isPublicado()){
+                if(entry2.getValue().isPublicado() && !now.isBefore(entry2.getValue().getBorn())){
                     ret.put(entry2.getKey(), entry2.getValue());
                 }
             }

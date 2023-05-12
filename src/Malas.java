@@ -1,12 +1,44 @@
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class Malas extends Artigo implements Serializable {
     private LocalDate dataPremium;
     private String tamanho, material;
     private double valorizacao;
+
+    //string para mala
+    public Malas fromString (String input){
+        int num = 0, bf = 0;
+        Malas mala = new Malas();
+        for(int i = 0; i< input.length(); i++){
+
+            if(input.charAt(i) == '='){
+                bf=i+1;
+            }
+            if(input.charAt(i) == ','){
+                if(num == 0){
+                    if(input.substring(bf, i).contains("null")){
+                        mala.setDataPremium(null);
+                    }else{
+                        mala.setDataPremium(LocalDate.parse(input.substring(bf, i)));
+                    }
+                } else if(num == 1){
+                    if(bf+1<= i-1) mala.setMaterial(input.substring(bf+1, i-1));
+                } else if(num == 2){
+                    if(bf+1<= i-1) mala.setTamanho(input.substring(bf+1, i-1));
+                } else if(num == 3){
+                    mala.setValorizacao(Double.parseDouble(input.substring(bf, i)));
+                    break;
+                }
+                num += 1;
+            }
+        }
+        return mala;
+    }
 
     //calcula o preço da mala
     public void calcPreco(LocalDate now){
@@ -18,7 +50,8 @@ public class Malas extends Artigo implements Serializable {
         }
         preco -= preco * desconto;
         if(super.isPremium()){
-            preco += preco * this.getValorizacao() * (ChronoUnit.YEARS.between(now, this.dataPremium));
+            if(!now.isBefore(this.dataPremium)) preco += preco * this.getValorizacao() *
+                    (ChronoUnit.YEARS.between(this.dataPremium, now) + 1);
         }
         super.setPreco(preco);
     }
@@ -101,8 +134,8 @@ public class Malas extends Artigo implements Serializable {
     public String toString() {
         return "\n" + "Malas {" +
                 " dataPremium=" + dataPremium +
-                ", material=" + material +
-                ", tamanho=" + tamanho +
+                ", material='" + material + '\'' +
+                ", tamanho='" + tamanho + '\'' +
                 ", valorização=" + valorizacao +
                 ", " +
                 super.toString(this) +

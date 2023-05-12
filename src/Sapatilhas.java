@@ -9,6 +9,36 @@ public class Sapatilhas extends Artigo implements Serializable {
     private String Cor;
     private LocalDate dataPremium;
 
+    //string para sapatilha
+    public Sapatilhas fromString (String input){
+        int num = 0, bf = 0;
+        Sapatilhas shoe = new Sapatilhas();
+        for(int i = 0; i< input.length(); i++){
+
+            if(input.charAt(i) == '='){
+                bf=i+1;
+            }
+            if(input.charAt(i) == ','){
+                if(num == 0){
+                    shoe.setTamanho(Integer.parseInt(input.substring(bf, i)));
+                } else if(num == 1){
+                    shoe.setAtacadores(input.substring(bf, i).equals("true"));
+                } else if(num == 2){
+                    if(bf+1<= i-1) shoe.setCor(input.substring(bf+1, i-1));
+                } else if(num == 3){
+                    if(input.substring(bf, i).contains("null")){
+                        shoe.setDataPremium(null);
+                    }else{
+                        shoe.setDataPremium(LocalDate.parse(input.substring(bf, i)));
+                    }
+                    break;
+                }
+                num += 1;
+            }
+        }
+        return shoe;
+    }
+
     //calcula o preço da sapatilha
     public void calcPreco(LocalDate now){
         double desconto = 0, preco = super.getPrecobase();
@@ -23,8 +53,8 @@ public class Sapatilhas extends Artigo implements Serializable {
                 || this.getTamanho() >= 45){
             preco -= desconto;
         } if(super.isPremium()){
-            preco += 100 * (ChronoUnit.YEARS.between(now, this.dataPremium) *
-                    (ChronoUnit.YEARS.between(now, this.dataPremium)));
+            preco += 100 * (ChronoUnit.YEARS.between(this.dataPremium, now) *
+                    (ChronoUnit.YEARS.between(this.dataPremium, now)));
         }
         super.setPreco(preco);
     }

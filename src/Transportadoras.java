@@ -5,7 +5,7 @@ import java.util.Objects;
 public class Transportadoras implements Serializable {
     private double imposto, rev;
     private Tamanhos valorBase, precoExp, precoPremium;
-    private Boolean premium, enviado;
+    private Boolean premium;
     private LocalDate dataEnviado;
     private int diasAtraso;
     private String formula, fpremium;
@@ -117,35 +117,6 @@ public class Transportadoras implements Serializable {
         return result;
     }
 
-    //a transportadora envia o artigo
-    public void enviar(LocalDate now){
-        if(this.getEnviado()){
-            System.out.println("A transportadora já enviou este artigo!");
-        } else{
-            int quit = 0;
-            for (int i = 0; i<3; i++){
-                if(this.getPrecoExp().get(i) == -1.0){
-                    System.out.println("Preço de expedição ainda não definido!");
-                    quit++;
-                    break;
-                }
-                if(this.getPremium()){
-                    if(this.getPrecoPremium().get(i) == -1.0){
-                        System.out.println("Preço do premium ainda não definido!");
-                        quit++;
-                        break;
-                    }
-                }
-            }
-            if (quit == 0){
-                this.setEnviado(true);
-                this.setDataEnviado(now);
-            } else{
-                System.out.println("Erro ao enviar artigo");
-            }
-        }
-    }
-
     //ativa o premium na transportadora
     public void ativaPremium(){
         this.setPremium(true);
@@ -165,7 +136,6 @@ public class Transportadoras implements Serializable {
         this.valorBase = new Tamanhos(other.getValorBase());
         this.imposto = other.getImposto();
         this.premium = other.getPremium();
-        this.enviado = other.getEnviado();
         this.dataEnviado = other.getDataEnviado();
         this.diasAtraso = other.getDiasAtraso();
         this.rev = other.getRev();
@@ -176,7 +146,6 @@ public class Transportadoras implements Serializable {
         this.imposto = imposto;
         this.diasAtraso = 1;
         this.setPremium(false);
-        this.setEnviado(false);
         this.setDataEnviado(null);
         this.precoExp = new Tamanhos();
         this.precoPremium = new Tamanhos();
@@ -268,14 +237,6 @@ public class Transportadoras implements Serializable {
         this.premium = premium;
     }
 
-    public Boolean getEnviado() {
-        return enviado;
-    }
-
-    public void setEnviado(Boolean enviado) {
-        this.enviado = enviado;
-    }
-
     public LocalDate getDataEnviado() {
         return dataEnviado;
     }
@@ -295,7 +256,6 @@ public class Transportadoras implements Serializable {
                 && this.getPrecoExp().equals(that.getPrecoExp())
                 && this.getPrecoPremium().equals(that.getPrecoPremium())
                 && Objects.equals(getPremium(), that.getPremium())
-                && Objects.equals(getEnviado(), that.getEnviado())
                 && Objects.equals(getDataEnviado(), that.getDataEnviado());
     }
 
@@ -308,7 +268,6 @@ public class Transportadoras implements Serializable {
                 ", precoExp=" + precoExp.toString() +
                 ", precoPremium=" + precoPremium.toString() +
                 ", premium=" + premium +
-                ", enviado=" + enviado +
                 ", dataEnviado=" + dataEnviado +
                 ", diasAtraso=" + diasAtraso +
                 '}';

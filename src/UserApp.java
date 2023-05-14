@@ -244,7 +244,7 @@ public class UserApp {
             adminMenu.setPreCondition(7, () -> this.getModel().getUser().size() > 0);
             adminMenu.setPreCondition(12, () -> this.getModel().getTransportadora().size() > 0);
             adminMenu.setPreCondition(11, () -> this.getModel().getUser().size() > 0);
-
+            adminMenu.setTitle("Admin Menu");
             adminMenu.run();
         } else{
             System.out.println("Login Inválido!");
@@ -345,7 +345,7 @@ public class UserApp {
 
         loginMenu.setPreCondition(1, ()-> this.getModel().getUser().size()>0);
         loginMenu.setPreCondition(2, ()-> this.getModel().getTransportadora().size()>0);
-
+        loginMenu.setTitle("Type Login Menu");
         loginMenu.run();
     }
 
@@ -365,7 +365,7 @@ public class UserApp {
             userMenu.setHandler(1, ()->this.details_transportadora(logged));
             userMenu.setHandler(2, ()->this.change_config_transportadora(logged));
             userMenu.setHandler(3, ()->this.rev_transportadora(logged));
-
+            userMenu.setTitle("Transportadora Menu");
             userMenu.run();
         } else{
             System.out.println("Transportadora ainda não registada.");
@@ -418,7 +418,7 @@ public class UserApp {
         config_trans_Menu.setHandler(4, ()-> this.formula_premium_transportadora(logged));
 
         config_trans_Menu.setPreCondition(4, logged::getPremium);
-
+        config_trans_Menu.setTitle("Transportadoras Config Menu");
         config_trans_Menu.run();
     }
 
@@ -491,7 +491,7 @@ public class UserApp {
             userMenu.setHandler(2, () -> this.user_change_config(logged));
             userMenu.setHandler(3, () -> this.user_central_cliente(logged));
             userMenu.setHandler(4, () -> this.user_central_vendedor(logged));
-
+            userMenu.setTitle("Login User Menu");
             userMenu.run();
         } else{
             System.out.println("E-mail ainda não registado.");
@@ -505,7 +505,7 @@ public class UserApp {
 
         userMenu.setHandler(1, () -> this.user_encomendar(logged));
         userMenu.setHandler(2, () -> this.user_bought(logged));
-
+        userMenu.setTitle("Cliente Menu");
         userMenu.run();
     }
 
@@ -529,7 +529,7 @@ public class UserApp {
         userMenu.setHandler(8, () -> this.user_artigo_config(logged));
         userMenu.setHandler(9, () -> this.user_artigo_clone(logged));
         userMenu.setHandler(10, () -> this.user_sent(logged));
-
+        userMenu.setTitle("Vendedor Menu");
         userMenu.run();
     }
 
@@ -607,7 +607,7 @@ public class UserApp {
             artigo_Menu.setHandler(7, () -> this.artigo_transportadora(artigo));
 
             artigo_Menu.setPreCondition(1, ()-> artigo.getNumeroDonos() > 0);
-
+            artigo_Menu.setTitle("Artigo Menu");
             artigo_Menu.run();
         } else{
             System.out.println("Artigo com id " + id + " não existe.");
@@ -749,7 +749,7 @@ public class UserApp {
         config_user_Menu.setHandler(2, ()-> this.nome_user(logged));
         config_user_Menu.setHandler(3, ()-> this.morada_user(logged));
         config_user_Menu.setHandler(4, ()-> this.nif_user(logged));
-
+        config_user_Menu.setTitle("User Config Menu");
         config_user_Menu.run();
     }
 
@@ -807,7 +807,7 @@ public class UserApp {
         config_user_Menu.setHandler(1, ()-> this.user_mala(logged));
         config_user_Menu.setHandler(2, ()-> this.user_tshirt(logged));
         config_user_Menu.setHandler(3, ()-> this.user_sapatilha(logged));
-
+        config_user_Menu.setTitle("Type Artigo Menu");
         config_user_Menu.run();
     }
 
@@ -1200,7 +1200,7 @@ public class UserApp {
         user_encomendar.setPreCondition(3, ()-> finalCurrent.getArtigos().size() > 0);
         user_encomendar.setPreCondition(5, ()-> finalCurrent.getArtigos().size() > 0);
         user_encomendar.setPreCondition(6, ()-> this.getModel().getArtigos().size() > 0);
-
+        user_encomendar.setTitle("Encomendas Menu");
         user_encomendar.run();
 
         if(c.get()!=1){
@@ -1447,7 +1447,7 @@ public class UserApp {
         registarMenu.setHandler(1, this::registar_user);
         registarMenu.setHandler(2, this::registar_transportadora);
         registarMenu.setHandler(3, this::registar_colecao);
-
+        registarMenu.setTitle("Registar Menu");
         registarMenu.run();
 
     }

@@ -24,7 +24,11 @@ public class Encomendas implements Serializable {
     // funçao para ver se pode pedir devolução ou não
     public Boolean devolucao(LocalDate now){
         setEstado(now);
-        return this.estado == 2 && (this.data.plusDays(this.getDevolucao()).isAfter(now));
+        if(this.estado == 2 && (this.getData().plusDays(this.getDevolucao()).isAfter(now))){
+            this.setEstado(-1);
+            return true;
+        }
+        return false;
     }
 
     //envia a encomenda
@@ -150,17 +154,21 @@ public class Encomendas implements Serializable {
 
     public void setEstado(LocalDate now) {
         LocalDate max = now;
-        if(this.getEstado() == 1){
+        if(this.getEstado() == 1 || this.getEstado() == 2){
             for (Map.Entry<String, Artigo> entry : this.getArtigos().entrySet()) {
                 Artigo art = entry.getValue();
                 if(!(max.plusDays(-1).isAfter(now))){
                     max = this.getData().plusDays(art.getTransportadoras().getDiasAtraso());
                 }
             }
+            if(this.getEstado() == 1 && !(max.isAfter(now))){
+                this.setEstado(2);
+            }
+            if(this.getEstado() == 2 && max.isAfter(now)){
+                this.setEstado(1);
+            }
         }
-        if(!(max.isBefore(now))){
-            this.setEstado(2);
-        }
+
     }
 
     public void setEstado(int estado) {

@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -62,6 +64,7 @@ public class UserApp {
                     }
                     try{ //data, email, id do artigo
                         StringBuilder fline = new StringBuilder();
+                        Map<String, Integer> already_sold = new HashMap<>();
                         if(mode == 0){
                             BufferedReader in = new BufferedReader(new FileReader(save));
                             StringBuilder sb = new StringBuilder();
@@ -79,13 +82,24 @@ public class UserApp {
                                 if(!(sub[0].equals(this.getModel().now().toString()) &&
                                 sub[1].equals(logged.getEmail())
                                 && sub[2].equals(entry.getValue().getID())
-                                && Integer.parseInt(sub[3]) <= entry.getValue().getSold())){
+                                )){
                                     fline.append(c);
+                                    fline.append("\n");
+                                    if(!(already_sold.containsKey(sub[2]))){
+                                        already_sold.put(sub[2], Integer.parseInt(sub[3]));
+                                    } else{
+                                        already_sold.put(sub[2], already_sold.get(sub[2]) + Integer.parseInt(sub[3]));
+                                    }
+
                                 }
+
                             }
+
                         }
-                        this.getModel().writeTxt(save, fline  + "\n" + this.getModel().now().toString()
-                                + " " + logged.getEmail() + " " + entry.getValue().getID() + " " + entry.getValue().getSold() + "\n");
+                        if(entry.getValue().getSold() - already_sold.get(entry.getValue().getID()) > 0){
+                            this.getModel().writeTxt(save, fline + this.getModel().now().toString()
+                                    + " " + logged.getEmail() + " " + entry.getValue().getID() + " " + (entry.getValue().getSold() - already_sold.get(entry.getValue().getID())) + "\n");
+                        }
                     } catch (IOException e){
                         System.err.println("Erro a registar ficheiro: " + e);
                     }
@@ -346,6 +360,118 @@ public class UserApp {
     }
 
     private void admin_seller_receita(){
+        NewMenu adminMenu = new NewMenu(new String[]{
+                "Num intervalo de tempo", "De sempre", "Listagem num intervalo"
+        });
+
+        adminMenu.setHandler(1, ()-> this.seller_time(0));
+        adminMenu.setHandler(2, this::seller_alltime);
+        adminMenu.setHandler(3, ()-> this.seller_time(1));
+
+        adminMenu.setTitle("Maior vendedor");
+
+        adminMenu.run();
+    }
+
+    private void seller_time(int i){
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date;
+        while(true){
+            System.out.println("Primeiro dia: (yyyy-mm-dd)");
+            String d1 = scin.nextLine();
+            try {
+                date = LocalDate.parse(d1, formatter);
+                break;
+            } catch (DateTimeParseException e) {
+                System.out.println("Essa data não é valida! Cancelar [y/n]? " + e.getMessage());
+                if(scin.nextLine().equals("y")){
+                    return;
+                }
+            }
+        }
+
+        LocalDate date2;
+
+        while(true){
+            System.out.println("Último dia: (yyyy-mm-dd)");
+            String d2 = scin.nextLine();
+            try {
+                date2 = LocalDate.parse(d2, formatter);
+                if(date2.isAfter(date) || date2.isEqual(date)){
+                    break;
+                } else{
+                    System.out.println("Esta data está antes da primeira data! Cancelar [y/n]?");
+                    if(scin.nextLine().equals("y")){
+                        return;
+                    }
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Essa data não é valida! Cancelar [y/n]? " + e.getMessage());
+                if(scin.nextLine().equals("y")){
+                    return;
+                }
+            }
+        }
+
+        String save = "saves/sales.txt";
+        File file = new File(save);
+        double max = 0.0;
+        if(file.exists()){
+            try{
+                StringBuilder fline = new StringBuilder();
+                BufferedReader in = new BufferedReader(new FileReader(save));
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while((line = in.readLine()) != null) {
+                    sb.append(line);
+                    sb.append("\n");
+                }
+                in.close();
+                String read = sb.toString();
+                String[] lines = read.split("\n");
+                String[] sub;
+                Map<String, Double> maxuser = new HashMap<>();
+                for (String c : lines) {
+                    sub = c.split(" ");
+                    if((LocalDate.parse(sub[0], formatter).isAfter(date) || LocalDate.parse(sub[0], formatter).isEqual(date))
+                            && (LocalDate.parse(sub[0], formatter).isBefore(date2) || LocalDate.parse(sub[0], formatter).isEqual(date2))){
+                        if(maxuser.containsKey(sub[1])){
+                            maxuser.put(sub[1], maxuser.get(sub[1]) + this.getModel().getUser(sub[1]).getArtigos().get(sub[2]).getPreco() * Integer.parseInt(sub[3]));
+                        } else{
+                            maxuser.put(sub[1], this.getModel().getUser(sub[1]).getArtigos().get(sub[2]).getPreco() * Integer.parseInt(sub[3]));
+                        }
+                        fline.append(c);
+                    }
+                }
+                if(i == 0){
+                    double maxValue = Double.MIN_VALUE;
+                    String key = null;
+                    for (Map.Entry<String, Double> entry : maxuser.entrySet()) {
+                        if (entry.getValue() > maxValue) {
+                            key = entry.getKey();
+                            maxValue = entry.getValue();
+                        }
+                    }
+                    System.out.println("O vendedor " + key + " foi o que mais faturou com: " +
+                            (maxValue - (maxValue * this.getModel().getVintagecut())));
+                } else{
+                    List<Map.Entry<String, Double>> list = new ArrayList<>(maxuser.entrySet());
+                    list.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+                    for (Map.Entry<String, Double> entry : list) {
+                        System.out.println(entry.getKey() + " faturou: " + entry.getValue());
+                    }
+                }
+            } catch(IOException e){
+                System.err.println("Erro a ler sales.txt");
+            }
+        } else{
+            System.out.println("Não há registos de vendas.");
+        }
+
+    }
+
+    private void seller_alltime(){
         double maior = -1.0, temp = 0.0;
         Utilizador t = new Utilizador();
         for(Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()){
@@ -354,7 +480,7 @@ public class UserApp {
                 maior = t.getRevenue();
             }
         }
-        System.out.println("Vendedor que faturou mais: " + t
+        System.out.println("Vendedor que faturou mais: " + t.getEmail()
                 + "\nFaturou: " + (maior - (maior * this.getModel().getVintagecut()))
         );
     }
@@ -578,13 +704,142 @@ public class UserApp {
 
     private void user_central_cliente(Utilizador logged){
         NewMenu userMenu = new NewMenu(new String[]{
-                "Encomendar", "Ver Artigos comprados"
+                "Encomendar", "Ver Artigos comprados", "Ver todas encomendas","Devolução"
         });
 
         userMenu.setHandler(1, () -> this.user_encomendar(logged));
         userMenu.setHandler(2, () -> this.user_bought(logged));
-        userMenu.setTitle("Cliente Menu");
+        userMenu.setHandler(3, () -> this.encomendas(logged));
+        userMenu.setHandler(4, () -> this.devolucao(logged));
+        userMenu.setTitle("Cliente");
         userMenu.run();
+    }
+
+    private void encomendas(Utilizador logged){
+        System.out.println(logged.getEncomendas());
+    }
+
+    private void devolucao(Utilizador logged){
+        String d = "";
+        while(true){
+            System.out.println("Introduza o numero da encomenda: ");
+            d = scin.nextLine();
+            if(logged.getEncomendas().containsKey(d)) break;
+            System.out.println("Esse de encomenda não existe! Cancelar devolução [y/n]?");
+            if(scin.nextLine().contains("y")) return;
+        }
+
+        if(logged.getEncomendas().get(d).devolucao(this.getModel().now())){
+            //remove outra vez o rev das transportadoras
+            Map<String, Transportadoras> adicionadas = new HashMap<>();
+            Map<String, Integer> quantidade = new HashMap<>();
+            Map<String, Transportadoras> adicionadasp = new HashMap<>();
+            Map<String, Integer> quantidadep = new HashMap<>();
+
+            transportadoras_price(logged.getEncomendas().get(d), adicionadas, quantidade, adicionadasp, quantidadep);
+
+            double rm = 0.0;
+
+            for (Map.Entry<String, Transportadoras> entry : adicionadas.entrySet()){
+                if(quantidade.get(entry.getKey()) <= 1){
+                    rm += entry.getValue().getPrecoExp().getPequeno();
+                    entry.getValue().setRev(entry.getValue().getRev() - entry.getValue().getPrecoExp().getPequeno());
+                }else if(quantidade.get(entry.getKey()) <= 5){
+                    rm += entry.getValue().getPrecoExp().getMedio();
+                    entry.getValue().setRev(entry.getValue().getRev() - entry.getValue().getPrecoExp().getMedio());
+                }else if(quantidade.get(entry.getKey()) > 5){
+                    rm += entry.getValue().getPrecoExp().getGrande();
+                    entry.getValue().setRev(entry.getValue().getRev() - entry.getValue().getPrecoExp().getGrande());
+                }
+            }
+
+            for (Map.Entry<String, Transportadoras> entry : adicionadasp.entrySet()){
+                if(quantidadep.get(entry.getKey()) <= 1){
+                    rm += entry.getValue().getPrecoPremium().getPequeno();
+                    entry.getValue().setRev(entry.getValue().getRev() - entry.getValue().getPrecoPremium().getPequeno());
+                }else if(quantidadep.get(entry.getKey()) <= 5){
+                    rm += entry.getValue().getPrecoPremium().getMedio();
+                    entry.getValue().setRev(entry.getValue().getRev() - entry.getValue().getPrecoPremium().getMedio());
+                }else if(quantidadep.get(entry.getKey()) > 5){
+                    rm += entry.getValue().getPrecoPremium().getGrande();
+                    entry.getValue().setRev(entry.getValue().getRev() - entry.getValue().getPrecoPremium().getGrande());
+                }
+            }
+            //remover no file sales.txt
+            String save = "saves/sales.txt";
+            File file = new File(save);
+            int mode;
+            if(file.exists()){
+                try{ //data, email, id do artigo
+                    StringBuilder fline = new StringBuilder();
+                    BufferedReader in = new BufferedReader(new FileReader(save));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while((line = in.readLine()) != null) {
+                        sb.append(line);
+                        sb.append("\n");
+                    }
+                    in.close();
+                    String read = sb.toString();
+                    String[] lines = read.split("\n");
+                    String[] sub;
+                    for (String c : lines) {
+                        sub = c.split(" ");
+                        System.out.println(sub[0] + logged.getEncomendas().get(d).getData().toString());
+                        if(!(sub[0].equals(logged.getEncomendas().get(d).getData().toString()))){
+                            fline.append(c);
+                            fline.append("\n");
+                        } else{
+                            for(Map.Entry<String, Artigo> entry : logged.getEncomendas().get(d).getArtigos().entrySet()){
+                                if(sub[2].equals(entry.getValue().getID())){
+                                    fline.append(sub[0]).append(" ").append(sub[1]).append(" ").append(sub[2]).append(" ").append(Integer.parseInt(sub[3]) - 1);
+                                    fline.append("\n");
+                                } else{
+                                    fline.append(c);
+                                    fline.append("\n");
+                                }
+                            }
+                        }
+
+                    }
+                    this.getModel().writeTxt(save, String.valueOf(fline));
+                } catch (IOException e){
+                    System.err.println("Error opening save: " + e);
+                }
+            }
+
+            //remover vendas
+            Utilizador nuser;
+            for (Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()) {
+                nuser = entry.getValue();
+                for (Map.Entry<String, Artigo> entry2 : nuser.getArtigos().entrySet()) {
+                    for(Map.Entry<String, Artigo> entry3 : logged.getEncomendas().get(d).getArtigos().entrySet()){
+                        if(entry3.getValue().getID().equals(entry2.getValue().getID())){
+                            if(entry2.getValue().getClass().equals(Malas.class)){
+                                Malas m = getMalaFromArtigo(entry2.getValue());
+                                m.setSold(m.getSold() -1);
+                                nuser.getArtigos().put(m.getID(), m);
+                            } else if(entry2.getValue().getClass().equals(Sapatilhas.class)){
+                                Sapatilhas m = getShoeFromArtigo(entry2.getValue());
+                                m.setSold(m.getSold() -1);
+                                nuser.getArtigos().put(m.getID(), m);
+                            }else if(entry2.getValue().getClass().equals(TShirt.class)){
+                                TShirt m = getTshirtFromArtigo(entry2.getValue());
+                                m.setSold(m.getSold() -1);
+                                nuser.getArtigos().put(m.getID(), m);
+                            }
+                            rm += entry2.getValue().getPreco();
+                        }
+                    }
+
+                }
+                this.getModel().getUser().put(entry.getKey(), nuser);
+            }
+            this.getModel().setRev(this.getModel().getRev() - (rm *this.getModel().getVintagecut()));
+            System.out.println("Devolução pedida com sucesso!");
+        } else{
+            System.out.println("Devolução não disponível para esta encomenda.");
+        }
     }
 
     private void user_central_vendedor(Utilizador logged){
@@ -612,10 +867,24 @@ public class UserApp {
     }
 
     private void user_sent(Utilizador logged){
+
+        NewMenu userMenu = new NewMenu(new String[]{
+                "Encomendas que a transportadora já enviou",
+                "Só entregues à transportadora"
+        });
+
+        userMenu.setHandler(1, () -> this.sent(2, logged));
+        userMenu.setHandler(2, () -> this.sent(1, logged));
+        userMenu.setTitle("Encomendas dos clientes");
+        userMenu.run();
+
+    }
+
+    private void sent(int estado, Utilizador logged){
         int equals;
         for(Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()){
             for(Map.Entry<String, Encomendas> entry2 : entry.getValue().getEncomendas().entrySet()){
-                if(entry2.getValue().getEstado() != 0){
+                if(entry2.getValue().getEstado() == estado){
                     equals = 0;
                     for(Map.Entry<String, Artigo> entry3 : entry2.getValue().getArtigos().entrySet()){
                         for(Map.Entry<String, Artigo> entry4 : logged.getArtigos().entrySet()){

@@ -67,6 +67,7 @@ public class Sapatilhas extends Artigo implements Serializable {
         super(art.isPublicado(), art.isPremium(), art.getEstado(), art.getNumeroDonos(), art.getDescricao(),
                 art.getBrand(), art.getPrecobase(), art.getColecao(), art.getTransportadoras());
         super.setID(art.getID());
+        super.setBorn(art.getBorn());
         this.atacadores=true;
         this.Cor="N/A";
         this.dataPremium= null;

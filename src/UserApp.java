@@ -15,6 +15,7 @@ public class UserApp {
         app.run();
     }
 
+    //calcula outra vez o preço de um artigo
     private void update_artigo(Artigo entry2, Utilizador entry){
         if(entry2.getClass().equals(Malas.class)){
             Malas mala = getMalaFromArtigo(entry2);
@@ -50,25 +51,7 @@ public class UserApp {
         //update dos calculos de cada artigo
         for (Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()) {
             for (Map.Entry<String, Artigo> entry2 : entry.getValue().getArtigos().entrySet()) {
-                if(entry2.getValue().getClass().equals(Malas.class)){
-                    Malas mala = getMalaFromArtigo(entry2.getValue());
-                    mala.calcPreco(this.getModel().now());
-
-                    this.getModel().getUser().remove(entry2.getKey());
-                    entry.getValue().getArtigos().put(mala.getID(), mala);
-                } else if(entry2.getValue().getClass().equals(Sapatilhas.class)){
-                    Sapatilhas shoe = getShoeFromArtigo(entry2.getValue());
-                    shoe.calcPreco(this.getModel().now());
-
-                    this.getModel().getUser().remove(entry2.getKey());
-                    entry.getValue().getArtigos().put(shoe.getID(), shoe);
-                } else if(entry2.getValue().getClass().equals(TShirt.class)){
-                    TShirt tshirt = getTshirtFromArtigo(entry2.getValue());
-                    tshirt.calcPreco();
-
-                    this.getModel().getUser().remove(entry2.getKey());
-                    entry.getValue().getArtigos().put(tshirt.getID(), tshirt);
-                }
+                update_artigo(entry2.getValue(), entry.getValue());
             }
         }
 
@@ -82,12 +65,12 @@ public class UserApp {
 
     private void viagem_tempo(){
         NewMenu viagem = new NewMenu(new String[]{
-                "Futuro", "Presente", "Passado", "Ver dia"
+                "Futuro", "Presente", "Passado" , "Ver dia"
         });
 
         viagem.setHandler(1, this::futuro);
         viagem.setHandler(2, this::presente);
-        viagem.setHandler(3, this::passado);
+        viagem.setHandler(3, this::past);
         viagem.setHandler(4, this::day);
 
         viagem.setPreCondition(2, ()-> !(LocalDate.now().isEqual(this.getModel().now())));
@@ -130,7 +113,7 @@ public class UserApp {
         System.out.println("Estamos no dia: " + this.getModel().now());
     }
 
-    private void passado(){
+    private void past(){
         System.out.println("Dias para o passado: ");
         String days = scin.nextLine(), cancel ="";
         while(Integer.parseInt(days) < 1){
@@ -193,6 +176,8 @@ public class UserApp {
         mainMenu.setHandler(3, this::viagem_tempo);
 
         mainMenu.setPreCondition(1, ()-> model.getUser().size()  > 0 || model.getTransportadora().size() > 0);
+
+        mainMenu.setTitle("Home");
 
         mainMenu.run();
 
@@ -266,15 +251,17 @@ public class UserApp {
 
     private void admin_transportadora_receita(){
         double maior = -1.0;
+        String id = "";
         Transportadoras t = new Transportadoras(1,1,1,1);
         for(Map.Entry<String, Transportadoras> entry : this.getModel().getTransportadora().entrySet()){
             if(maior < entry.getValue().getRev()){
                 t = entry.getValue();
                 maior = t.getRev();
+                id = entry.getKey();
             }
         }
-        System.out.println("Transportadora que faturou mais: " + t
-                            + " Faturou: " + maior
+        System.out.println("Transportadora que faturou mais: " + id + "\n" + t
+                            + "\nFaturou: " + (maior - (maior * this.getModel().getVintagecut()))
         );
     }
 
@@ -288,7 +275,7 @@ public class UserApp {
             }
         }
         System.out.println("Vendedor que faturou mais: " + t
-                + " Faturou: " + maior
+                + "\nFaturou: " + (maior - (maior * this.getModel().getVintagecut()))
         );
     }
 
@@ -297,14 +284,7 @@ public class UserApp {
     }
 
     private void see_artigos(){
-        for(Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()){
-            System.out.println(entry.getValue().getEmail() + ": ");
-            for(Map.Entry<String, Artigo> entry2 : entry.getValue().getArtigos().entrySet()){
-                if(this.getModel().now().isBefore(entry2.getValue().getBorn())) {
-                    System.out.println(entry2.getValue());
-                }
-            }
-        }
+        System.out.println(this.getModel().getArtigos());
     }
 
     public void see_encomendas(){
@@ -564,8 +544,8 @@ public class UserApp {
                             }
                         }
                     }
-                    if(equals == entry2.getValue().getArtigos().size()){
-                        System.out.println(entry2.getValue());
+                    if(equals > 0){
+                        System.out.println("To: " + entry.getValue().getEmail() + ": " + entry2.getValue());
                     }
                 }
             }
@@ -908,7 +888,7 @@ public class UserApp {
         }
         System.out.println("Id do artigo: " + mala.getID());
 
-
+        mala.setBorn(this.getModel().now());
         logged.addArtigo(mala);
     }
 
@@ -971,6 +951,7 @@ public class UserApp {
         }
         System.out.println("Id do artigo: " + tshirt.getID());
 
+        tshirt.setBorn(this.getModel().now());
         logged.addArtigo(tshirt);
     }
 
@@ -1052,6 +1033,7 @@ public class UserApp {
         }
         System.out.println("Id do artigo: " + sapatilha.getID());
 
+        sapatilha.setBorn(this.getModel().now());
         logged.addArtigo(sapatilha);
     }
 
@@ -1295,9 +1277,13 @@ public class UserApp {
         String id = scin.nextLine();
 
         if(this.getModel().getArtigos().containsKey(id)){
-            current.addArtigo(this.getModel().getArtigos().get(id));
+            if(this.getModel().getArtigos().get(id).isPublicado()){
+                current.addArtigo(this.getModel().getArtigos().get(id));
+            } else{
+                System.out.println("Artigo com id: " + id + " não está disponivel para venda.");
+            }
         } else{
-            System.out.println("Artigo com id: " + id + " não existe");
+            System.out.println("Artigo com id: " + id + " não existe.");
         }
     }
 
@@ -1440,8 +1426,9 @@ public class UserApp {
 
     private void user_sold(Utilizador logged){
         for (Map.Entry<String, Artigo> entry : logged.getVendasEfetuadas().entrySet()) {
-            System.out.println(entry.getValue() + " vendeu: " + entry.getValue().getSold());
+            System.out.println(" vendeu: " + entry.getValue().getSold() + entry.getValue());
         }
+        user_encomendar(logged);
     }
 
     private void user_selling(Utilizador logged){

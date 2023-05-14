@@ -1,8 +1,6 @@
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class Malas extends Artigo implements Serializable {
@@ -64,6 +62,7 @@ public class Malas extends Artigo implements Serializable {
         super(art.isPublicado(), art.isPremium(), art.getEstado(), art.getNumeroDonos(), art.getDescricao(),
                 art.getBrand(), art.getPrecobase(), art.getColecao(), art.getTransportadoras());
         super.setID(art.getID());
+        super.setBorn(art.getBorn());
         this.tamanho = "";
         this.material = "";
         this.valorizacao = 0.1;

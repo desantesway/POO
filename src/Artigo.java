@@ -234,21 +234,24 @@ public class Artigo implements Serializable {
         this.premium=false;
     }
 
+    @Override
     public String toString() {
         return "Artigo{" +
                 "publicado=" + publicado +
                 ", premium=" + premium +
                 ", estado='" + estado + '\'' +
-                ", NumeroDonos=" + NumeroDonos +
                 ", descricao='" + descricao + '\'' +
                 ", Brand='" + Brand + '\'' +
                 ", ID='" + ID + '\'' +
+                ", NumeroDonos=" + NumeroDonos +
+                ", devolucao=" + devolucao +
+                ", sold=" + sold +
                 ", preco=" + preco +
                 ", precobase=" + precobase +
                 ", colecao=" + colecao +
                 ", transportadoras=" + transportadoras +
-                ", devolução=" + devolucao +
-                '}' + "\n";
+                ", born=" + born +
+                '}';
     }
 
     public String toString(Object o) {
@@ -263,7 +266,9 @@ public class Artigo implements Serializable {
                 ", precobase=" + precobase +
                 ", colecao=" + colecao +
                 ", transportadoras=" + transportadoras +
-                ", devolução=" + devolucao;
+                ", devolução=" + devolucao +
+                ", sold=" + sold +
+                ", born=" + born;
     }
 
     public Artigo clone(){

@@ -41,6 +41,8 @@ public class NewMenu {
 
     // Variáveis de instância
 
+    private String title; // nome do titlo de cada menu
+
     private List<String> opcoes;            // Lista de opções
     private List<PreCondition> disponivel;  // Lista de pré-condições
     private List<Handler> handlers;         // Lista de handlers
@@ -54,10 +56,19 @@ public class NewMenu {
         this.opcoes = Arrays.asList(opcoes);
         this.disponivel = new ArrayList<>();
         this.handlers = new ArrayList<>();
+        this.title = "Menu";
         this.opcoes.forEach(s-> {
             this.disponivel.add(()->true);
             this.handlers.add(()->System.out.println("\nATENÇÃO: Opção não implementada!"));
         });
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     // Métodos de instância
@@ -106,7 +117,7 @@ public class NewMenu {
 
     /** Apresentar o NewMenu */
     private void show() {
-        System.out.println("\n *** NewMenu *** ");
+        System.out.println("\n" + "*** " + this.getTitle() + " ***");
         for (int i=0; i<this.opcoes.size(); i++) {
             System.out.print(i+1);
             System.out.print(" - ");

@@ -1017,7 +1017,7 @@ public class UserApp {
     private void artigo_stock(Artigo artigo){
 
         while(true){
-            System.out.println("Stock a aumentar: ");
+            System.out.println("Novo stock");
             String stock = scin.nextLine();
             try{
                 int st = Integer.parseInt(stock);
@@ -1154,7 +1154,7 @@ public class UserApp {
 
     // mostra os detalhes do usuario
     private void user_details(Utilizador logged){
-        String print="";
+        String print = "";
         if(!(logged.getRevenue() == 0.0)) print += "Receita: " + logged.getRevenue() + "\n";
         print += "Artigos a venda: ";
         for(Map.Entry<String, Artigo> entry : logged.getArtigos().entrySet()){
@@ -1338,6 +1338,7 @@ public class UserApp {
             mala.setID(mala.generateID());
         }
         System.out.println("Id do artigo: " + mala.getID());
+        System.out.println("Stock: " + mala.getStock());
 
         mala.setBorn(this.getModel().now());
         logged.addArtigo(mala);
@@ -1397,6 +1398,7 @@ public class UserApp {
 
         System.out.println("Preco base: " + tshirt.getPrecobase());
         System.out.println("Preco após cálculos: " + tshirt.getPreco());
+        System.out.println("Stock: " + tshirt.getStock());
 
         while(this.getModel().getArtigos().containsKey(tshirt.getID())){
             tshirt.setID(tshirt.generateID());
@@ -1489,6 +1491,7 @@ public class UserApp {
         System.out.println("Descricao do artigo: "+ sapatilha.getDescricao());
         System.out.println("Preco base: " + sapatilha.getPrecobase());
         System.out.println("Preco após cálculos: " + sapatilha.getPreco());
+        System.out.println("Stock: " + sapatilha.getStock());
 
         while(this.getModel().getArtigos().containsKey(sapatilha.getID())){
             sapatilha.setID(sapatilha.generateID());

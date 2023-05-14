@@ -10,6 +10,30 @@ public class sys implements Serializable{
     private Map<String, Transportadoras> transportadora;
     private Map<String, Colecao> colecao;
 
+    public Map<String, Artigo> getSelling(){
+        Map<String, Artigo> ret = new HashMap<>();
+        for(Map.Entry<String, Utilizador> entry : this.getUser().entrySet()){
+            for(Map.Entry<String, Artigo> entry2 : entry.getValue().getArtigos().entrySet()) {
+                if(entry2.getValue().isPublicado()){
+                    ret.put(entry2.getKey(), entry2.getValue());
+                }
+            }
+        }
+        return ret;
+    }
+
+    public Map<String, Artigo> getSold(){
+        Map<String, Artigo> ret = new HashMap<>();
+        for(Map.Entry<String, Utilizador> entry : this.getUser().entrySet()){
+            for(Map.Entry<String, Artigo> entry2 : entry.getValue().getArtigos().entrySet()) {
+                if(entry2.getValue().getSold() > 0){
+                    ret.put(entry2.getKey(), entry2.getValue());
+                }
+            }
+        }
+        return ret;
+    }
+
     // mostra todos os artigos do sistema
     public Map<String, Artigo> getArtigos(){
         Map<String, Artigo> ret = new HashMap<>();
@@ -43,6 +67,14 @@ public class sys implements Serializable{
             System.out.println("File name: " + nomef);
             throw e;
         }
+    }
+
+    // guarda uma string num ficheiro
+    public void writeTxt(String nomef, String txt) throws IOException {
+        FileWriter pw = new FileWriter(nomef);
+        pw.write(txt);
+        pw.close();
+
     }
 
     // carrega o ficheiro salvo e retorna o sistema

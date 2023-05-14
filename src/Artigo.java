@@ -99,6 +99,7 @@ public class Artigo implements Serializable {
         this.transportadoras=l.getTransportadoras();
         this.devolucao = l.getDevolucao();
         this.sold = l.getSold();
+        this.born = l.getBorn();
     }
 
     public LocalDate getBorn() {

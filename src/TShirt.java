@@ -63,6 +63,8 @@ public class TShirt extends Artigo implements Serializable {
                 art.getBrand(), art.getPrecobase(), art.getColecao(), art.getTransportadoras());
         super.setID(art.getID());
         super.setBorn(art.getBorn());
+        super.setSold(art.getSold());
+        super.setDevolucao(art.getDevolucao());
         this.Padrao="";
         this.tamanho = "S";
     }

@@ -4,18 +4,8 @@ import java.util.*;
 
 public class Utilizador implements Serializable {
     private String email, nome, morada, nif, ID;
-    private Map<String, Artigo> produtosAVenda, vendasEfetuadas, artigos;
+    private Map<String, Artigo> artigos;
     private Map<String, Encomendas> encomendas;
-
-    // adiciona um artigo a venda
-    public void adicionarProdutoAVenda(Artigo venda) {
-        this.produtosAVenda.put(venda.getID(), venda);
-    }
-
-    // remove um artigo a venda
-    public void removerProdutoAVenda(String key) {
-        this.produtosAVenda.remove(key);
-    }
 
     public Map<String, Artigo> getComprados(LocalDate now){
         Map<String, Artigo> ret = new HashMap<>();
@@ -40,20 +30,10 @@ public class Utilizador implements Serializable {
 
     }
 
-    // adiciona um artigo vendido
-    public void adicionarVendaEfetuada(Artigo venda) {
-        this.vendasEfetuadas.put(venda.getID(), venda);
-    }
-
-    // remove um artigo vendido
-    public void removerVendaEfetuada(String key) {
-        this.vendasEfetuadas.remove(key);
-    }
-
     // obtem o o valor total das vendas
     public double getRevenue() {
         double revenue = 0.0;
-        for (Map.Entry<String, Artigo> entry : this.getVendasEfetuadas().entrySet()) {
+        for (Map.Entry<String, Artigo> entry : this.getArtigos().entrySet()) {
             revenue += entry.getValue().getPreco() * entry.getValue().getSold();
         }
         return revenue;
@@ -79,8 +59,6 @@ public class Utilizador implements Serializable {
         this.morada="";
         this.nif="";
         this.encomendas = new HashMap<>();
-        this.produtosAVenda = new HashMap<>();
-        this.vendasEfetuadas = new HashMap<>();
         this.artigos = new HashMap<>();
     }
     public Utilizador(Utilizador l){
@@ -90,8 +68,6 @@ public class Utilizador implements Serializable {
         this.morada=l.getMorada();
         this.nif=l.getNif();
         this.encomendas = l.getEncomendas();
-        this.produtosAVenda = l.getProdutosAVenda();
-        this.vendasEfetuadas = l.getVendasEfetuadas();
         this.artigos = l.getArtigos();
     }
 
@@ -102,8 +78,6 @@ public class Utilizador implements Serializable {
         this.morada=morada;
         this.setNif(nif);
         this.encomendas = new HashMap<>();
-        this.produtosAVenda = new HashMap<>();
-        this.vendasEfetuadas = new HashMap<>();
         this.artigos = new HashMap<>();
     }
 
@@ -114,22 +88,6 @@ public class Utilizador implements Serializable {
 
     public void setID(String ID) {
         this.ID = ID;
-    }
-
-    public Map<String, Artigo> getProdutosAVenda() {
-        return produtosAVenda;
-    }
-
-    public void setProdutosAVenda(Map<String, Artigo> produtosAVenda) {
-        this.produtosAVenda = produtosAVenda;
-    }
-
-    public Map<String, Artigo> getVendasEfetuadas() {
-        return vendasEfetuadas;
-    }
-
-    public void setVendasEfetuadas(Map<String, Artigo> vendasEfetuadas) {
-        this.vendasEfetuadas = vendasEfetuadas;
     }
 
     public void addArtigo(Artigo artigo) {
@@ -206,8 +164,6 @@ public class Utilizador implements Serializable {
                 ", nome='" + nome + '\'' +
                 ", morada='" + morada + '\'' +
                 ", nif='" + nif + '\'' +
-                ", produtosAVenda=" + produtosAVenda +
-                ", vendasEfetuadas=" + vendasEfetuadas +
                 ", artigos=" + artigos +
                 ", encomendas=" + encomendas +
                 '}';

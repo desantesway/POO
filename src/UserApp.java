@@ -1,10 +1,18 @@
+import jdk.jshell.execution.Util;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.lang.System.in;
 
 public class UserApp {
     private sys model;
@@ -42,12 +50,49 @@ public class UserApp {
         //update nos produtos vendidos
         for (Map.Entry<String, Utilizador> entry1 : this.getModel().getUser().entrySet()) {
             Utilizador logged = entry1.getValue();
-            for (Map.Entry<String, Artigo> entry : logged.getProdutosAVenda().entrySet()) {
+            for (Map.Entry<String, Artigo> entry : logged.getArtigos().entrySet()) {
                 if(entry.getValue().getSold() > 0){
-                    logged.adicionarVendaEfetuada(entry.getValue());
+                    String save = "saves/sales.txt";
+                    File file = new File(save);
+                    int mode;
+                    if(file.exists()){
+                        mode = 0;
+                    } else{
+                        mode = 1;
+                    }
+                    try{ //data, email, id do artigo
+                        StringBuilder fline = new StringBuilder();
+                        if(mode == 0){
+                            BufferedReader in = new BufferedReader(new FileReader(save));
+                            StringBuilder sb = new StringBuilder();
+                            String line;
+                            while((line = in.readLine()) != null) {
+                                sb.append(line);
+                                sb.append("\n");
+                            }
+                            in.close();
+                            String read = sb.toString();
+                            String[] lines = read.split("\n");
+                            String[] sub;
+                            for (String c : lines) {
+                                sub = c.split(" ");
+                                if(!(sub[0].equals(this.getModel().now().toString()) &&
+                                sub[1].equals(logged.getEmail())
+                                && sub[2].equals(entry.getValue().getID())
+                                && Integer.parseInt(sub[3]) <= entry.getValue().getSold())){
+                                    fline.append(c);
+                                }
+                            }
+                        }
+                        this.getModel().writeTxt(save, fline  + "\n" + this.getModel().now().toString()
+                                + " " + logged.getEmail() + " " + entry.getValue().getID() + " " + entry.getValue().getSold() + "\n");
+                    } catch (IOException e){
+                        System.err.println("Erro a registar ficheiro: " + e);
+                    }
                 }
             }
         }
+
         //update dos calculos de cada artigo
         for (Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()) {
             for (Map.Entry<String, Artigo> entry2 : entry.getValue().getArtigos().entrySet()) {
@@ -153,11 +198,11 @@ public class UserApp {
 
     private UserApp(){
         model = new sys();
-        scin = new Scanner(System.in);
-        File file = new File("sys.obj");
+        scin = new Scanner(in);
+        File file = new File("saves/sys.obj");
         if(file.exists()){
             try{
-                this.setModel(this.getModel().load("sys.obj"));
+                this.setModel(this.getModel().load("saves/sys.obj"));
             } catch (ClassNotFoundException | IOException e) {
                 System.out.println("Erro ao ler ficheiro: " + e);
 
@@ -169,6 +214,17 @@ public class UserApp {
 
     private void run(){
         updates();
+        File file = new File("saves/sales-old.txt");
+        if(file.exists()){
+            Path source = Paths.get("saves/sales-old.txt");
+            Path target = Paths.get("saves/sales.txt");
+
+            try {
+                Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                System.out.println("Error copying file: " + e.getMessage());
+            }
+        }
         NewMenu mainMenu = new NewMenu(new String[]{
                 "Log-in", "Registar", "Viagem no Tempo"
         });
@@ -188,7 +244,7 @@ public class UserApp {
 
     private void save(){
         try{
-            this.getModel().save("sys.obj");
+            this.getModel().save("saves/sys.obj");
             System.out.println("Salvo!");
         } catch (IOException e){
             System.out.println("Erro a registar ficheiro: " + e);
@@ -203,6 +259,18 @@ public class UserApp {
 
         if(y.equals("y")){
             save();
+        }
+
+        File file = new File("saves/sales.txt");
+        if(file.exists()){
+            Path source = Paths.get("saves/sales.txt");
+            Path target = Paths.get("saves/sales-old.txt");
+
+            try {
+                Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                System.out.println("Error copying file: " + e.getMessage());
+            }
         }
 
         System.out.println("Turning off...");
@@ -244,7 +312,7 @@ public class UserApp {
             adminMenu.setPreCondition(7, () -> this.getModel().getUser().size() > 0);
             adminMenu.setPreCondition(12, () -> this.getModel().getTransportadora().size() > 0);
             adminMenu.setPreCondition(11, () -> this.getModel().getUser().size() > 0);
-            adminMenu.setTitle("Admin Menu");
+            adminMenu.setTitle("Admin");
             adminMenu.run();
         } else{
             System.out.println("Login Inválido!");
@@ -345,7 +413,7 @@ public class UserApp {
 
         loginMenu.setPreCondition(1, ()-> this.getModel().getUser().size()>0);
         loginMenu.setPreCondition(2, ()-> this.getModel().getTransportadora().size()>0);
-        loginMenu.setTitle("Type Login Menu");
+        loginMenu.setTitle("Login");
         loginMenu.run();
     }
 
@@ -540,8 +608,8 @@ public class UserApp {
                 if(entry2.getValue().getEstado() != 0){
                     equals = 0;
                     for(Map.Entry<String, Artigo> entry3 : entry2.getValue().getArtigos().entrySet()){
-                        for(Map.Entry<String, Artigo> entry4 : logged.getVendasEfetuadas().entrySet()){
-                            if(entry3.getValue().equals(entry4.getValue())){
+                        for(Map.Entry<String, Artigo> entry4 : logged.getArtigos().entrySet()){
+                            if(entry3.getValue().equals(entry4.getValue()) && entry4.getValue().getSold() > 0){
                                 equals +=1;
                             }
                         }
@@ -724,11 +792,12 @@ public class UserApp {
         artigo.setTransportadoras(this.getModel().getTransportadora().get(idt));
     }
 
+    //;
     private void user_details(Utilizador logged){
         String print="";
         if(!(logged.getRevenue() == 0.0)) print += "Receita: " + logged.getRevenue() + "\n";
-        if(logged.getProdutosAVenda().size() > 0) print += "Artigos a venda: " + logged.getProdutosAVenda()+ "\n";
-        if(logged.getVendasEfetuadas().size() > 0) print += "Vendas efetuadas: " + logged.getVendasEfetuadas() + "\n";
+        if(this.getModel().getSelling().size() > 0) print += "Artigos a venda: " + this.getModel().getSelling() + "\n";
+        if(this.getModel().getSold().size() > 0) print += "Vendas efetuadas: " + this.getModel().getSold() + "\n";
         if(logged.getArtigos().size() > 0) print += "Artigos á venda: " + logged.getArtigos() + "\n";
         if(logged.getEncomendas().size() > 0) print += "Encomendas Realizadas: " + logged.getEncomendas();
         System.out.println("Email: " + logged.getEmail() + "\n"
@@ -1143,11 +1212,9 @@ public class UserApp {
         if(logged.getArtigos().containsKey(id)){
             if(logged.getArtigos().get(id).isPublicado()){
                 logged.getArtigos().get(id).privar();
-                logged.getProdutosAVenda().remove(id);
                 System.out.println("Privado com sucesso!");
             } else {
                 logged.getArtigos().get(id).publicar();
-                logged.getProdutosAVenda().put(id, logged.getArtigos().get(id));
                 System.out.println("Publicado com sucesso!");
             }
         } else{
@@ -1264,11 +1331,37 @@ public class UserApp {
         this.getModel().setRev(this.getModel().getRev() + ((preco + transportadoras) * this.getModel().getVintagecut()));
 
         current.enviar(this.getModel().now());
-        for (Map.Entry<String, Artigo> entry : current.getArtigos().entrySet()) {
-            Artigo art = this.getModel().getArtigos().get(entry.getKey());
-            art.setSold(art.getSold() + 1);
+        Utilizador nuser;
+        for (Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()) {
+            nuser = entry.getValue();
+            for (Map.Entry<String, Artigo> entry2 : nuser.getArtigos().entrySet()) {
+                for(Map.Entry<String, Artigo> entry3 : current.getArtigos().entrySet()){
+                    if(entry3.getValue().getID().equals(entry2.getValue().getID())){
+                        if(entry2.getValue().getClass().equals(Malas.class)){
+                            Malas m = getMalaFromArtigo(entry2.getValue());
+                            m.setSold(m.getSold() + 1);
+                            nuser.getArtigos().put(m.getID(), m);
+                        } else if(entry2.getValue().getClass().equals(Sapatilhas.class)){
+                            Sapatilhas m = getShoeFromArtigo(entry2.getValue());
+                            m.setSold(m.getSold() + 1);
+                            nuser.getArtigos().put(m.getID(), m);
+                        }else if(entry2.getValue().getClass().equals(TShirt.class)){
+                            TShirt m = getTshirtFromArtigo(entry2.getValue());
+                            m.setSold(m.getSold() + 1);
+                            nuser.getArtigos().put(m.getID(), m);
+                        }
+                    }
+                }
+
+            }
+            this.getModel().getUser().put(entry.getKey(), nuser);
         }
-        logged.adicionarEncomenda(current);
+        logged.adicionarEncomenda(current.clone());
+        current.setEstado(0);
+        current.setArtigos(new HashMap<>());
+        current.setData(null);
+        current.setDimensao();
+        current.setDevolucao(14);
         updates();
         System.out.println("Obrigado e volte sempre!");
         return 1;
@@ -1427,15 +1520,19 @@ public class UserApp {
     }
 
     private void user_sold(Utilizador logged){
-        for (Map.Entry<String, Artigo> entry : logged.getVendasEfetuadas().entrySet()) {
-            System.out.println(" vendeu: " + entry.getValue().getSold() + entry.getValue());
+        for (Map.Entry<String, Artigo> entry : logged.getArtigos().entrySet()) {
+            if(entry.getValue().getSold() > 0){
+                System.out.println("Vendeu: " + entry.getValue().getSold() + entry.getValue());
+            }
         }
-        user_encomendar(logged);
+        user_receita(logged);
     }
 
     private void user_selling(Utilizador logged){
-        for (Map.Entry<String, Artigo> entry : logged.getProdutosAVenda().entrySet()) {
-            System.out.println(entry.getValue());
+        for (Map.Entry<String, Artigo> entry : logged.getArtigos().entrySet()) {
+            if(entry.getValue().isPublicado()){
+                System.out.println(entry.getValue());
+            }
         }
     }
 

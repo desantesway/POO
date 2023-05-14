@@ -1,5 +1,3 @@
-import jdk.jshell.execution.Util;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -122,6 +120,7 @@ public class UserApp {
         }
     }
 
+    // menu da viagem no tempo
     private void viagem_tempo(){
         NewMenu viagem = new NewMenu(new String[]{
                 "Futuro", "Presente", "Passado" , "Ver dia"
@@ -134,11 +133,12 @@ public class UserApp {
 
         viagem.setPreCondition(2, ()-> !(LocalDate.now().isEqual(this.getModel().now())));
 
-        viagem.setTitle("Viagem de Tempo");
+        viagem.setTitle("Viagem no Tempo");
 
         viagem.run();
     }
 
+    // retorna de um artigo para mala
     private Malas getMalaFromArtigo(Artigo entry2){
         Malas mala = new Malas(entry2);
         Malas mala2 = mala.fromString(entry2.toString());
@@ -150,6 +150,7 @@ public class UserApp {
         return mala;
     }
 
+    // retorna de um artigo para sapatilha
     private Sapatilhas getShoeFromArtigo(Artigo entry2){
         Sapatilhas shoe = new Sapatilhas(entry2);
         Sapatilhas shoe2 = shoe.fromString(entry2.toString());
@@ -161,6 +162,7 @@ public class UserApp {
         return shoe;
     }
 
+    // retorna de um artigo para Tshirt
     private TShirt getTshirtFromArtigo(Artigo entry2){
         TShirt tshirt = new TShirt(entry2);
         TShirt tshirt2 = tshirt.fromString(entry2.toString());
@@ -170,10 +172,12 @@ public class UserApp {
         return tshirt;
     }
 
+    // dia atual
     private void day(){
         System.out.println("Estamos no dia: " + this.getModel().now());
     }
 
+    // ir para o passado
     private void past(){
         System.out.println("Dias para o passado: ");
         String days = scin.nextLine(), cancel ="";
@@ -189,6 +193,7 @@ public class UserApp {
         updates();
     }
 
+    // ir para o futuro
     private void futuro(){
         System.out.println("Dias para o futuro: ");
         String days = scin.nextLine(), cancel ="";
@@ -204,6 +209,7 @@ public class UserApp {
         updates();
     }
 
+    // ir para o presente
     private void presente(){
         this.getModel().setNow(0);
         updates();
@@ -309,38 +315,44 @@ public class UserApp {
 
         if(login.equals("admin")){
             NewMenu adminMenu = new NewMenu(new String[]{
-                    "Mudar % da vintage", "Ver % da vintage", "Ver usuarios registados", "Eliminar usuário",
+                    "Mudar % da vintage", "Ver % da vintage", "Ver coleções","Ver usuarios registados", "Eliminar usuário",
                     "Ver todas as transportadoras", "Eliminar transportadora", "Ver todas as encomendas", "Ver todos artigos",
                     "Ver cardapio", "Ver receita da vintage", "Vendedor que vendeu mais",
-                    "Transportadora que faturou mais", "Guardar o sistema"
+                    "Transportadora que faturou mais","Guardar o sistema"
             });
 
             adminMenu.setHandler(1, this::change_cut_vintage);
             adminMenu.setHandler(2, this::see_vintage);
-            adminMenu.setHandler(3, this::see_users);
-            adminMenu.setHandler(4, this::del_user);
-            adminMenu.setHandler(5, this::see_transportadora);
-            adminMenu.setHandler(6, this::del_transportadora);
-            adminMenu.setHandler(7, this::see_encomendas);
-            adminMenu.setHandler(8, this::see_artigos);
-            adminMenu.setHandler(9, this::encomenda_cardapio);
-            adminMenu.setHandler(10, this::admin_receita);
-            adminMenu.setHandler(11, this::admin_seller_receita);
-            adminMenu.setHandler(12, this::admin_transportadora_receita);
-            adminMenu.setHandler(13, this::save);
+            adminMenu.setHandler(3, this::admin_colecoes);
+            adminMenu.setHandler(4, this::see_users);
+            adminMenu.setHandler(5, this::del_user);
+            adminMenu.setHandler(6, this::see_transportadora);
+            adminMenu.setHandler(7, this::del_transportadora);
+            adminMenu.setHandler(8, this::see_encomendas);
+            adminMenu.setHandler(9, this::see_artigos);
+            adminMenu.setHandler(10, this::encomenda_cardapio);
+            adminMenu.setHandler(11, this::admin_receita);
+            adminMenu.setHandler(12, this::admin_seller_receita);
+            adminMenu.setHandler(13, this::admin_transportadora_receita);
+            adminMenu.setHandler(14, this::save);
 
-            adminMenu.setPreCondition(3, () -> this.getModel().getUser().size() > 0);
+            adminMenu.setPreCondition(4, () -> this.getModel().getColecao().size() > 0);
             adminMenu.setPreCondition(4, () -> this.getModel().getUser().size() > 0);
-            adminMenu.setPreCondition(5, () -> this.getModel().getTransportadora().size() > 0);
+            adminMenu.setPreCondition(5, () -> this.getModel().getUser().size() > 0);
             adminMenu.setPreCondition(6, () -> this.getModel().getTransportadora().size() > 0);
-            adminMenu.setPreCondition(7, () -> this.getModel().getUser().size() > 0);
-            adminMenu.setPreCondition(12, () -> this.getModel().getTransportadora().size() > 0);
-            adminMenu.setPreCondition(11, () -> this.getModel().getUser().size() > 0);
+            adminMenu.setPreCondition(7, () -> this.getModel().getTransportadora().size() > 0);
+            adminMenu.setPreCondition(8, () -> this.getModel().getUser().size() > 0);
+            adminMenu.setPreCondition(13, () -> this.getModel().getTransportadora().size() > 0);
+            adminMenu.setPreCondition(12, () -> this.getModel().getUser().size() > 0);
             adminMenu.setTitle("Admin");
             adminMenu.run();
         } else{
             System.out.println("Login Inválido!");
         }
+    }
+
+    private void admin_colecoes(){
+        System.out.println(this.getModel().getColecao());
     }
 
     private void admin_transportadora_receita(){
@@ -416,7 +428,6 @@ public class UserApp {
 
         String save = "saves/sales.txt";
         File file = new File(save);
-        double max = 0.0;
         if(file.exists()){
             try{
                 StringBuilder fline = new StringBuilder();
@@ -472,7 +483,7 @@ public class UserApp {
     }
 
     private void seller_alltime(){
-        double maior = -1.0, temp = 0.0;
+        double maior = -1.0;
         Utilizador t = new Utilizador();
         for(Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()){
             if(maior < entry.getValue().getRevenue()){

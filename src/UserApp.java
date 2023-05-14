@@ -94,9 +94,11 @@ public class UserApp {
                             }
 
                         }
-                        if(entry.getValue().getSold() - already_sold.get(entry.getValue().getID()) > 0){
-                            this.getModel().writeTxt(save, fline + this.getModel().now().toString()
-                                    + " " + logged.getEmail() + " " + entry.getValue().getID() + " " + (entry.getValue().getSold() - already_sold.get(entry.getValue().getID())) + "\n");
+                        if(already_sold.containsKey(entry.getValue().getID())){
+                            if(entry.getValue().getSold() - already_sold.get(entry.getValue().getID()) > 0){
+                                this.getModel().writeTxt(save, fline + this.getModel().now().toString()
+                                        + " " + logged.getEmail() + " " + entry.getValue().getID() + " " + (entry.getValue().getSold() - already_sold.get(entry.getValue().getID())) + "\n");
+                            }
                         }
                     } catch (IOException e){
                         System.err.println("Erro a registar ficheiro: " + e);
@@ -216,6 +218,7 @@ public class UserApp {
         System.out.println("Viagem para o presente concluída!");
     }
 
+    //construtor da app
     private UserApp(){
         model = new sys();
         scin = new Scanner(in);
@@ -232,6 +235,7 @@ public class UserApp {
 
     }
 
+    // run da app
     private void run(){
         Path dir = Paths.get("saves");
 
@@ -272,6 +276,7 @@ public class UserApp {
         closeApp();
     }
 
+    // guarda o sistema em "saves/sys.obj"
     private void save(){
         try{
             this.getModel().save("saves/sys.obj");
@@ -281,6 +286,7 @@ public class UserApp {
         }
     }
 
+    // desliga o sistem
     private void closeApp(){
         String y;
 
@@ -307,54 +313,48 @@ public class UserApp {
 
     }
 
+    // menu de funcinalidades admin
     private void admin(){
-        String login;
+        NewMenu adminMenu = new NewMenu(new String[]{
+                "Mudar % da vintage", "Ver % da vintage", "Ver coleções","Ver usuarios registados", "Eliminar usuário",
+                "Ver todas as transportadoras", "Eliminar transportadora", "Ver todas as encomendas", "Ver todos artigos",
+                "Ver cardapio", "Ver receita da vintage", "Vendedor que vendeu mais",
+                "Transportadora que faturou mais","Guardar o sistema"
+        });
 
-        System.out.println("Login key: ");
-        login = scin.nextLine();
+        adminMenu.setHandler(1, this::change_cut_vintage);
+        adminMenu.setHandler(2, this::see_vintage);
+        adminMenu.setHandler(3, this::admin_colecoes);
+        adminMenu.setHandler(4, this::see_users);
+        adminMenu.setHandler(5, this::del_user);
+        adminMenu.setHandler(6, this::see_transportadora);
+        adminMenu.setHandler(7, this::del_transportadora);
+        adminMenu.setHandler(8, this::see_encomendas);
+        adminMenu.setHandler(9, this::see_artigos);
+        adminMenu.setHandler(10, this::encomenda_cardapio);
+        adminMenu.setHandler(11, this::admin_receita);
+        adminMenu.setHandler(12, this::admin_seller_receita);
+        adminMenu.setHandler(13, this::admin_transportadora_receita);
+        adminMenu.setHandler(14, this::save);
 
-        if(login.equals("admin")){
-            NewMenu adminMenu = new NewMenu(new String[]{
-                    "Mudar % da vintage", "Ver % da vintage", "Ver coleções","Ver usuarios registados", "Eliminar usuário",
-                    "Ver todas as transportadoras", "Eliminar transportadora", "Ver todas as encomendas", "Ver todos artigos",
-                    "Ver cardapio", "Ver receita da vintage", "Vendedor que vendeu mais",
-                    "Transportadora que faturou mais","Guardar o sistema"
-            });
-
-            adminMenu.setHandler(1, this::change_cut_vintage);
-            adminMenu.setHandler(2, this::see_vintage);
-            adminMenu.setHandler(3, this::admin_colecoes);
-            adminMenu.setHandler(4, this::see_users);
-            adminMenu.setHandler(5, this::del_user);
-            adminMenu.setHandler(6, this::see_transportadora);
-            adminMenu.setHandler(7, this::del_transportadora);
-            adminMenu.setHandler(8, this::see_encomendas);
-            adminMenu.setHandler(9, this::see_artigos);
-            adminMenu.setHandler(10, this::encomenda_cardapio);
-            adminMenu.setHandler(11, this::admin_receita);
-            adminMenu.setHandler(12, this::admin_seller_receita);
-            adminMenu.setHandler(13, this::admin_transportadora_receita);
-            adminMenu.setHandler(14, this::save);
-
-            adminMenu.setPreCondition(4, () -> this.getModel().getColecao().size() > 0);
-            adminMenu.setPreCondition(4, () -> this.getModel().getUser().size() > 0);
-            adminMenu.setPreCondition(5, () -> this.getModel().getUser().size() > 0);
-            adminMenu.setPreCondition(6, () -> this.getModel().getTransportadora().size() > 0);
-            adminMenu.setPreCondition(7, () -> this.getModel().getTransportadora().size() > 0);
-            adminMenu.setPreCondition(8, () -> this.getModel().getUser().size() > 0);
-            adminMenu.setPreCondition(13, () -> this.getModel().getTransportadora().size() > 0);
-            adminMenu.setPreCondition(12, () -> this.getModel().getUser().size() > 0);
-            adminMenu.setTitle("Admin");
-            adminMenu.run();
-        } else{
-            System.out.println("Login Inválido!");
-        }
+        adminMenu.setPreCondition(3, () -> this.getModel().getColecao().size() > 0);
+        adminMenu.setPreCondition(4, () -> this.getModel().getUser().size() > 0);
+        adminMenu.setPreCondition(5, () -> this.getModel().getUser().size() > 0);
+        adminMenu.setPreCondition(6, () -> this.getModel().getTransportadora().size() > 0);
+        adminMenu.setPreCondition(7, () -> this.getModel().getTransportadora().size() > 0);
+        adminMenu.setPreCondition(8, () -> this.getModel().getUser().size() > 0);
+        adminMenu.setPreCondition(13, () -> this.getModel().getTransportadora().size() > 0);
+        adminMenu.setPreCondition(12, () -> this.getModel().getUser().size() > 0);
+        adminMenu.setTitle("Admin");
+        adminMenu.run();
     }
 
+    // mostra coleçoes
     private void admin_colecoes(){
         System.out.println(this.getModel().getColecao());
     }
 
+    // mostra a receita da transportadora
     private void admin_transportadora_receita(){
         double maior = -1.0;
         String id = "";
@@ -371,6 +371,7 @@ public class UserApp {
         );
     }
 
+    // menu para ver o maior vendedor
     private void admin_seller_receita(){
         NewMenu adminMenu = new NewMenu(new String[]{
                 "Num intervalo de tempo", "De sempre", "Listagem num intervalo"
@@ -385,6 +386,7 @@ public class UserApp {
         adminMenu.run();
     }
 
+    // maior vendedor (0) ou lista de maiores vendedores (1) em um determinado tempo
     private void seller_time(int i){
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -482,6 +484,7 @@ public class UserApp {
 
     }
 
+    //maior vendedor de sempre
     private void seller_alltime(){
         double maior = -1.0;
         Utilizador t = new Utilizador();
@@ -496,14 +499,17 @@ public class UserApp {
         );
     }
 
+    // receita da vintage
     private void admin_receita(){
         System.out.println("Receita total da Vintage: " + this.getModel().getRev());
     }
 
+    // ver todos os artigos do sistema
     private void see_artigos(){
         System.out.println(this.getModel().getArtigos());
     }
 
+    // ver todas as encomendas no sistema
     public void see_encomendas(){
         for(Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()){
             if (entry.getValue().getEncomendas().size() > 0) {
@@ -512,10 +518,12 @@ public class UserApp {
         }
     }
 
+    // ver a percentagem que a vintage tira em cada compra
     public void see_vintage(){
         System.out.println(this.getModel().getVintagecut() * 100 + " %");
     }
 
+    // alterar a percentagem que a vintage tira em cada compra
     public void change_cut_vintage(){
         String cut;
         System.out.println("Nova % da plataforma para cada venda: ");
@@ -523,10 +531,12 @@ public class UserApp {
         this.getModel().setVintagecut((double) Integer.parseInt(cut) / 100);
     }
 
+    // ver todas as transportadoras do sistema
     private void see_transportadora(){
         System.out.println(model.getTransportadora());
     }
 
+    // eliminar uma transportadoras do sistema
     private void del_transportadora(){
         String id;
 
@@ -536,10 +546,12 @@ public class UserApp {
         this.getModel().getTransportadora().remove(id);
     }
 
+    // ver todos os utilizadores do sistema
     private void see_users(){
         System.out.println(model.getUser());
     }
 
+    // eliminiar um utilizador do sistema
     private  void del_user(){
         String email;
 
@@ -549,6 +561,7 @@ public class UserApp {
         model.DelUser(email);
     }
 
+    // menu de login
     private void login(){
         NewMenu loginMenu = new NewMenu(new String[]{
                  "User" , "Transportadora", "Admin"
@@ -564,6 +577,7 @@ public class UserApp {
         loginMenu.run();
     }
 
+    // login como transportadora
     private void login_transportadora(){
         String id;
 
@@ -587,10 +601,12 @@ public class UserApp {
         }
     }
 
+    // receita da transportadora
     private void rev_transportadora(Transportadoras logged){
         System.out.println("Receita até ao momento: " + (logged.getRev() - (logged.getRev()*this.getModel().getVintagecut())));
     }
 
+    // detalhes da transportadora
     private void details_transportadora(Transportadoras logged){
         if(logged.getPremium()){
             System.out.println("Imposto = " + logged.getImposto() + "\n"
@@ -622,6 +638,7 @@ public class UserApp {
 
     }
 
+    // mudar alguma configuração da transportadora
     private void change_config_transportadora(Transportadoras logged){
         NewMenu config_trans_Menu = new NewMenu(new String[]{
                 "Ativar/Desativar Premium" , "Mudar Valores Base", "Mudar Formula Expedição", "Mudar Formula Expedição Premium"
@@ -637,6 +654,7 @@ public class UserApp {
         config_trans_Menu.run();
     }
 
+    // mudar a formula premium da transportadora
     private void formula_premium_transportadora(Transportadoras logged){
         System.out.println("Formula nova para os preços de expedição Premium:\nkeys:\nvalor - valor base dos 3 tamanhos\nimposto - imposto");
         String formula = scin.nextLine();
@@ -646,6 +664,7 @@ public class UserApp {
         System.out.println(logged.getPrecoPremium());
     }
 
+    // mudar a formula da transportadora
     private void formula_transportadora(Transportadoras logged){
         System.out.println("Formula nova para os preços de expedição:\nkeys:\nvalor - valor base dos 3 tamanhos\nimposto - imposto");
         String formula = scin.nextLine();
@@ -655,6 +674,7 @@ public class UserApp {
         System.out.println(logged.getPrecoExp());
     }
 
+    // construção da transportadora
     private void base_transportadora(Transportadoras logged){
         String base;
 
@@ -681,14 +701,19 @@ public class UserApp {
 
     }
 
+    // ativar/desativar o premium de uma transportadora
     private void premium_transportadora(Transportadoras logged){
         if(logged.getPremium()){
             logged.desativaPremium();
+            if(logged.getPrecoPremium().getPequeno() == -1.0){
+                formula_transportadora(logged);
+            }
         } else{
             logged.ativaPremium();
         }
     }
 
+    // login como utilizador
     private void login_user(){
         String email;
 
@@ -706,13 +731,14 @@ public class UserApp {
             userMenu.setHandler(2, () -> this.user_change_config(logged));
             userMenu.setHandler(3, () -> this.user_central_cliente(logged));
             userMenu.setHandler(4, () -> this.user_central_vendedor(logged));
-            userMenu.setTitle("Login User Menu");
+            userMenu.setTitle("User");
             userMenu.run();
         } else{
             System.out.println("E-mail ainda não registado.");
         }
     }
 
+    // menu do cliente
     private void user_central_cliente(Utilizador logged){
         NewMenu userMenu = new NewMenu(new String[]{
                 "Encomendar", "Ver Artigos comprados", "Ver todas encomendas","Devolução"
@@ -726,10 +752,12 @@ public class UserApp {
         userMenu.run();
     }
 
+    // mostrar as encomendas do user
     private void encomendas(Utilizador logged){
         System.out.println(logged.getEncomendas());
     }
 
+    // pedir devolução numa encomenda
     private void devolucao(Utilizador logged){
         String d = "";
         while(true){
@@ -849,10 +877,11 @@ public class UserApp {
             this.getModel().setRev(this.getModel().getRev() - (rm *this.getModel().getVintagecut()));
             System.out.println("Devolução pedida com sucesso!");
         } else{
-            System.out.println("Devolução não disponível para esta encomenda.");
+            System.out.println("Dias para devolução não estão dentro dos 14 dias após compra.");
         }
     }
 
+    // menu do vendedor
     private void user_central_vendedor(Utilizador logged){
 
         NewMenu userMenu = new NewMenu(new String[]{
@@ -877,6 +906,7 @@ public class UserApp {
         userMenu.run();
     }
 
+    // menu das encomendas ja enviadas
     private void user_sent(Utilizador logged){
 
         NewMenu userMenu = new NewMenu(new String[]{
@@ -891,6 +921,7 @@ public class UserApp {
 
     }
 
+    // mostra os enviados, 1 para os mandados so para a transportadora, 2 transportadora ja enviou
     private void sent(int estado, Utilizador logged){
         int equals;
         for(Map.Entry<String, Utilizador> entry : this.getModel().getUser().entrySet()){
@@ -912,6 +943,7 @@ public class UserApp {
         }
     }
 
+    // duplicar um artigo
     private void user_artigo_clone(Utilizador logged){
         System.out.println("Introduza o id do artigo a duplicar: ");
         String id = scin.nextLine(), cancel = "";
@@ -936,6 +968,7 @@ public class UserApp {
 
     }
 
+    // ver artigos que o user criou, do passado ate ao presente
     private void user_artigo_created(Utilizador logged){
         for(Map.Entry<String, Artigo> entry : logged.getArtigos().entrySet()) {
             if (!this.getModel().now().isBefore(entry.getValue().getBorn())) {
@@ -944,6 +977,7 @@ public class UserApp {
         }
     }
 
+    // menu de para mudar variaveis em artigos
     private void user_artigo_config(Utilizador logged){
         System.out.println("Introduza o id do artigo a editar: ");
         String id = scin.nextLine();
@@ -972,6 +1006,7 @@ public class UserApp {
         }
     }
 
+    // mudar estado do artigo
     private void artigo_estado(Artigo artigo, Utilizador logged) {
         String estado="", cancel="";
         System.out.println("Introduza o estado (Pouco usado, Usado, Muito usado):");
@@ -989,23 +1024,26 @@ public class UserApp {
         update_artigo(artigo, logged);
     }
 
+    // mudar descriçao do artigo
     private void artigo_descricao(Artigo artigo) {
         System.out.println("Nova descricao:");
         String descricao= scin.nextLine();
         artigo.setDescricao(descricao);
     }
 
+    // mudar marca do artigo
     private void artigo_brand(Artigo artigo){
         System.out.println("Nova marca:");
         String brand= scin.nextLine();
         artigo.setBrand(brand);
     }
 
+    // mudar numero de donos do artigo
     private void artigo_NDonos(Artigo artigo, Utilizador logged){
         int numerodonos=0;
         System.out.println("Introduza o numero de donos: ");
         String nd = scin.nextLine(), cancel="";
-        numerodonos=Integer.parseInt(nd);
+        numerodonos = Integer.parseInt(nd);
         while(numerodonos < 0){
             System.out.println("Numero de donos invalido");
             System.out.println("Cancelar a adição [y/n]?");
@@ -1025,6 +1063,7 @@ public class UserApp {
         }
     }
 
+    // mudar preço base do artigo
     private void artigo_precobase(Artigo artigo, Utilizador logged){
         System.out.println("Novo preco base:");
         double val = Integer.parseInt(scin.nextLine());
@@ -1043,6 +1082,7 @@ public class UserApp {
         update_artigo(artigo, logged);
     }
 
+    // mudar coleçao do artigo
     private void artigo_colecao(Artigo artigo, Utilizador logged){
         System.out.println("Nome da nova coleção:");
         String id = scin.nextLine(),cancel="";
@@ -1059,6 +1099,7 @@ public class UserApp {
         update_artigo(artigo, logged);
     }
 
+    // mudar transportadora do artigo
     private void artigo_transportadora(Artigo artigo){
         System.out.println("Id da nova transportadora:");
         String idt = scin.nextLine(),cancel="";
@@ -1082,12 +1123,22 @@ public class UserApp {
         artigo.setTransportadoras(this.getModel().getTransportadora().get(idt));
     }
 
-    //;
+    // mostra os detalhes do usuario
     private void user_details(Utilizador logged){
         String print="";
         if(!(logged.getRevenue() == 0.0)) print += "Receita: " + logged.getRevenue() + "\n";
-        if(this.getModel().getSelling().size() > 0) print += "Artigos a venda: " + this.getModel().getSelling() + "\n";
-        if(this.getModel().getSold().size() > 0) print += "Vendas efetuadas: " + this.getModel().getSold() + "\n";
+        print += "Artigos a venda: ";
+        for(Map.Entry<String, Artigo> entry : logged.getArtigos().entrySet()){
+            if(entry.getValue().isPublicado()){
+                print += entry.getValue();
+            }
+        }
+        print += "Vendas efetuadas: ";
+        for(Map.Entry<String, Artigo> entry : logged.getArtigos().entrySet()){
+            if(entry.getValue().getSold() > 0){
+                print += this.getModel().getSold() + "\n";
+            }
+        }
         if(logged.getArtigos().size() > 0) print += "Artigos á venda: " + logged.getArtigos() + "\n";
         if(logged.getEncomendas().size() > 0) print += "Encomendas Realizadas: " + logged.getEncomendas();
         System.out.println("Email: " + logged.getEmail() + "\n"
@@ -1099,6 +1150,7 @@ public class UserApp {
         );
     }
 
+    // menu para mudar a info do user
     private void user_change_config(Utilizador logged){
         NewMenu config_user_Menu = new NewMenu(new String[]{
                 "Mudar email" , "Mudar nome", "Mudar morada", "Mudar nif"
@@ -1112,6 +1164,7 @@ public class UserApp {
         config_user_Menu.run();
     }
 
+    // mudar email do user
     private void email_user(Utilizador logged){
         System.out.println("Introduza o novo email:");
         String email = scin.nextLine(), cancel = "";
@@ -1131,18 +1184,24 @@ public class UserApp {
         logged.setEmail(email);
         System.out.println("Novo e-mail: " + logged.getEmail());
     }
+
+    // mudar nome do user
     private void nome_user(Utilizador logged){
         System.out.println("Introduza novo nome:");
         String nome = scin.nextLine();
         logged.setNome(nome);
         System.out.println("Novo nome: " + logged.getNome());
     }
+
+    // muda a morada do user
     private void morada_user(Utilizador logged){
         System.out.println("Introduza nova morada:");
         String m = scin.nextLine();
         logged.setMorada(m);
         System.out.println("Nova morada: " + logged.getMorada());
     }
+
+    //muda o nif do user
     private void nif_user(Utilizador logged){
         System.out.println("Introduza novo nif:");
         String nif = scin.nextLine(), cancel = "";
@@ -1159,6 +1218,7 @@ public class UserApp {
         System.out.println("Novo nif: " + logged.getNif());
     }
 
+    // menu para criar novo artigo
     private void user_new_artigo(Utilizador logged){
         NewMenu config_user_Menu = new NewMenu(new String[]{
                 "Mala" , "Tshirt", "Sapatilha"
@@ -1170,6 +1230,7 @@ public class UserApp {
         config_user_Menu.run();
     }
 
+    // criar mala
     private void user_mala(Utilizador logged){
         Malas mala=new Malas();
         System.out.println("Introduza o tamanho da Mala (Pequeno, Medio, Grande): ");
@@ -1253,6 +1314,7 @@ public class UserApp {
         logged.addArtigo(mala);
     }
 
+    // criar tshirt
     private void user_tshirt(Utilizador logged){ //padrao
         TShirt tshirt = new TShirt();
         System.out.println("Introduza o tamanho da tshirt (S, M, L, XL, XXL):");
@@ -1316,12 +1378,18 @@ public class UserApp {
         logged.addArtigo(tshirt);
     }
 
-    private void user_sapatilha(Utilizador logged){ //atacadores,cor
+    // criar sapatilha
+    private void user_sapatilha(Utilizador logged){ //atacadores, cor
 
         Sapatilhas sapatilha=new Sapatilhas();
         System.out.println("Introduza o tamanho das sapatilhas (15...50):");
         String tam=scin.nextLine(), cancel= "", nd;
-        int tamanho=Integer.parseInt(tam);
+        int tamanho = 0;
+        try{
+            tamanho=Integer.parseInt(tam);
+        } catch (NumberFormatException e){
+
+        }
         while(tamanho < 15 || tamanho > 50){
             System.out.println("Tamanho Inválido");
             System.out.println("Cancelar a adição [y/n]?");
@@ -1329,7 +1397,11 @@ public class UserApp {
             if(cancel.contains("y")) break;
             System.out.println("Introduza o tamanho (15...50):");
             nd = scin.nextLine();
-            tamanho=Integer.parseInt(nd);
+            try{
+                tamanho=Integer.parseInt(nd);
+            } catch (NumberFormatException e){
+
+            }
         }
         if(cancel.contains("y")) return;
 
@@ -1398,13 +1470,18 @@ public class UserApp {
         logged.addArtigo(sapatilha);
     }
 
+    // construtor comum do artigo
     public Artigo common_artigo(int p){
         Artigo artigo=new Artigo();
         String cancel="";
         int numerodonos=0;
         System.out.println("Introduza o numero de donos: ");
         String nd = scin.nextLine();
-        numerodonos=Integer.parseInt(nd);
+        try{
+            numerodonos=Integer.parseInt(nd);
+        } catch (NumberFormatException e){
+
+        }
         while(numerodonos < 0){
             System.out.println("Numero de donos invalidos");
             System.out.println("Cancelar a adição [y/n]?");
@@ -1412,7 +1489,12 @@ public class UserApp {
             if(cancel.contains("y")) break;
             System.out.println("Introduza o numero de donos:");
             nd = scin.nextLine();
-            numerodonos=Integer.parseInt(nd);
+            try{
+                numerodonos=Integer.parseInt(nd);
+            } catch (NumberFormatException e){
+
+            }
+
         }
         if(cancel.contains("y")) return new Artigo();
         artigo.setNumeroDonos(numerodonos);
@@ -1439,21 +1521,25 @@ public class UserApp {
         String brand=scin.nextLine();
         artigo.setBrand(brand);
 
-        double precobase=0;
-        System.out.println("Introduza o preco base (sem calculos): ");
-        String price = scin.nextLine();
-        precobase=Integer.parseInt(price);
-
-        while(precobase < 0){
-            System.out.println("Precobase: ");
-            System.out.println("Cancelar a adição [y/n]?");
-            cancel = scin.nextLine();
-            if(cancel.contains("y")) break;
-            System.out.println("Introduza um novo precobase: ");
+        double precobase;
+        String price = "";
+        while(true){
+            System.out.println("Introduza o preco base (sem calculos): ");
             price = scin.nextLine();
-            precobase=Integer.parseInt(price);
+            try{
+                precobase=Integer.parseInt(price);
+                if(precobase < 0){
+                    System.out.println("Preço não válido. Cancelar a adição [y/n]?");
+                    cancel = scin.nextLine();
+                    if(cancel.contains("y")) return new Artigo();
+                } else{
+                    break;
+                }
+            } catch (NumberFormatException ignored){
+                System.err.println("Numero não válido");
+            }
         }
-        if(cancel.contains("y")) return new Artigo();
+
         artigo.setPrecobase(precobase);
 
         System.out.println("Descricao do artigo: ");
@@ -1496,6 +1582,7 @@ public class UserApp {
         return artigo;
     }
 
+    // publica um artigo
     private void user_publish_artigo(Utilizador logged){
         System.out.println("Insira o ID do artigo a publicar: ");
         String id = scin.nextLine();
@@ -1512,6 +1599,7 @@ public class UserApp {
         }
     }
 
+    // remove um artigo
     private void user_rm_artigo(Utilizador logged){
 
         System.out.println("Insira o ID do artigo a remover: ");
@@ -1530,6 +1618,7 @@ public class UserApp {
         }
     }
 
+    // menu da encomenda do user
     private void user_encomendar(Utilizador logged){
         Encomendas current = new Encomendas();
         for(Map.Entry<String, Encomendas> entry : logged.getEncomendas().entrySet()){
@@ -1557,7 +1646,7 @@ public class UserApp {
         user_encomendar.setPreCondition(3, ()-> finalCurrent.getArtigos().size() > 0);
         user_encomendar.setPreCondition(5, ()-> finalCurrent.getArtigos().size() > 0);
         user_encomendar.setPreCondition(6, ()-> this.getModel().getArtigos().size() > 0);
-        user_encomendar.setTitle("Encomendas Menu");
+        user_encomendar.setTitle("Encomenda");
         user_encomendar.run();
 
         if(c.get()!=1){
@@ -1565,10 +1654,12 @@ public class UserApp {
         }
     }
 
+    // cardapio (todos artigos publicos)
     public void encomenda_cardapio(){
         System.out.println(this.getModel().getCardapio(this.getModel().now()));
     }
 
+    // comprar a encomenda
     private int encomenda_comprar(Encomendas current, Utilizador logged){
 
         Map<String, Transportadoras> adicionadas = new HashMap<>();
@@ -1657,6 +1748,7 @@ public class UserApp {
         return 1;
     }
 
+    // adicionar um produto na encomenda
     private void encomenda_add(Encomendas current){
         System.out.println("Id do artigo a adicionar: ");
         String id = scin.nextLine();
@@ -1672,6 +1764,7 @@ public class UserApp {
         }
     }
 
+    // remover um produto na encomenda
     private void encomenda_rm(Encomendas current){
         System.out.println("Id do artigo a remover: ");
         String id = scin.nextLine();
@@ -1737,6 +1830,7 @@ public class UserApp {
         }
     }
 
+    // ver produtos + preço da encomenda
     private void encomenda_see(Encomendas current){
         Map<String, Transportadoras> adicionadas = new HashMap<>();
         Map<String, Integer> quantidade = new HashMap<>();
@@ -1780,6 +1874,7 @@ public class UserApp {
         );
     }
 
+    // limpar a encomenda
     private void encomenda_clean(Encomendas current){
         System.out.println("Tem a certeza que quer limpar o carrinho [y/n]?");
         String clean = scin.nextLine();
@@ -1792,10 +1887,12 @@ public class UserApp {
         }
     }
 
+    // ver receita do vendedor
     private void user_receita(Utilizador logged){
         System.out.println("Receita até ao momento: " + (logged.getRevenue() - (logged.getRevenue()*this.getModel().getVintagecut())));
     }
 
+    // ver produtos que foram comprados
     private void user_bought(Utilizador logged){
         boolean s = true;
         for (Map.Entry<String, Encomendas> entry : logged.getEncomendas().entrySet()) {
@@ -1809,6 +1906,7 @@ public class UserApp {
         }
     }
 
+    // ver produtos vendidos
     private void user_sold(Utilizador logged){
         for (Map.Entry<String, Artigo> entry : logged.getArtigos().entrySet()) {
             if(entry.getValue().getSold() > 0){
@@ -1818,6 +1916,7 @@ public class UserApp {
         user_receita(logged);
     }
 
+    // ver produtos que tao publicos
     private void user_selling(Utilizador logged){
         for (Map.Entry<String, Artigo> entry : logged.getArtigos().entrySet()) {
             if(entry.getValue().isPublicado()){
@@ -1826,6 +1925,7 @@ public class UserApp {
         }
     }
 
+    // menu de registo
     private void registar(){
         NewMenu registarMenu = new NewMenu(new String[]{
                 "User", "Transportadora", "Coleção"
@@ -1839,6 +1939,7 @@ public class UserApp {
 
     }
 
+    // registar uma coleção
     private void registar_colecao(){
         String col, cancel = "";
         System.out.println("Nome da coleção:");
@@ -1860,6 +1961,7 @@ public class UserApp {
         this.getModel().addColecao(cole);
     }
 
+    // registar usuario
     private void registar_user(){
         String email= "", nome, morada, nif="", cancel = "";
         System.out.println("Introduza o novo email:");
@@ -1900,6 +2002,7 @@ public class UserApp {
         System.out.println("Id de login: " + user.getID());
     }
 
+    // registar transportadora
     private void registar_transportadora(){
         String imposto, p, m, g, premium, formula, diasatraso;
         Transportadoras transportadora;
@@ -1931,10 +2034,17 @@ public class UserApp {
             transportadora.formulaPremium(formula);
         }
 
-        System.out.println("Dias de atraso de envio em relação à compra: ");
-        diasatraso = scin.nextLine();
+        while(true){
+            System.out.println("Dias de atraso de envio em relação à compra: ");
+            diasatraso = scin.nextLine();
+            try{
+                transportadora.setDiasAtraso(Integer.parseInt(diasatraso));
+                break;
+            } catch (NumberFormatException e){
+                return;
+            }
+        }
 
-        transportadora.setDiasAtraso(Integer.parseInt(diasatraso));
 
         System.out.println("Numero de login: " + this.getModel().getTransportadora().size());
 

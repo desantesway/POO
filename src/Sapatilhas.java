@@ -43,12 +43,12 @@ public class Sapatilhas extends Artigo implements Serializable {
     public void calcPreco(LocalDate now){
         double desconto = 0, preco = super.getPrecobase();
         if(super.getNumeroDonos() != 0){
-            desconto += super.getPrecobase() / super.getNumeroDonos();
+            desconto += super.getPrecobase() / (super.getNumeroDonos() * 5);
         }
         switch (super.getEstado()) {
-            case "Pouco usado" -> desconto *= 2;
-            case "Usado" -> desconto *= 3;
-            case "Muito usado" -> desconto *= 4;
+            case "Pouco usado" -> desconto *= 0.5;
+            case "Usado" -> desconto *= 0.75;
+            case "Muito usado" -> desconto *= 1;
         } if (!(super.getColecao().getdata().plusDays(365).isAfter(now))
                 || this.getTamanho() >= 45){
             preco -= desconto;

@@ -75,6 +75,8 @@ public class UserApp {
 
         viagem.setPreCondition(2, ()-> !(LocalDate.now().isEqual(this.getModel().now())));
 
+        viagem.setTitle("Viagem de Tempo");
+
         viagem.run();
     }
 

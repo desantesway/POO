@@ -87,6 +87,11 @@ public class Malas extends Artigo implements Serializable {
         this.dataPremium=m.getDataPremium();
         this.material=m.getMaterial();
         this.valorizacao=m.getValorizacao();
+        super.setDevolucao(m.getDevolucao());
+        super.setBorn(m.getBorn());
+        super.setSold(m.getSold());
+        super.setPreco(m.getPreco());
+        super.setStock(m.getStock());
     }
 
     public Malas(){

@@ -82,6 +82,11 @@ public class TShirt extends Artigo implements Serializable {
                 s.getTransportadoras());
         this.Padrao=s.getPadrao();
         this.tamanho = s.getTamanho();
+        super.setDevolucao(s.getDevolucao());
+        super.setBorn(s.getBorn());
+        super.setSold(s.getSold());
+        super.setPreco(s.getPreco());
+        super.setStock(s.getStock());
     }
     public TShirt(String Padrao, String tamanho){
         super();

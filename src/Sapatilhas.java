@@ -120,6 +120,11 @@ public class Sapatilhas extends Artigo implements Serializable {
         this.Cor = s.getCor();
         this.dataPremium = s.getDataPremium();
         this.tamanho = s.getTamanho();
+        super.setDevolucao(s.getDevolucao());
+        super.setBorn(s.getBorn());
+        super.setSold(s.getSold());
+        super.setPreco(s.getPreco());
+        super.setStock(s.getStock());
     }
 
     public int getTamanho() {

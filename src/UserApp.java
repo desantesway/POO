@@ -213,7 +213,16 @@ public class UserApp {
     }
 
     private void run(){
-        updates();
+        Path dir = Paths.get("saves");
+
+        if (!Files.exists(dir)) {
+            try {
+                Files.createDirectory(dir);
+            } catch (IOException e) {
+                System.out.println("Error creating directory: " + e.getMessage());
+            }
+        }
+
         File file = new File("saves/sales-old.txt");
         if(file.exists()){
             Path source = Paths.get("saves/sales-old.txt");
@@ -225,6 +234,7 @@ public class UserApp {
                 System.out.println("Error copying file: " + e.getMessage());
             }
         }
+        updates();
         NewMenu mainMenu = new NewMenu(new String[]{
                 "Log-in", "Registar", "Viagem no Tempo"
         });

@@ -97,11 +97,13 @@ public class UserApp {
                             }
 
                         }
-                        if(already_sold.containsKey(entry.getValue().getID())){
+                        if(already_sold.size() > 0){
                             if(entry.getValue().getSold() - already_sold.get(entry.getValue().getID()) > 0){
                                 this.getModel().writeTxt(save, fline + this.getModel().now().toString()
                                         + " " + logged.getEmail() + " " + entry.getValue().getID() + " " + (entry.getValue().getSold() - already_sold.get(entry.getValue().getID())) + "\n");
                             }
+                        } else{
+                            this.getModel().writeTxt(save, String.valueOf(fline));
                         }
                     } catch (IOException e){
                         System.err.println("Erro a registar ficheiro: " + e);

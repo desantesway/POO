@@ -80,22 +80,22 @@ public class UserApp {
                             String[] sub;
                             for (String c : lines) {
                                 sub = c.split(" ");
-                                if(!(sub[0].equals(this.getModel().now().toString()) &&
-                                sub[1].equals(logged.getEmail())
-                                && sub[2].equals(entry.getValue().getID())
-                                )){
-                                    fline.append(c);
-                                    fline.append("\n");
-                                    if(!(already_sold.containsKey(sub[2]))){
-                                        already_sold.put(sub[2], Integer.parseInt(sub[3]));
-                                    } else{
-                                        already_sold.put(sub[2], already_sold.get(sub[2]) + Integer.parseInt(sub[3]));
+                                if(c.length() > 5){
+                                    if(!(sub[0].equals(this.getModel().now().toString()) &&
+                                            sub[1].equals(logged.getEmail())
+                                            && sub[2].equals(entry.getValue().getID())
+                                    )){
+                                        fline.append(c);
+                                        fline.append("\n");
+                                        if(!(already_sold.containsKey(sub[2]))){
+                                            already_sold.put(sub[2], Integer.parseInt(sub[3]));
+                                        } else{
+                                            already_sold.put(sub[2], already_sold.get(sub[2]) + Integer.parseInt(sub[3]));
+                                        }
+
                                     }
-
                                 }
-
                             }
-
                         }
                         if(already_sold.size() > 0){
                             if(entry.getValue().getSold() - already_sold.get(entry.getValue().getID()) > 0){
@@ -103,7 +103,8 @@ public class UserApp {
                                         + " " + logged.getEmail() + " " + entry.getValue().getID() + " " + (entry.getValue().getSold() - already_sold.get(entry.getValue().getID())) + "\n");
                             }
                         } else{
-                            this.getModel().writeTxt(save, String.valueOf(fline));
+                            this.getModel().writeTxt(save, fline + this.getModel().now().toString()
+                                    + " " + logged.getEmail() + " " + entry.getValue().getID() + " " + entry.getValue().getSold() + "\n");
                         }
                     } catch (IOException e){
                         System.err.println("Erro a registar ficheiro: " + e);

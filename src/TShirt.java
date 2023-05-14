@@ -66,6 +66,7 @@ public class TShirt extends Artigo implements Serializable {
         super.setSold(art.getSold());
         super.setDevolucao(art.getDevolucao());
         super.setPreco(art.getPreco());
+        super.setStock(art.getStock());
         this.Padrao="";
         this.tamanho = "S";
     }
@@ -107,7 +108,7 @@ public class TShirt extends Artigo implements Serializable {
     public String toString() {
         return "\n" + "TShirt{" +
                 " Padrao='" + Padrao + '\'' +
-                " Tamanho='" + tamanho + '\'' +
+                ", Tamanho='" + tamanho + '\'' +
                 ", " +
                 super.toString(this) +
                 '}';

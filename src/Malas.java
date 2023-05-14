@@ -66,6 +66,7 @@ public class Malas extends Artigo implements Serializable {
         super.setSold(art.getSold());
         super.setDevolucao(art.getDevolucao());
         super.setPreco(art.getPreco());
+        super.setStock(art.getStock());
         this.tamanho = "";
         this.material = "";
         this.valorizacao = 0.1;

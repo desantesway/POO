@@ -5,7 +5,7 @@ import java.util.UUID;
 public class Artigo implements Serializable {
     private boolean publicado, premium;
     private String estado, descricao, Brand, ID;
-    private int NumeroDonos, devolucao, sold;
+    private int NumeroDonos, devolucao, sold, stock;
     private double preco, precobase;
     private Colecao colecao;
     private Transportadoras transportadoras;
@@ -52,6 +52,7 @@ public class Artigo implements Serializable {
         this.transportadoras = transportadoras;
         this.devolucao = 14;
         this.sold = 0;
+        this.stock = 0;
     }
 
     public Artigo() {
@@ -67,6 +68,7 @@ public class Artigo implements Serializable {
         this.colecao=new Colecao();
         this.devolucao = 14;
         this.sold = 0;
+        this.stock = 0;
     }
 
     public Artigo(Transportadoras transportadoras) {
@@ -83,6 +85,7 @@ public class Artigo implements Serializable {
         this.transportadoras = transportadoras;
         this.devolucao = 14;
         this.sold = 0;
+        this.stock = 0;
     }
 
     public Artigo(Artigo l){
@@ -101,6 +104,15 @@ public class Artigo implements Serializable {
         this.sold = l.getSold();
         this.born = l.getBorn();
         this.preco = l.getPreco();
+        this.stock = l.getStock();
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 
     public LocalDate getBorn() {
@@ -252,6 +264,7 @@ public class Artigo implements Serializable {
                 ", precobase=" + precobase +
                 ", colecao=" + colecao +
                 ", transportadoras=" + transportadoras +
+                ", stock=" + stock +
                 ", born=" + born +
                 '}';
     }
@@ -270,6 +283,7 @@ public class Artigo implements Serializable {
                 ", transportadoras=" + transportadoras +
                 ", devolução=" + devolucao +
                 ", sold=" + sold +
+                ", stock=" + stock +
                 ", born=" + born;
     }
 
@@ -282,18 +296,21 @@ public class Artigo implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Artigo artigo = (Artigo) o;
-        return publicado == artigo.publicado
-                && premium == artigo.premium
-                && NumeroDonos == artigo.NumeroDonos
-                && devolucao == artigo.devolucao
-                && Double.compare(artigo.preco, preco) == 0
-                && Double.compare(artigo.precobase, precobase) == 0
-                && Objects.equals(estado, artigo.estado)
-                && Objects.equals(descricao, artigo.descricao)
-                && Objects.equals(Brand, artigo.Brand)
-                && Objects.equals(ID, artigo.ID)
-                && Objects.equals(colecao, artigo.colecao)
-                && Objects.equals(transportadoras, artigo.transportadoras);
-    }
+                return publicado == artigo.publicado
+                        && premium == artigo.premium
+                        && NumeroDonos == artigo.NumeroDonos
+                        && devolucao == artigo.devolucao
+                        && sold == artigo.sold
+                        && stock == artigo.stock
+                        && Double.compare(artigo.preco, preco) == 0
+                        && Double.compare(artigo.precobase, precobase) == 0
+                        && Objects.equals(estado, artigo.estado)
+                        && Objects.equals(descricao, artigo.descricao)
+                        && Objects.equals(Brand, artigo.Brand)
+                        && Objects.equals(ID, artigo.ID)
+                        && Objects.equals(colecao, artigo.colecao)
+                        && Objects.equals(transportadoras, artigo.transportadoras)
+                        && Objects.equals(born, artigo.born);
 
+    }
 }

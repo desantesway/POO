@@ -30,18 +30,21 @@ public class UserApp {
             mala.calcPreco(this.getModel().now());
 
             this.getModel().getUser().remove(entry2.getID());
+            if(mala.getStock() == mala.getSold()) mala.privar();
             entry.getArtigos().put(mala.getID(), mala);
         } else if(entry2.getClass().equals(Sapatilhas.class)){
             Sapatilhas shoe = getShoeFromArtigo(entry2);
             shoe.calcPreco(this.getModel().now());
 
             this.getModel().getUser().remove(entry2.getID());
+            if(shoe.getStock() == shoe.getSold()) shoe.privar();
             entry.getArtigos().put(shoe.getID(), shoe);
         } else if(entry2.getClass().equals(TShirt.class)){
             TShirt tshirt = getTshirtFromArtigo(entry2);
             tshirt.calcPreco();
 
             this.getModel().getUser().remove(entry2.getID());
+            if(tshirt.getStock() == tshirt.getSold()) tshirt.privar();
             entry.getArtigos().put(tshirt.getID(), tshirt);
         }
     }
@@ -986,7 +989,7 @@ public class UserApp {
             NewMenu artigo_Menu = new NewMenu(new String[]{
                     "Mudar estado", "Mudar descricao",
                     "Mudar Marca", "Mudar Numero de Donos",
-                    "Mudar preco base","Mudar colecao","Mudar transportadora"
+                    "Mudar preco base","Mudar colecao","Mudar transportadora", "Aumentar Stock"
 
             });
             Artigo artigo = logged.getArtigos().get(id);
@@ -997,6 +1000,7 @@ public class UserApp {
             artigo_Menu.setHandler(5, () -> this.artigo_precobase(artigo, logged));
             artigo_Menu.setHandler(6, () -> this.artigo_colecao(artigo, logged));
             artigo_Menu.setHandler(7, () -> this.artigo_transportadora(artigo));
+            artigo_Menu.setHandler(8, () -> this.artigo_stock(artigo));
 
             artigo_Menu.setPreCondition(1, ()-> artigo.getNumeroDonos() > 0);
             artigo_Menu.setTitle("Artigo Menu");
@@ -1004,6 +1008,28 @@ public class UserApp {
         } else{
             System.out.println("Artigo com id " + id + " não existe.");
         }
+    }
+
+    //aumenta o stock
+    private void artigo_stock(Artigo artigo){
+
+        while(true){
+            System.out.println("Stock a aumentar: ");
+            String stock = scin.nextLine();
+            try{
+                int st = Integer.parseInt(stock);
+                if(st > 0){
+                    artigo.setStock(st);
+                    break;
+                } else{
+                    System.out.println("Número não válido. cancelar operação [y/n]? ");
+                    if(scin.nextLine().contains("y")) return;
+                }
+            } catch (NumberFormatException e){
+
+            }
+        }
+
     }
 
     // mudar estado do artigo
@@ -1545,6 +1571,24 @@ public class UserApp {
         System.out.println("Descricao do artigo: ");
         String descricao = scin.nextLine();
         artigo.setDescricao(descricao);
+        int stock = 0;
+        while(true){
+            System.out.println("Stock do artigo: ");
+            price = scin.nextLine();
+            try{
+                stock=Integer.parseInt(price);
+                if(stock < 0){
+                    System.out.println("Stock não válido. Cancelar a adição [y/n]?");
+                    cancel = scin.nextLine();
+                    if(cancel.contains("y")) return new Artigo();
+                } else{
+                    break;
+                }
+            } catch (NumberFormatException ignored){
+                System.err.println("Numero não válido");
+            }
+        }
+        artigo.setStock(stock);
 
 
         System.out.println("Nome da colecao do artigo:");
@@ -1587,12 +1631,16 @@ public class UserApp {
         System.out.println("Insira o ID do artigo a publicar: ");
         String id = scin.nextLine();
         if(logged.getArtigos().containsKey(id)){
-            if(logged.getArtigos().get(id).isPublicado()){
-                logged.getArtigos().get(id).privar();
-                System.out.println("Privado com sucesso!");
-            } else {
-                logged.getArtigos().get(id).publicar();
-                System.out.println("Publicado com sucesso!");
+            if(logged.getArtigos().get(id).getSold() == logged.getArtigos().get(id).getStock()){
+                if(logged.getArtigos().get(id).isPublicado()){
+                    logged.getArtigos().get(id).privar();
+                    System.out.println("Privado com sucesso!");
+                } else {
+                    logged.getArtigos().get(id).publicar();
+                    System.out.println("Publicado com sucesso!");
+                }
+            } else{
+                System.out.println("Sem stock!");
             }
         } else{
             System.out.println("Artigo " + id + " não existe");

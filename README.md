@@ -51,7 +51,7 @@ This project was built with a strong emphasis on Object-Oriented Programming (OO
     ```
 4.  **Run the Application:**
     ```bash
-    java Main
+    java UserApp
     ```
 
 ---
